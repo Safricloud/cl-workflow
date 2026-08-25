@@ -192,7 +192,7 @@ function installedSha(root: string, name: string): string | null {
   ];
   for (const candidate of candidates) {
     if (!fs.existsSync(candidate)) continue;
-    let parsed: unknown = null;
+    let parsed: unknown;
     try {
       parsed = JSON.parse(fs.readFileSync(candidate, "utf8"));
     } catch {
@@ -244,7 +244,7 @@ function versionLabel(kitVersion: { version: string; sha: string | null }): stri
 function loadLock(targetDir: string): Lock | null {
   const file = abs(targetDir, LOCK_REL);
   if (!fs.existsSync(file)) return null;
-  let parsed: unknown = null;
+  let parsed: unknown;
   try {
     parsed = JSON.parse(fs.readFileSync(file, "utf8"));
   } catch {
@@ -272,7 +272,10 @@ function loadLock(targetDir: string): Lock | null {
 
 function writeLock(targetDir: string, lock: Lock): void {
   const ordered: Record<string, string> = {};
-  for (const key of Object.keys(lock.files).sort()) ordered[key] = lock.files[key];
+  for (const key of Object.keys(lock.files).sort()) {
+    const value = lock.files[key];
+    if (value !== undefined) ordered[key] = value;
+  }
   const body: Lock = {
     kitVersion: lock.kitVersion,
     hashAlgo: lock.hashAlgo,
@@ -298,7 +301,7 @@ function hookScripts(entry: unknown): string[] {
   if (!isRecord(entry)) return [];
   const fields: unknown[] = [entry["command"]];
   const args = entry["args"];
-  if (Array.isArray(args)) fields.push(...args);
+  if (Array.isArray(args)) fields.push(...args.filter((a): a is string => typeof a === "string"));
   const out: string[] = [];
   for (const field of fields) {
     if (typeof field === "string" && HOOK_PATH.test(toPosix(field))) out.push(field);
@@ -308,8 +311,8 @@ function hookScripts(entry: unknown): string[] {
 
 function isKitHookEntry(entry: unknown, stems: Set<string>): boolean {
   for (const script of hookScripts(entry)) {
-    const match = HOOK_PATH.exec(toPosix(script));
-    if (match !== null && stems.has(match[1].replace(/\.[^.]*$/, ""))) return true;
+    const stem = HOOK_PATH.exec(toPosix(script))?.[1];
+    if (stem !== undefined && stems.has(stem.replace(/\.[^.]*$/, ""))) return true;
   }
   return false;
 }
@@ -612,7 +615,7 @@ function cmdDoctor(targetDir: string): number {
   if (!fs.existsSync(settingsPath)) {
     fail(state, `${MERGED} missing`, FAILS_OPEN);
   } else {
-    let settings: unknown = null;
+    let settings: unknown;
     try {
       settings = JSON.parse(readLf(settingsPath));
     } catch (e) {
@@ -655,7 +658,7 @@ function cmdDoctor(targetDir: string): number {
   if (!fs.existsSync(shim)) {
     fail(state, `.claude/hooks/package.json missing`, `without {"type":"module"} the hooks break in a "type":"commonjs" project. ` + FAILS_OPEN);
   } else {
-    let type: unknown = undefined;
+    let type: unknown;
     try {
       const parsed: unknown = JSON.parse(readLf(shim));
       type = isRecord(parsed) ? parsed["type"] : undefined;
@@ -730,7 +733,7 @@ function main(argv: readonly string[]): number {
     return 0;
   }
   const rest = argv.slice(1).filter((a) => !a.startsWith("-"));
-  const targetDir = path.resolve(rest.length > 0 ? rest[0] : ".");
+  const targetDir = path.resolve(rest[0] ?? ".");
   if (command === "init") {
     fs.mkdirSync(targetDir, { recursive: true });
     return cmdInit(targetDir);

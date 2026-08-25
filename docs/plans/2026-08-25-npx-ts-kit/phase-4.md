@@ -55,9 +55,9 @@ exit 0; reverting this item leaves no `dist/` → `npx` path dead.
 (`.claude/**` incl. `.claude/cl-workflow.lock`, `docs/guides/agent-workflow.md`), root
 `CLAUDE.md`, and this status block. `.github/` untouched (4.2's).
 
-**The CLI.** One file, 746 lines of source → 692 emitted, zero runtime dependencies, `node:` builtins only,
-erasable syntax only. `dist/cli.js` is exactly `tsc -p tsconfig.build.json`'s output — the
-shebang survives the emit, so the `bin` shim works on POSIX too.
+**The CLI.** One file, 746 lines of source → 692 emitted, zero runtime dependencies, `node:`
+builtins only, erasable syntax only. `dist/cli.js` is exactly `tsc -p tsconfig.build.json`'s
+output — the shebang survives the emit, so the `bin` shim works on POSIX too.
 
 - **Manifest derived from `template/` at run time**, never a list. `walk(template/)` →
   classify by the 9-entry `OWNED` const plus `settings.json` → everything else managed. The
@@ -129,7 +129,7 @@ lines, the three conventions, Deploy `none yet`, Process section verbatim from t
 - Root: `git check-ignore -v` now names a matching line for all four runtime paths
   (`rule-zero.grants`, `rule-zero.log`, `worktrees/x`, `pr-watch/1.json`) — the broken-anchor
   defect is gone from this repo's own install.
-- `npm pack --dry-run` → 37 files, including `dist/cli.js` (29.2kB),
+- `npm pack --dry-run` → 37 files, including `dist/cli.js` (29.5kB),
   `template/.claude/gitignore` (65B), `template/.claude/hooks/package.json` (18B), `LICENSE`.
 - Blob identity check: `git ls-files -s .claude/hooks/rule-zero.ts template/.claude/hooks/rule-zero.ts`
   → same SHA, same mode. The generated root copy is byte-identical to the template.

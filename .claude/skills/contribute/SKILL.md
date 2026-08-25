@@ -78,7 +78,7 @@ action; anything vague about what "done" looks like.
 
 When answered:
 - Append a dated **Decisions** section to the review (do not rewrite what is above it).
-- For each rule-zero yes: `python3 .claude/hooks/rule-zero.py --grant '<regex matching the
+- For each rule-zero yes: `node .claude/hooks/rule-zero.ts --grant '<regex matching the
   exact command>'` — written now, before any code that performs it.
 - Settled decisions → `mem/outstanding.md` → *Settled — do not re-open*.
 - Anything only the owner can do (accounts, content, filings) → `mem/outstanding.md` →
@@ -185,7 +185,7 @@ branch, one branch per PR. The PR number is not written into the repo — `gh pr
 The reviewer is GitHub Copilot. Its output is a claim, verified before acted on.
 
 ```
-python3 .claude/hooks/pr-watch.py --pr <n> --reset      # first cycle; polls every minute
+node .claude/hooks/pr-watch.ts --pr <n> --reset      # first cycle; polls every minute
 ```
 It returns as soon as something new appears (inline comments and review bodies, with any
 collapsed low-confidence section extracted), or with `"new": []` after **5 quiet minutes** —
@@ -199,12 +199,12 @@ implementers as **inline briefs** (files, approach, scoped validation, acceptanc
 archived and is not reopened); each returns its status block in its message. Verify, commit
 the fix, push. Reply to each comment with the verdict. Post one **cycle comment** on the PR —
 head SHA, items returned, verdicts, the implementers' status blocks — that is the cycle record;
-nothing in the repo is updated. Run `pr-watch.py --pr <n>` again (no `--reset`).
+nothing in the repo is updated. Run `pr-watch.ts --pr <n>` again (no `--reset`).
 
 **Silence — `"new": []` after a cycle with nothing new — closes the loop.** Then:
 
 ```
-python3 .claude/hooks/docs-only.py --base origin/<default> --pr <n> --branch <branch> --grant
+node .claude/hooks/docs-only.ts --base origin/<default> --pr <n> --branch <branch> --grant
 ```
 - **Exit 0 (docs-only):** the standing rule applies — go to §9 and merge now, without asking.
 - **Exit 3 (code changed):** report — PR, head SHA, CI, cycles, blocked-on-owner issues —
@@ -214,21 +214,21 @@ python3 .claude/hooks/docs-only.py --base origin/<default> --pr <n> --branch <br
 ## 9. Merge — on the owner's word, or docs-only
 
 Two ways in. **The owner says merge** → write the bundle grant. **The PR is docs-only** (the
-`docs-only.py` check above passed and wrote the grant itself under the standing rule) → no
+`docs-only.ts` check above passed and wrote the grant itself under the standing rule) → no
 word needed. Either way, most repos protect the default branch, so the admin bypass is always
 used:
 
 ```
-python3 .claude/hooks/rule-zero.py --bundle merge-cleanup <n> <branch>   # owner's yes only; docs-only already granted
+node .claude/hooks/rule-zero.ts --bundle merge-cleanup <n> <branch>   # owner's yes only; docs-only already granted
 # docs-only only: CI is pointless, cancel it
 gh run list --branch <branch> --status in_progress --json databaseId -q '.[].databaseId' | xargs -r -n1 gh run cancel
 gh pr merge <n> --<squash|merge as the owner said, or squash> --admin --delete-branch
 git switch <default> && git pull
 git branch -D <branch>                                                    # -d refuses after a squash merge
-python3 .claude/hooks/rule-zero.py --clear
+node .claude/hooks/rule-zero.ts --clear
 ```
 Report in the conversation: which way in (the owner's words, quoted — or "docs-only standing
-rule, `docs-only.py` at `<head>`"), method, SHA. Nothing in the repo records the merge. If the
+rule, `docs-only.ts` at `<head>`"), method, SHA. Nothing in the repo records the merge. If the
 PR was merged before a cycle ran, the owed cycle is worked post-merge through the whole loop
 as a new contribution.
 

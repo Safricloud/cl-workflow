@@ -35,7 +35,11 @@
   command as a segment, so a heredoc or `git commit -m` whose text quotes a guarded shape
   (`path:outside-repo …`, a hard-reset command) is denied — write such text through the file
   tools or from a variable; (c) an `allow` line like `^git branch -d worktree-` needs the
-  literal name — `git branch -d "$BR"` is judged on the variable and denied.
+  literal name — `git branch -d "$BR"` is judged on the variable and denied; (d) Claude Code's
+  own worktree-isolation check for sub-agents (not the kit's hook) refuses `git -C <path
+  outside the worktree>`, `cd <absolute path>` before `git`, and any Bash text containing a
+  bare `<` (a heredoc with `i < n` is read as a redirect) — implementers needing a scratch
+  clone make it inside their worktree and delete it; the kit cannot change this.
 
 ## Settled — do not re-open, do not "fix"
 - 2026-08-25 — ESLint sits beside `tsc`, it does not replace it: ESLint 10 + typescript-eslint 8

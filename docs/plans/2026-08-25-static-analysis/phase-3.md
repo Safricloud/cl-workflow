@@ -124,7 +124,47 @@ outputs verbatim.
   `pnpm build`, dist drift, generated-`.claude/` drift, self-test 62, CLI smoke).
 
 ## Merge-back record (orchestrator)
-<!-- worktree branch, commits merged, conflicts and how resolved, worktree removed -->
+- **Item 3.1** — `worktree-agent-aeba13e38532c5a34`, clean; `5a9cda2`, `700b256`; three-way
+  merge onto `eb4d897` (CLAUDE.md/ledger commit had landed) → `f27240e`, no conflicts.
+  Worktree `node_modules` deleted, worktree removed, branch deleted; `git worktree list` →
+  main only, no `worktree-*` branches.
 
-## Verification (orchestrator, after this phase merged)
-<!-- the full check, the gate, both self-tests, the scratch-clone gate cases, the diff re-read -->
+## Verification (orchestrator, after this phase merged) — the final verification
+On `f27240e`, this Windows machine, Node 24.4.1, after `pnpm install --frozen-lockfile`:
+- **`npx eslint --max-warnings 0 .`** — 0 problems; `-f json` → **18 files** (8 + 8 hooks,
+  `src/cli.ts`, `eslint.config.mjs`).
+- **`npx tsc --noEmit`** — exit 0; `--listFilesOnly` minus `node_modules` → **17** repo `.ts`
+  files.
+- **`pnpm build && git diff --exit-code --stat dist/`** — clean.
+- **`pnpm selftest`** → `62/62`; **`node .claude/hooks/rule-zero-selftest.ts`** (root copy) →
+  `62/62`.
+- **Generated-copy gate:** `node dist/cli.js update .` → `0 refreshed, 24 already current, 0
+  left beside as .new`; `git status --porcelain --untracked-files=all -- .claude/` → empty.
+- **`diff -r .claude/hooks template/.claude/hooks`** → only `Only in .claude/hooks:
+  __pycache__` — an untracked, git-ignored leftover of the Python era on this machine, not a
+  tracked difference; left alone.
+- **Smoke:** `node dist/cli.js init <scratchpad>/smoke-final` → 33 written; `doctor` →
+  `ok self-test 62/62`, `6 passed, 0 failed`.
+- **Live probe on the regenerated root hook** (`node .claude/hooks/rule-zero.ts`, `Write` on
+  `<repo>\docs\probe.md`): `CLAUDE_PROJECT_DIR` = `c:\…` → **silent**; `C:\Users\KEATON~1\…` →
+  **silent** (both denied before phase 3).
+- **Gate checker, re-run by me in fresh scratch clones under the scratchpad** (the implementer
+  had to clone inside its worktree): baseline → empty; **case A** (append a comment to
+  `.claude/hooks/lib.ts`, commit) → `update: … 1 left beside as .new`, porcelain
+  `?? .claude/hooks/lib.ts.new`; **case B** (fresh clone, append the same to
+  `template/.claude/hooks/lib.ts`, commit) → `update: 1 refreshed …`, porcelain
+  ` M .claude/cl-workflow.lock` + ` M .claude/hooks/lib.ts`. My first case-B attempt printed
+  `.new` because my own harness had stacked B on A and then reverted the wrong commit — a
+  harness error, redone cleanly; recorded so the odd first result is not mistaken for a gate
+  fault.
+- **README diff re-read against `ci.yml`:** the enumeration "install, lint, typecheck, build,
+  `dist/` drift check, generated-`.claude/` drift check, self-test, and a CLI smoke test" is
+  the workflow's step order; "seven hooks" matches the payload listing and the lock's
+  `hooksManifest`; the Development block's six lines are the commands CI runs.
+- **`.claude/rule-zero.log`:** no denials after phase 2.5 landed for the orchestrator; the
+  phase-3 implementer's denials were the scratchpad `Write` (`path:outside-repo`, correct —
+  outside the repo) and the *harness's* worktree-isolation check (Claude Code's, not the
+  kit's) on `git -C <outside path>` and on any command text containing a bare `<` — noted in
+  the ledger.
+- **Not done here:** CI has not run on a GitHub runner yet — the first evidence for the
+  `ubuntu-latest` leg and for the drift-gate step there is this PR's `ci-ok`.

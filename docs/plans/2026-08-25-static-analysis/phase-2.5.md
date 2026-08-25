@@ -78,7 +78,10 @@ new cases FAIL on this Windows machine (61: `deny` where SILENT expected; 62 lik
 exits 1 — record the two FAIL lines verbatim; restore, 62/62. Also: with `isWithin` made
 case-sensitive again on win32 only, case 61 fails and 62 passes — record it, restore.
 #### Status — item 2.5.1
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**In progress** (implementer, 2026-08-25).
+- **Measured first, as the item asks** (worktree root, `node`, v24.4.1): plain
+  `fs.realpathSync` returns the *input* spelling for all three forms; `fs.realpathSync.native`
+  returns the canonical long form for all three.
 
 ## Merge-back record (orchestrator)
 <!-- worktree branch, commits merged, conflicts and how resolved, worktree removed -->

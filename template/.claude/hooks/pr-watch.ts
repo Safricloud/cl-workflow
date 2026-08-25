@@ -109,8 +109,13 @@ function headSha(pr: string): string {
 }
 
 function requireId(record: Record<string, unknown>, what: string): string {
-  const id = record.id;
-  if (id === undefined || id === null) throw new Error(`gh returned a ${what} with no id`);
+  const id = record["id"];
+  // GitHub sends an integer id. Anything that is not a string or a number counts as "no id"
+  // and takes the throw a missing key took: String() on an object would write "[object
+  // Object]" into the seen-set, and the same item would look new on every poll.
+  if (typeof id !== "string" && typeof id !== "number") {
+    throw new Error(`gh returned a ${what} with no id`);
+  }
   return String(id);
 }
 
@@ -122,33 +127,33 @@ function fetch(slug: string, pr: string): WatchItem[] {
     items.push({
       kind: "comment",
       id: `c${requireId(raw, "comment")}`,
-      author: orNull(asRecord(raw.user).login),
+      author: orNull(asRecord(raw["user"])["login"]),
       state: null,
-      path: orNull(raw.path),
+      path: orNull(raw["path"]),
       // `c.get("line") or c.get("original_line")`: a 0 line falls through, same as Python.
-      line: orNull(raw.line || raw.original_line),
+      line: orNull(raw["line"] || raw["original_line"]),
       // A JSON `null` body reads as `""` here where Python would have printed `null`; GitHub
       // always sends a string for a review comment.
-      body: typeof raw.body === "string" ? raw.body : "",
+      body: typeof raw["body"] === "string" ? raw["body"] : "",
       collapsed_sections: [],
-      url: orNull(raw.html_url),
-      created_at: orNull(raw.created_at),
+      url: orNull(raw["html_url"]),
+      created_at: orNull(raw["created_at"]),
     });
   }
   for (const raw of ghJson(["api", `repos/${slug}/pulls/${pr}/reviews`, "--paginate"])) {
     if (!isRecord(raw)) throw new Error("gh returned a review that is not an object");
-    const body = typeof raw.body === "string" ? raw.body : "";
+    const body = typeof raw["body"] === "string" ? raw["body"] : "";
     items.push({
       kind: "review",
       id: `r${requireId(raw, "review")}`,
-      author: orNull(asRecord(raw.user).login),
-      state: orNull(raw.state),
+      author: orNull(asRecord(raw["user"])["login"]),
+      state: orNull(raw["state"]),
       path: null,
       line: null,
       body,
-      collapsed_sections: [...body.matchAll(DETAILS_RE)].map((m) => m[1].trim()),
-      url: orNull(raw.html_url),
-      created_at: orNull(raw.submitted_at),
+      collapsed_sections: [...body.matchAll(DETAILS_RE)].map((m) => (m[1] ?? "").trim()),
+      url: orNull(raw["html_url"]),
+      created_at: orNull(raw["submitted_at"]),
     });
   }
   return items;
@@ -233,7 +238,7 @@ async function main(argv: readonly string[]): Promise<number> {
   const seen = new Set<string>();
   if (fs.existsSync(statePath) && !a.reset) {
     const state = JSON.parse(fs.readFileSync(statePath, "utf8")) as unknown;
-    const previous = asRecord(state).seen;
+    const previous = asRecord(state)["seen"];
     if (Array.isArray(previous)) for (const id of previous) seen.add(String(id));
   }
 

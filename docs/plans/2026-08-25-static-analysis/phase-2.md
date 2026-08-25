@@ -65,7 +65,10 @@ keep `(r.stdout ?? "")`; LF.
 **Acceptance:** the three validations; **must FAIL if reverted:** revert `pr-watch.ts` → its 19
 errors return under `npx tsc --noEmit`; restore, green. Record.
 #### Status — item 2.2
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**In progress** (implementer, 2026-08-25).
+- **Files touched:** `template/.claude/hooks/pr-watch.ts` (19 errors), `template/.claude/hooks/status-block.ts` (3 errors) — bracket access + real guards, in progress
+- **Commits:** _pending_
+- **Blocked on:** the `Edit`/`Write` tools — rule zero denies every edit as `path:outside-repo`; using `sed` through Bash on the same in-repo files instead. Details when this block turns Done.
 
 ### Item 2.3 — `docs-only.ts`, `reload-plan.ts`, `path-fence.ts`
 **Files:** `template/.claude/hooks/docs-only.ts`, `template/.claude/hooks/reload-plan.ts`,

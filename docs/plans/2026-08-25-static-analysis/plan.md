@@ -7,9 +7,10 @@
 **Owner go-ahead:** 2026-08-25 at the Questions phase — "B — TS config, conventions as rules,
 drift gate"; "recommendedTypeChecked"; "eslint.config.mjs"; "Both: regex rule + eslint-plugin-n";
 "All eight"; drift gate "Yes"; "Merge when the review loop is silent — squash, --admin"
-**Phases:** `phase-1.md` (1 item, serial: toolchain + CLI) · `phase-2.md` (3 items, parallel: the
-hooks) · `phase-3.md` (1 item, serial: regenerate the root copy, README) · `phase-<n>.5.md` added
-if verification finds anything
+**Phases:** `phase-1.md` (1 item, serial: toolchain + CLI) · `phase-1.5.md` (1 item, beside
+phase 2: config comment) · `phase-2.md` (3 items, parallel: the hooks) · `phase-2.5.md` (1 item,
+serial: the inside-repo judgement on Windows, self-test 60 → 62) · `phase-3.md` (1 item,
+serial: regenerate the root copy, README)
 
 ## Measured facts (from the investigations; do not re-derive)
 | Fact | Value | Where measured |
@@ -102,6 +103,29 @@ single-use grant (done, grant consumed) · 9 README housekeeping **yes** · 10
   its **own worktree** (`path:outside-repo …/.claude/worktrees/<id>/eslint.config.mjs`); the
   implementer wrote through Bash instead. Not fixed in this contribution (out of the ask);
   recorded in `mem/outstanding.md` → engineering follow-ups at archive time.
+  **Root cause measured during phase 2** (10 denials in the log by then, every implementer
+  hit it): the hook feeds a worktree `Write` through `pyRealpath` (`lib.ts:231`, plain
+  `fs.realpathSync`) and tests `resolved.startsWith(pyRealpath(root) + sep)` as an exact
+  string. `fs.realpathSync` on Windows does **not** expand 8.3 short names and does **not**
+  normalise the drive letter's case, so the verdict flips on the *form* of
+  `CLAUDE_PROJECT_DIR`: long form `C:\…` and forward slashes → allowed; `C:\Users\KEATON~1\…`
+  or `c:\…` → `path:outside-repo` for a path that is inside the repo (probe payloads T1–T8,
+  `.claude/rule-zero.log` lines with `permission_mode` `probe`). The comment on `pyRealpath`
+  ("expands 8.3 short names, exactly as Python's does") is false. The fix — `realpathSync.native`
+  on both sides, case-insensitive comparison on win32, self-test cases — ripples into
+  `EXPECTED_SELFTEST_CASES`, README, CI.
+  **Revised the same evening, after items 2.2 and 2.3 both reported and reproduced it
+  independently:** four of four implementers in this loop worked with their file tools dead.
+  That is the kit's own gate breaking the kit's own loop, the cause is measured three ways, and
+  the fix is a helper plus two self-test cases — **phase 2.5**, serial, before phase 3, which
+  then regenerates the root copy from the fixed hooks. Veto in the PR if the owner wants it as
+  its own contribution; the diff is separable (`lib.ts`, `rule-zero.ts`, `path-fence.ts`,
+  `rule-zero-selftest.ts`, the 60→62 count in `src/cli.ts`, README, CI).
+- 2026-08-25 — Accepted item 2.2's two behaviour-visible deviations: `requireId` treats a
+  non-string, non-number id as "no id" and throws (was `String(id)` → `"[object Object]"` in
+  the seen-set, making the item look new on every poll); a `<details>` capture that is
+  somehow absent yields `""` and the section stays visible. Both are the fail-closed
+  direction; veto in the PR.
 
 ## Phasing
 Phase 1 is one serial item: it touches every magnet at once — `package.json`, the lock,

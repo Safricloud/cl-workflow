@@ -246,7 +246,43 @@ errors return; restore, green. Record.
   root copy of these three files; and what to do about the two findings above.
 
 ## Merge-back record (orchestrator)
-<!-- per item: worktree branch, commits merged, conflicts and how resolved, worktree removed -->
+- **Item 2.1** — `worktree-agent-a5d64be8152773cf5`, clean; `84082f0`, `8774035`, `d5bdb09`;
+  three-way merge onto `b38d821` (phase 1.5 had landed) → `7bd856e`, no conflicts. Worktree
+  `node_modules` deleted, worktree removed, branch deleted.
+- **Item 2.2** — `worktree-agent-a21a3e1bd452a597b`, clean; `c1cffae`, `0dffbe2`; merged →
+  `9ee3c81`, no conflicts (its status section merged beside 2.1's). Worktree removed, branch
+  deleted.
+- **Item 2.3** — `worktree-agent-a9e85815ac679c8cb`, clean; `103bd70`, `db92832`; merged →
+  `da2d852`, no conflicts. Worktree removed, branch deleted. `git worktree list` → the main
+  checkout only; no `worktree-*` branches remain.
 
 ## Verification (orchestrator, after this phase merged)
-<!-- what was run, counts, checkers verified, findings → phase 2.5 items -->
+On `da2d852`, this Windows machine, Node 24.4.1:
+- `npx tsc --noEmit` — errors by directory: `template` **0**, `src` **0**, `.claude` **66**
+  (the generated root copy, still the pre-phase-2 text; phase 3 regenerates it).
+- `npx eslint --max-warnings 0 template src eslint.config.mjs` — clean, exit 0.
+  `npx eslint --max-warnings 0 .` — **2 problems**, both in `.claude/hooks/` (`pr-watch.ts:114`
+  `no-base-to-string`, `rule-zero.ts:198` `no-useless-assignment`) — the stale copy.
+- `pnpm selftest` — `60/60 cases passed`, exit 0, on the merged trio.
+- `grep` for `!.`/`!)`/`!;`/`eslint-disable`/`ts-expect-error`/`ts-ignore` across
+  `template/.claude/hooks/*.ts` — none.
+- **Diffs re-read, every hunk, for behaviour:** 2.1 — `--bundle` with a short argv falls to
+  usage/exit 2 (before: `argv[2]` undefined would have reached `pyEscape`), the self-test
+  throws on a malformed BUNDLE harness grant, `loadConf` treats an absent line as blank;
+  2.2 — `requireId` rejects object/boolean ids (fail-closed, accepted as a mid-loop decision),
+  `<details>` capture `?? ""`; 2.3 — `docs-only` routes an empty status/target to the code
+  verdict, `reload-plan` skips a half-matched item, `path-fence` bracket access only. All
+  `(r.stdout ?? "")` guards intact.
+- **Status blocks read:** 2.1 checkers — `lib.ts` reverted → its two errors back; deny path
+  broken → selftest 24/60 with the negative control firing; restored 60/60. 2.2 — seven
+  before/after smoke runs byte-identical; `pr-watch.ts` reverted → 19 tsc errors +
+  `no-base-to-string` back. 2.3 — four smoke pairs identical; `docs-only.ts` reverted → 9
+  errors back; a `path` (no `node:`) import → eslint red. Not covered by any smoke:
+  `status-block`'s exit-2 refusal path, `pr-watch`'s live `gh` path (needs a real PR).
+- **`.claude/rule-zero.log`:** 13 `path:outside-repo` denials on worktree paths across the
+  four implementers (the fence defect → **phase 2.5**), one denial of a commit message that
+  quoted the token, one denial of an `echo` whose payload text contained the guarded
+  hard-reset shape (the implementer rebuilt the payload from a variable). No denial hid a
+  real rule-zero action.
+- **Finding → phase 2.5:** the inside-repo comparison is spelling-sensitive on Windows;
+  item 2.5.1 (`phase-2.5.md`).

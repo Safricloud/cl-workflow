@@ -1,8 +1,9 @@
 # Phase 3 — 1 implementer, serial (2026-08-25-static-analysis)
 
-**Plan:** `plan.md` · **Starts from:** merged, verified phase 2 (`template/` clean under
-`tsc` and ESLint; the root `.claude/hooks/` copy still carries the old text and is the only
-red left)
+**Plan:** `plan.md` · **Starts from:** merged, verified phase 2.5 (`template/` clean under
+`tsc` and ESLint, self-test at 62/62; the root `.claude/hooks/` copy still carries the old
+text and is the only red left). Every "60/60" in this file's validations reads **62/62**
+after phase 2.5; `doctor` asserts 62.
 **Magnet files this phase touches:** the generated root copy (`.claude/hooks/*.ts`,
 `.claude/cl-workflow.lock`) and `README.md` — one item, nothing beside it.
 

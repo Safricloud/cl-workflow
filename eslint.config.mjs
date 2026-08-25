@@ -1,5 +1,6 @@
 // Flat config, loaded by ESLint with no flag and no jiti (it is .mjs on purpose --
-// eslint.config.ts would need --experimental-strip-types on every invocation).
+// ESLint loads eslint.config.ts only with --flag unstable_native_nodejs_ts_config
+// or an installed jiti; the owner chose the flag-free file).
 // Typed linting is scoped to **/*.ts so this file is linted by core rules only and
 // the type-aware parser never has to place a .mjs in a program.
 import js from "@eslint/js";

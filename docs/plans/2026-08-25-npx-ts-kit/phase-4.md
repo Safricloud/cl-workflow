@@ -20,7 +20,12 @@ tsconfig.build.json` to committed `dist/cli.js`.
 - `update [dir]`: managed list (const in `cli.ts`, from investigation-structure's 20/9/1
   split): hash matches any shipped version → overwrite; edited → `<name>.new` + warn; owned →
   never touched; `settings.json` → deep-merge only `worktree.baseRef` + the kit's three hook
-  entries.
+  entries. **The manifest is derived from `template/` as it exists at build time, not from the
+  investigation's stale list**: it must carry the seven `.ts` hook files AND
+  `.claude/hooks/package.json` (the ESM shim — a stale manifest here means every hook fails
+  open on a `"type":"commonjs"` project), and no `.py` name. Simplest correct form: walk
+  `template/` at runtime and classify by the owned-list (the 9 owned + settings.json); managed
+  = everything else.
 - `doctor [dir]`: Node ≥ 24; lock present and parseable; settings.json hook commands point at
   files that exist; selftest run and **60/60** (phase 2.5 grew the suite) — say loudly that a
   hook with a broken path fails OPEN (the README's own warning, now mechanised).

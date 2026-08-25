@@ -59,6 +59,7 @@ the `cl-workflow` bin.
   rules/process.md              always loaded: rule zero, the two gates, the three habits, roles
   skills/contribute/SKILL.md    /contribute — the loop as an operating checklist
   skills/contribute/templates/  review, investigation, plan, phase, blocked-issue, pr-body, issue-comment
+  hooks/package.json            {"type":"module"} — keeps the hooks ESM even in a "type":"commonjs" project
   hooks/lib.ts                  shared: stdin JSON, conf parsing, pattern compilation, grants, log
   hooks/rule-zero.ts            PreToolUse — deny > allow > guard; grants (--grant, --bundle, --list, --clear); log
   hooks/rule-zero-selftest.ts   proves the gate fires and only when it should (60 cases + negative control)

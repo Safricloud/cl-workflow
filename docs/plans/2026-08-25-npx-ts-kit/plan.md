@@ -81,7 +81,14 @@ repo-settings writes executed (done: `main` pushed, default, ruleset live) · on
   choice is defended inside the suite; every "57/57" claim becomes "60/60".
 - 2026-08-25 — Phase 2's ESM finding: a consumer project with `"type": "commonjs"` silently
   breaks `node .claude/hooks/*.ts` (gate fails open). Fix shipped via item 3.3:
-  `template/.claude/hooks/package.json` = `{"type":"module"}` (measured working).
+  `template/.claude/hooks/package.json` = `{"type":"module"}` (measured working, measured
+  shipping via `npm pack`).
+- 2026-08-25 — Orchestrator document edits after 3.3's merge: README payload listing gained
+  the `hooks/package.json` line (one-line documentation of a shipped file); phase-4.1's
+  manifest spec now derives managed files from `template/` at runtime rather than a static
+  list, so the shim and the seven `.ts` files cannot be silently omitted.
+- 2026-08-25 — 3.3's vestigial `__pycache__/` ignore pattern left in place (harmless in
+  consumer repos; pruning it is not worth a diff line now).
 
 ## Phasing
 Phase 1 is one serial item: it touches every magnet at once (root manifest, payload move,

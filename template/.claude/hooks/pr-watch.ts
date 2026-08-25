@@ -29,9 +29,9 @@
  * when it exits. Both work; neither needs the orchestrator to count minutes.
  *
  * This is a CLI, not a hook: it reads no stdin, and its exit code carries the result (0 on a
- * printed payload, 1 on any `gh` failure, 2 on bad arguments). Ported from `pr-watch.py`;
- * zero dependencies, `node:` builtins only, erasable syntax only. The wait is
- * `setTimeout` from `node:timers/promises` — never a busy loop.
+ * printed payload, 1 on any `gh` failure, 2 on bad arguments). Zero dependencies: `node:`
+ * builtins only, erasable syntax only. The wait is `setTimeout` from `node:timers/promises`
+ * — never a busy loop.
  */
 import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";

@@ -11,10 +11,10 @@
  * Output is plain text on stdout, which SessionStart adds to context. Written as statements of
  * fact, not instructions. Exit is always 0.
  *
- * Ported from reload-plan.py. Two dialect notes (investigation-hooks.md §2): Python's `\Z`
- * becomes a *literal Z* in JavaScript, so every `\Z` anchor here is written `$` with the `s`
- * flag and no `m` flag — which is exactly Python's `\Z`; and `re.findall` with two groups
- * becomes `matchAll` with the `g` flag.
+ * Two regex dialect notes (investigation-hooks.md §2): a Python `\Z` anchor is a *literal Z* in
+ * JavaScript, so every end-of-string anchor here is written `$` with the `s` flag and no `m`
+ * flag — which is exactly what `\Z` means; and `re.findall` with two groups becomes `matchAll`
+ * with the `g` flag.
  */
 import * as fs from "node:fs";
 import * as path from "node:path";

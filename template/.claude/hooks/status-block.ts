@@ -18,9 +18,9 @@
  * Loop guard: if Claude Code reports it is already continuing because of this hook
  * (`stop_hook_active`), allow the stop rather than spin.
  *
- * Ported from status-block.py. The exit-2 protocol is the whole contract: **2** (with the
- * paragraph on stderr) is the only refusal channel; every other path leaves the exit code at 0.
- * `process.exitCode` rather than `process.exit()` so stderr is flushed before Node leaves.
+ * The exit-2 protocol is the whole contract: **2** (with the paragraph on stderr) is the only
+ * refusal channel; every other path leaves the exit code at 0. `process.exitCode` rather than
+ * `process.exit()` so stderr is flushed before Node leaves.
  */
 import { spawnSync } from "node:child_process";
 import * as fs from "node:fs";

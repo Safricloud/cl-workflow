@@ -30,7 +30,7 @@
  * writer) and log the standing rule as the "yes".
  * Exit 0 if docs-only, 3 if not, 1 on git error, 2 on bad arguments.
  *
- * Ported from `docs-only.py`: zero dependencies, `node:` builtins only, erasable syntax only.
+ * Zero dependencies: `node:` builtins only, erasable syntax only.
  */
 import { spawnSync } from "node:child_process";
 import * as path from "node:path";

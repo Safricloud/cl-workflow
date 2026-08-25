@@ -9,12 +9,11 @@
  * Used by `investigator`, which may write only under docs/reviews/<id>/ — investigation reports
  * are part of the record, but nothing else in the repo is the investigator's to touch.
  *
- * Ported from path-fence.py, with the Windows defect fixed. The Python version built its
- * allowed prefix with `os.path.join(base, "docs/reviews") + os.sep`, which keeps the forward
- * slash on Windows (`C:\repo\docs/reviews\`) while the resolved path uses backslashes
- * (`C:\repo\docs\reviews\x.md`), so `startswith` was False for *every* path and the fence
- * denied the investigator its own report. `path.join` normalises separators, so building the
- * prefix the same way on both sides is the whole fix (investigation-hooks.md §1, §5).
+ * Both sides of the prefix test must be built the same way, through `path.join`. Paste a
+ * literal `docs/reviews` onto the base instead and the forward slash survives on Windows
+ * (`C:\repo\docs/reviews\`) while the resolved path uses backslashes
+ * (`C:\repo\docs\reviews\x.md`), so `startsWith` is False for *every* path and the fence denies
+ * the investigator its own report (investigation-hooks.md §1, §5).
  *
  * The deny channel is a JSON line on stdout at **exit 0**, exactly as rule-zero does. This hook
  * never exits non-zero: a hook that fails to run is a non-blocking error and the write goes

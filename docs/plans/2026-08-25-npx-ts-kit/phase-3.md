@@ -83,7 +83,90 @@ not break lib imports).
 **Acceptance:** grep-empty above; settings.json parses; reverting this item reintroduces
 `python3` call sites under `template/` (grep catches it).
 #### Status — item 3.3
-*(implementer keeps this current: In progress → Done | Blocked)*
+**Done** — 2026-08-25, worktree `agent-a61e5cc93892fb92e`, branch
+`worktree-agent-a61e5cc93892fb92e`.
+
+**What changed**
+- `template/.claude/settings.json` — three hook entries to exec form `"command": "node"`,
+  args `${CLAUDE_PROJECT_DIR}/.claude/hooks/{rule-zero,status-block,reload-plan}.ts`.
+  Timeouts, matchers and `statusMessage` untouched (10 / 30 / 10).
+- `template/.claude/agents/investigator.md` — path-fence frontmatter wiring → `node` +
+  `path-fence.ts`; the `"docs/reviews"` argument unchanged.
+- `template/.claude/skills/contribute/SKILL.md` — all eight call sites (`:81` `--grant`,
+  `:188` `pr-watch --reset`, `:202` prose, `:207` `docs-only --grant`, `:217` prose,
+  `:222` `--bundle merge-cleanup`, `:228` `--clear`, `:231` prose). Commands and file names
+  only; no reasoning rewritten.
+- `template/.claude/rules/process.md` — `:19` grant command, `:31` `docs-only.ts` prose.
+- `template/docs/guides/agent-workflow.md` — `:72`, `:86`, `:94`, `:343`, `:383`, `:392`,
+  `:494`, `:495`. Commands and file names only.
+- `template/mem/outstanding.md:39` — settled decision now cites `docs-only.ts`.
+- `template/.claude/rule-zero.conf` header — `rule-zero.py` → `rule-zero.ts`, and
+  "(Python re, searched, not anchored)" → "(JavaScript RegExp, compiled without the u flag;
+  searched, not anchored — existing patterns keep their meaning)". Three lines where there was
+  one; **no rule line touched** (the 60/60 selftest below is the proof).
+- `template/.claude/hooks/package.json` (new) — exactly `{"type":"module"}` + LF. 18 bytes.
+- **Deleted** (`git rm`) the seven `template/.claude/hooks/*.py`: `docs-only`, `path-fence`,
+  `pr-watch`, `reload-plan`, `rule-zero-selftest`, `rule-zero`, `status-block`.
+
+**Validation — actual outputs**
+- `git grep -nE "python3|\.py\b" -- template/` → **no output, exit 1**. Same pattern via
+  `grep -rnE … template/` (catches the untracked shim too) → **no output, exit 1**.
+- `node -e` `JSON.parse` on `template/.claude/settings.json` → parses; the three hook objects
+  print as
+  `{"type":"command","command":"node","args":["${CLAUDE_PROJECT_DIR}/.claude/hooks/rule-zero.ts"],"timeout":10,"statusMessage":"rule zero"}`,
+  `…status-block.ts"],"timeout":30}`, `…reload-plan.ts"],"timeout":10}`.
+- `node -e` `JSON.parse` on `template/.claude/hooks/package.json` → `{"type":"module"}`.
+  `od -c` → `{ " t y p e " : " m o d u l e " } \n`, 0o22 = 18 bytes, no CR.
+- `pnpm install --frozen-lockfile` → typescript 6.0.3, @types/node 24.13.3.
+  **`pnpm typecheck` → clean, exit 0** (`tsc --noEmit`). The deletions break no import: `lib.ts`
+  and `rule-zero.ts` reference no `.py`-adjacent path, and `tsconfig.json` includes
+  `template/.claude/hooks` as a directory, so the not-yet-written 3.1/3.2 hooks cost nothing.
+- `node template/.claude/hooks/rule-zero-selftest.ts` (Node **v24.4.1**) →
+  `60/60 cases passed; 39 lines logged to rule-zero.log`, exit 0 — the conf header rewrite
+  left every rule intact.
+- **ESM shim measured, before and after.** Scratch consumer project with
+  `package.json` = `{"type":"commonjs"}`, `lib.ts` + `rule-zero.ts` + `rule-zero.conf` copied
+  in, a `git push --force origin main` PreToolUse payload on stdin:
+  - *without* `hooks/package.json`: `SyntaxError: Cannot use import statement outside a module`
+    (plus `Warning: Failed to load the ES module`), **exit 1** — i.e. the gate fails open,
+    exactly the phase-2 finding.
+  - *with* the shim copied in: the deny JSON on stdout at **exit 0** —
+    `"permissionDecision":"deny"`, reason `rule-zero.conf:19 deny git push .*(--force|…)`.
+- `npm pack --dry-run --json` → 30 files, and `template/.claude/hooks/package.json` **is
+  listed** — the shim actually ships (nested manifests outside `node_modules` are ordinary
+  files to npm-packlist).
+- `git diff --check` / `git diff --cached --check` → clean; no CR bytes introduced.
+- `git grep -nE "52/52|57/57" -- template/` → **no output, exit 1**, before and after this item:
+  phase 2.5 had already fixed the four README counts, and no file under `template/` ever
+  carried a count claim. Nothing to change.
+- `template/.claude/gitignore` **verified unchanged and correct**: the phase-1 five-pattern
+  unanchored set (`rule-zero.grants`, `rule-zero.log`, `worktrees/`, `pr-watch/`,
+  `__pycache__/`). Not touched.
+
+**Deviations**
+1. **`template/.claude/agents/implementer.md` not touched.** Read as the Files list directs;
+   `grep -nE "python|\.py\b|hooks/"` → zero matches. The conditional in the Files list
+   ("touch only if a `.py` reference exists") did not fire.
+2. **The conf header note is three lines, not one.** The replacement text does not fit the
+   original line inside the file's 100-column comment block, so the parenthetical wraps under
+   the `<verb> <extended regex>` column. Content is exactly what the item specifies.
+
+**For the orchestrator (outside this item's Files)**
+- **Phase 4.1's managed manifest must list `template/.claude/hooks/package.json`** — a new
+  managed payload file — and must drop the seven `.py` names and carry the five `.ts` hooks
+  3.1/3.2 add. If the manifest is written from a stale list the shim never reaches consumers
+  and every hook fails open on a `"type": "commonjs"` project.
+- **`README.md:62-69`'s payload file listing does not mention `hooks/package.json`.** README is
+  in no phase-3 Files list; it is one line to add wherever the orchestrator prefers.
+- **`__pycache__/` in `template/.claude/gitignore` is now vestigial** — the kit ships zero
+  Python after this item. Left in place deliberately: plan.md accepts phase 1's five-pattern
+  set as a mid-loop decision, the pattern is scoped to `.claude/` in a *consumer's* repo where
+  it stays harmless, and the item's instruction was to verify the anchoring, not to prune.
+  One-line removal if the orchestrator wants it gone.
+- Settings and investigator frontmatter now point at `status-block.ts`, `reload-plan.ts` and
+  `path-fence.ts`, which **items 3.1/3.2 create**. Between this merge and theirs those three
+  gates are inert (missing file → Claude Code treats it as a non-blocking hook error).
+  `rule-zero.ts` — the load-bearing one — is live now.
 
 ## Merge-back record (orchestrator)
 

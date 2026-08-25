@@ -36,7 +36,7 @@
   deploy are reported in the conversation. Otherwise the loop triggers its own reviews. (owner)
 - 2026-08-25 — Anything blocked on the owner becomes a GitHub issue labelled `blocked-on-owner`
   + kind + area, created before the archive. (owner)
-- 2026-08-25 — Standing merge approval: a docs/comments-only PR (measured by `docs-only.py`)
+- 2026-08-25 — Standing merge approval: a docs/comments-only PR (measured by `docs-only.ts`)
   is merged by the orchestrator after the review loop is silent, CI cancelled. (owner)
 - 2026-08-25 — `gh pr merge --admin` is always used; branch protection is not the gate. (owner)
 - 2026-08-25 — PR review quiet window is 5 minutes, restarting on every push. (owner)

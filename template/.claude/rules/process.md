@@ -16,7 +16,7 @@ Approval for one action is not approval for the next. Delegation is not approval
 A hook enforces this, silently, with no prompts. When it denies: a sub-agent records the
 command under **Blocked** and moves on; the orchestrator either had the yes at the Questions
 phase (grant already written) or records the need under *Blocked on the owner* and continues
-with everything else. Grants: `python3 .claude/hooks/rule-zero.py --grant '<regex>'` /
+with everything else. Grants: `node .claude/hooks/rule-zero.ts --grant '<regex>'` /
 `--bundle merge-cleanup <pr> <branch>`.
 
 ## One prompt phase
@@ -28,7 +28,7 @@ Nothing is deferred except what the owner must personally do — and that become
 issue labelled `blocked-on-owner`. The archive commit before the PR is the last record commit;
 after `gh pr create` nothing under `docs/` or `mem/` changes. At the end, report and stop; the
 owner initiates the merge — with one standing exception: a PR whose diff is documentation or
-comments only (`docs-only.py` says so) is merged by the orchestrator once the review loop is
+comments only (`docs-only.ts` says so) is merged by the orchestrator once the review loop is
 silent, CI cancelled, `--admin` bypass. The admin bypass is used for every merge; the rule-zero
 grant, not branch protection, is the gate.
 

@@ -9,8 +9,8 @@ hooks:
     - matcher: "Edit|Write|MultiEdit|NotebookEdit"
       hooks:
         - type: command
-          command: "python3"
-          args: ["${CLAUDE_PROJECT_DIR}/.claude/hooks/path-fence.py", "docs/reviews"]
+          command: "node"
+          args: ["${CLAUDE_PROJECT_DIR}/.claude/hooks/path-fence.ts", "docs/reviews"]
 ---
 
 You answer **one brief** from the orchestrator and write **one report**. You establish ground

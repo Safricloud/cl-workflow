@@ -140,6 +140,11 @@ From the Questions round:
    create the ruleset (required check `ci-ok`, repository-admin bypass)
 8. PR scope → **one PR, phased internally**
 
+Mid-loop, resolving issue #1:
+9. Licence → **MIT** (owner delegated: "Choose a permissive license for me. I don't mind what
+   people do with this repo." — 2026-08-25). Copyright holder "Safricloud". Lands via item
+   4.1; the PR carries `Fixes #1`.
+
 **Rule-zero grants written:**
 `^gh api -X PATCH repos/Safricloud/cl-workflow -f default_branch=main$` for the default-branch
 change; `^gh api -X POST repos/Safricloud/cl-workflow/rulesets --input .*` for the ruleset.

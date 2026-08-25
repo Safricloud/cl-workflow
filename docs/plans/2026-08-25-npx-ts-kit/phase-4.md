@@ -9,7 +9,9 @@ the script names it calls were fixed in phase 1).
 **Files:** `src/cli.ts` (new), `dist/cli.js` (built, committed), root working copy refresh:
 `.claude/**` (managed files replaced by the template's `.ts` kit, `.py` hooks deleted,
 `.gitignore` restored from `gitignore`), root `CLAUDE.md` (filled in for the kit repo),
-`.claude/cl-workflow.lock` (new), `package.json` (only if a script needs correcting).
+`.claude/cl-workflow.lock` (new), `LICENSE` (new: standard MIT text, "Copyright (c) 2026
+Safricloud" — owner decision 9, resolves #1), `package.json` (`"license": "MIT"`; scripts
+only if one needs correcting).
 **Approach:** One-file CLI, zero runtime deps, erasable TS, compiled by `tsc -p
 tsconfig.build.json` to committed `dist/cli.js`.
 - `init [dir]`: copy `template/**` → target; rename `gitignore` → `.gitignore`; never clobber

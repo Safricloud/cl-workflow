@@ -113,6 +113,6 @@ into a scratch dir as the real consumer path; read the diff of every load-bearin
 `.claude/rule-zero.log` reviewed for denials implementers hit.
 
 ## Blocked on the owner
-- **#1 — Choose a licence for the kit** (licensing). Ships without a `license` field; the
-  package never reaches the registry so the npm warning is cosmetic. Unblocks: LICENSE file +
-  manifest field as a follow-up docs-only change.
+- ~~**#1 — Choose a licence for the kit**~~ **Resolved mid-loop** — owner delegated a
+  permissive choice ("I don't mind what people do with this repo", 2026-08-25); **MIT**
+  selected, copyright "Safricloud". Lands via item 4.1; PR carries `Fixes #1`.

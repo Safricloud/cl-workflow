@@ -661,6 +661,9 @@ function cmdDoctor(targetDir) {
 }
 /* ----------------------------------------------------------------------- entry point */
 function main(argv) {
+    // `cl-workflow init | head -3` closes stdout under us. The report is not worth aborting a
+    // half-finished install for, and EPIPE arrives as an async 'error' event no try/catch sees.
+    process.stdout.on("error", () => { });
     const command = argv.length > 0 ? argv[0] : "";
     if (command === "" || command === "-h" || command === "--help" || command === "help") {
         say(USAGE);

@@ -119,3 +119,27 @@ Did not run any hook port (no code exists yet); took npm/cli#9133 (prepare-scrip
 regression) from the issue tracker rather than reproducing it; did not measure `npx` cache
 staleness across machines; did not design the `update` command's settings-merge edge cases
 beyond naming the kit-owned keys; did not touch GitHub settings — all reads.
+
+---
+## Decisions (recorded 2026-08-25)
+
+From conversation, before the Questions round:
+1. Distribution → **npx from GitHub only; never published to the npm registry** — "I would
+   like to use npx directly from the github repo (no NPM registry needed)"
+2. Merge gate → **CI gates merging to main via PRs; no CI after merge; admin override
+   allowed** — "CI gating merging to main, but no CI after merging to main … allow admin
+   override for merging"
+3. Node floor → **≥ 24** — "Node version floor is 24"
+4. Compiler → **TypeScript 6 with tsc** — "we will need TypeScript 6 and its compiler"
+5. Package manager → **pnpm** — "We can use pnpm for the manager"
+
+From the Questions round:
+6. CLI shape → **`.ts` source compiled by tsc 6 into a committed `dist/cli.mjs`, with a CI
+   job that fails when dist drifts from src**
+7. Repo settings writes → **yes to all three**: push `main`, set it as default branch,
+   create the ruleset (required check `ci-ok`, repository-admin bypass)
+8. PR scope → **one PR, phased internally**
+
+**Rule-zero grants written:**
+`^gh api -X PATCH repos/Safricloud/cl-workflow -f default_branch=main$` for the default-branch
+change; `^gh api -X POST repos/Safricloud/cl-workflow/rulesets --input .*` for the ruleset.

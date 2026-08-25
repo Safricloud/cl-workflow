@@ -20,6 +20,22 @@
   install caveats when either moves; `pnpm dlx` is the measured always-works path today.
 - 2026-08-25 — `pr-watch.ts` has run only against a fake `gh` (news/quiet/head-change all
   measured); real-PR pagination remains unmeasured until the first PR review cycle.
+- 2026-08-25 — Confirm on the first loop after `2026-08-25-static-analysis` merges that an
+  implementer's `Edit`/`Write` work inside its worktree (the spelling fix in `pyRealpath` /
+  `isWithin` was verified by probe and self-test, never by a live sub-agent — the live session
+  ran the stale root copy throughout that loop). If a `path:outside-repo` denial on a worktree
+  path still appears in `.claude/rule-zero.log`, reopen: the next suspect is the form of
+  `CLAUDE_PROJECT_DIR` the sub-agent receives.
+- 2026-08-25 — `isWithin`'s case-insensitive win32 branch has no self-test case of its own
+  (`realpathSync.native` already canonicalises the drive letter); it only matters for
+  `pyRealpath`'s no-ancestor fallback. Add a case if that fallback ever bites.
+- 2026-08-25 — Kit ergonomics seen this loop, not fixed: (a) `git worktree remove` fails with
+  "Directory not empty" when the implementer ran `pnpm install` in its worktree — delete the
+  worktree's `node_modules` first, then remove; (b) the gate judges every *line* of a Bash
+  command as a segment, so a heredoc or `git commit -m` whose text quotes a guarded shape
+  (`path:outside-repo …`, a hard-reset command) is denied — write such text through the file
+  tools or from a variable; (c) an `allow` line like `^git branch -d worktree-` needs the
+  literal name — `git branch -d "$BR"` is judged on the variable and denied.
 
 ## Settled — do not re-open, do not "fix"
 - 2026-08-25 — ESLint sits beside `tsc`, it does not replace it: ESLint 10 + typescript-eslint 8

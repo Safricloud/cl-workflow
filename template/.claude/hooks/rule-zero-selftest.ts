@@ -23,8 +23,14 @@ const DEFAULT_CONF = path.join(HERE, "..", "rule-zero.conf");
 const SILENT = "silent";
 const DENY = "deny";
 
-/** "orch" | "agent" | [role, grant_regex] — the magic grant "BUNDLE <pr> <branch>" runs --bundle. */
-type Context = string | readonly [string, string];
+/**
+ * "orch" | "agent" | [role, grant_regex] | [role, grant_regex, extra_conf_line]
+ *
+ * The magic grant "BUNDLE <pr> <branch>" runs --bundle; "" means no grant at all. The optional
+ * third element appends one rule line to this case's own copy of rule-zero.conf — the only way
+ * to exercise a conf the shipped file must never contain (the dialect cases below).
+ */
+type Context = string | readonly [string, string, string?];
 
 /** (label, tool, tool_input, context, expected) */
 type Case = readonly [string, string, Record<string, unknown>, Context, string];
@@ -98,16 +104,39 @@ const CASES: readonly Case[] = [
   ["rm -rf home", "Bash", { command: "rm -rf ~" }, ["orch", ".*"], DENY],
   ["rm -rf root", "Bash", { command: "rm -rf /" }, ["orch", ".*"], DENY],
   ["force push main", "Bash", { command: "git push -f origin main" }, ["orch", ".*"], DENY],
+
+  // --- regex dialect: these three defend the port's compile choices (investigation-hooks.md §2)
+  // Patterns are compiled by lib.ts `compilePattern` as `new RegExp(pattern)` — no `u`, no `v`.
+  // This case goes red the moment anyone adds the `u` flag: Python's `re.escape` (which wrote
+  // every grants file this kit has produced, and `--bundle` still does) emits `\-` and `\ `,
+  // both hard SyntaxErrors under `u`, and a grant that will not compile is silently skipped —
+  // so the deny would come back with no error anyone could see.
+  ["grant written by pyEscape (\\- and \\ )", "Bash", { command: "git push --force origin feat/npx-ts-kit" }, ["orch", "^git\\ push\\ \\-\\-force\\ origin\\ feat/npx\\-ts\\-kit$"], SILENT],
+  // A Python-only inline flag in the conf must fail *closed*: one deny at exit 0 naming the bad
+  // line, never a crash (a hook that dies is a hook that fails open) and never silence.
+  // `npm test` is silent under the stock conf, so this deny can only be the fail-closed path.
+  ["conf line with (?i) fails closed", "Bash", { command: "npm test" }, ["orch", "", "guard (?i)^npm test"], DENY],
+  // `\Z` is an end-of-string anchor in Python and a literal `Z` in JS. Locked here rather than
+  // left as folklore: under the JS reading `npm run deployZ` matches (and would not in Python).
+  ["conf line with \\Z matches a literal Z", "Bash", { command: "npm run deployZ" }, ["orch", "", "guard ^npm run deploy\\Z"], DENY],
 ];
 
 function runCase(
   project: string,
+  confText: string,
   tool: string,
   toolInput: Record<string, unknown>,
   context: Context,
 ): [string, string] {
   const isAgent = context === "agent" || (typeof context !== "string" && context[0] === "agent");
-  const grant = typeof context === "string" ? null : context[1];
+  const grant = typeof context === "string" || context[1] === "" ? null : context[1];
+  const extraConf = typeof context === "string" ? "" : (context[2] ?? "");
+  // every case starts from the shipped conf; a case's extra rule line applies to it only
+  fs.writeFileSync(
+    path.join(project, ".claude", "rule-zero.conf"),
+    extraConf === "" ? confText : confText.trimEnd() + "\n" + extraConf + "\n",
+    "utf8",
+  );
   const grantsPath = path.join(project, ".claude", "rule-zero.grants");
   // every case starts with an empty grants file; a grant applies to this case only
   fs.writeFileSync(grantsPath, "", "utf8");
@@ -186,10 +215,10 @@ function main(): void {
   try {
     fs.mkdirSync(path.join(project, ".claude", "worktrees", "agent-1", "src"), { recursive: true });
     fs.mkdirSync(path.join(project, "src"), { recursive: true });
-    fs.copyFileSync(conf, path.join(project, ".claude", "rule-zero.conf"));
+    const confText = fs.readFileSync(conf, "utf8");
     let failures = 0;
     for (const [label, tool, toolInput, context, expected] of CASES) {
-      const [verdict, reason] = runCase(project, tool, toolInput, context);
+      const [verdict, reason] = runCase(project, confText, tool, toolInput, context);
       const ok = verdict === expected;
       failures += ok ? 0 : 1;
       const mark = ok ? "PASS" : "FAIL";
@@ -205,7 +234,13 @@ function main(): void {
       `\n${CASES.length - failures}/${CASES.length} cases passed; ${nLog} lines logged to rule-zero.log\n`,
     );
     // negative control: prove the hook can fail, so a green run is evidence
-    const bad = runCase(project, "Bash", { command: "git push --force origin feat/x" }, "orch")[0];
+    const bad = runCase(
+      project,
+      confText,
+      "Bash",
+      { command: "git push --force origin feat/x" },
+      "orch",
+    )[0];
     if (bad !== DENY) {
       process.stdout.write("NEGATIVE CONTROL FAILED: force push was not denied\n");
       failures += 1;

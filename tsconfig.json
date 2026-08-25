@@ -10,6 +10,14 @@
       "node"
     ],
     "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": true,
     "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true,
     "allowImportingTsExtensions": true,
@@ -19,6 +27,7 @@
   },
   "include": [
     "src",
-    "template/.claude/hooks"
+    "template/.claude/hooks",
+    ".claude/hooks"
   ]
 }

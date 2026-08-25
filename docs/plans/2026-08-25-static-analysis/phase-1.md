@@ -152,7 +152,48 @@ then restore. Record all three results in the status block.
   it will be exercised in phase 2.
 
 ## Merge-back record (orchestrator)
-<!-- worktree branch, commits merged, conflicts and how resolved, worktree removed -->
+- **Item 1.1** — branch `worktree-agent-a0aba77f99a1abb6e`, worktree clean
+  (`git -C <wt> status --short` empty); four commits `ea29f5b`, `acf3379`, `98fb92c`, `2b0361f`;
+  `git merge --no-edit` fast-forwarded `d473b79` → `2b0361f`, no conflicts. `git worktree
+  remove` failed once with "Directory not empty" (the worktree's `node_modules`, ~100 packages
+  from the implementer's install); git had already unregistered it. `node_modules` and the
+  leftover copy of tracked files were deleted, `git worktree prune`, `git branch -d` → deleted
+  at `2b0361f`. Nothing of the branch was lost: every commit is on this branch.
 
 ## Verification (orchestrator, after this phase merged)
-<!-- what was run, counts, checkers verified, findings → phase 1.5 items -->
+Run on `2b0361f`, this Windows machine, Node 24.4.1, after `pnpm install --frozen-lockfile`
+("Lockfile is up to date"):
+- `npx eslint --max-warnings 0 .` — **4 problems, 4 errors, exit 1**, all in the two hook
+  directories: `no-base-to-string` `pr-watch.ts:114` and `no-useless-assignment`
+  `rule-zero.ts:198`, once per copy. `-f json` → **18 files linted** (17 `.ts` + the config);
+  0 findings in `src/`, 0 in `eslint.config.mjs`. Matches the implementer's claim.
+- `npx tsc --noEmit` — exit 2, errors by directory: `template` **66**, `.claude` **66**,
+  `src` **0**. Matches 69 − 3 per copy.
+- `pnpm build && git diff --exit-code --stat dist/` — clean.
+- `pnpm selftest` — `60/60 cases passed`.
+- `node dist/cli.js update .` — "0 refreshed, 24 already current, 0 left beside as .new";
+  `git status --porcelain --untracked-files=all -- .claude/` → empty.
+- **Checker (a) re-verified by me:** appended `import * as fs2 from "fs"` to `src/cli.ts` →
+  `no-restricted-imports` ("'fs' import is restricted … zero runtime dependencies") **and**
+  `n/prefer-node-protocol` ("Prefer `node:fs` over `fs`") both fired; restored, `git diff
+  --exit-code src/cli.ts` clean. Checkers (b) and (c) taken from the status block (TS6133
+  seen; 132 → 0 with the flags removed, 132 back with them restored).
+- **Diffs read:** `eslint.config.mjs` (50 lines — matches the plan's decisions; the `plugins:
+  { n }` deviation is required and accepted); `tsconfig.json` (eight flags, three `include`
+  entries; `tsconfig.build.json` untouched); `ci.yml` (+13, `ci-ok` byte-identical, `lint`
+  before `typecheck`, the drift-gate step with `shell: bash`); `package.json` (four
+  devDependencies, no `dependencies` key — the zero-runtime-deps rule holds); `src/cli.ts`
+  (8 hunks, each re-read for behaviour: the `writeLock` guard cannot drop a key —
+  `Object.keys` of the same object; `hookScripts` reaches the same string set; `?.[1]` on a
+  mandatory group; `rest[0] ?? "."` resolves `""` to the cwd as before). No `!`, no
+  suppression, no `eslint-disable`.
+- **`.claude/rule-zero.log`:** three denials for the implementer — one `path:outside-repo`
+  on its own worktree's `eslint.config.mjs` (the Write tool; it wrote the file through Bash
+  instead — a fence artefact of worktree paths, noted for the ledger), and two for
+  `git checkout -- tsconfig.json` (recorded in the status block; restored by rewriting).
+- **Finding → phase 1.5:** the config's header comment says `eslint.config.ts` "would need
+  `--experimental-strip-types`" — wrong mechanism; Node 24 strips by default, ESLint needs
+  `--flag unstable_native_nodejs_ts_config` (investigation-eslint.md). Item 1.5.1, runs
+  beside phase 2.
+- **Not done here:** the drift-gate step has not run on a GitHub runner yet (first PR CI will
+  be the evidence); the +97 lock packages were not audited individually.

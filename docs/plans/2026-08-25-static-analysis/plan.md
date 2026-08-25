@@ -89,7 +89,19 @@ single-use grant (done, grant consumed) · 9 README housekeeping **yes** · 10
   README edits are an implementer's (item 3.1) because they travel with the regenerated copy.
 
 ## Decisions made mid-loop — implemented; veto in the PR
-<!-- appended, dated, as the loop runs -->
+- 2026-08-25 — Accepted item 1.1's deviation: `plugins: { n }` registered in the `**/*.ts`
+  block (ESLint aborts otherwise; the four rules are as specified).
+- 2026-08-25 — **Phase 1.5** added from phase-1 verification: the config header names
+  `--experimental-strip-types` as the reason for `.mjs`; the measured reason is ESLint's
+  `--flag unstable_native_nodejs_ts_config`. Comment-only fix, item 1.5.1, dispatched beside
+  phase 2 (disjoint file).
+- 2026-08-25 — A finished worktree's `node_modules` (created by the implementer's own
+  `pnpm install`) blocks `git worktree remove` on Windows; it is deleted by hand before the
+  remove. Not work, reproducible from the lock; recorded so the next loop expects it.
+- 2026-08-25 — The rule-zero path fence denied the implementer's Write tool on a file inside
+  its **own worktree** (`path:outside-repo …/.claude/worktrees/<id>/eslint.config.mjs`); the
+  implementer wrote through Bash instead. Not fixed in this contribution (out of the ask);
+  recorded in `mem/outstanding.md` → engineering follow-ups at archive time.
 
 ## Phasing
 Phase 1 is one serial item: it touches every magnet at once — `package.json`, the lock,

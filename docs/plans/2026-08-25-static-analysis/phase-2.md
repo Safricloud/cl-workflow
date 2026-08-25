@@ -181,7 +181,69 @@ keep `(r.stdout ?? "")`; LF.
 **Acceptance:** the three validations; **must FAIL if reverted:** revert `docs-only.ts` → its 9
 errors return; restore, green. Record.
 #### Status — item 2.3
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-25).
+- **Files touched:**
+  - `template/.claude/hooks/docs-only.ts` — the two index reads in the `--name-status` loop take
+    `?? ""`, and the status letter is read with `charAt(0)` so the existing `status !== ""` test
+    is still what stops `"ADR".includes("")` saying yes; `result.granted` becomes
+    `result["granted"]`. A read that goes missing therefore falls through to `commentOnly`,
+    whose unknown-language verdict is **code** — never docs, which is the direction that matters
+    for a hook that unlocks a self-merge.
+  - `template/.claude/hooks/reload-plan.ts` — every capture group is read through `?.[1]`; a
+    missing group prints nothing for that part, and an item whose two groups did not both
+    arrive is skipped; `process.env["CLAUDE_PROJECT_DIR"]` and `payload["cwd"]` bracket access.
+  - `template/.claude/hooks/path-fence.ts` — five TS4111 bracket-access fixes, no logic touched.
+- **Commits:** `103bd70` (the three hooks) and this one, on branch
+  `worktree-agent-a9e85815ac679c8cb`.
+- **Deviation:** none. No `!` anywhere, and no new default that lets a call through. Two of the
+  fallbacks (`parts[0] ?? ""`, `split(...)[0] ?? ""`) cannot fire on real input — `split` always
+  yields at least one element — and are commented as such rather than left unexplained.
+- **Verified against the installed package before writing:** typescript 6.0.3, eslint 10.9.1,
+  typescript-eslint 8.68.0 (`node_modules/*/package.json`, after `pnpm install --frozen-lockfile`
+  in this worktree). The `lib.ts` helpers these hooks lean on return non-optionals — `asString`
+  at `template/.claude/hooks/lib.ts:32-34`, `asRecord` at `:27-29` — while `readLines` at
+  `:82-88` can return `[""]`, so the empty-entry path in `docs-only.ts` is reachable and is
+  exactly the one that has to classify as code.
+- **Validation (scoped; full check left to the orchestrator):**
+  - `npx tsc --noEmit 2>&1 | grep -E ...(docs-only|reload-plan|path-fence)...` — empty. The same
+    run still reports 109 errors overall (the other two items plus the generated root copy), so
+    the pipeline is not vacuously silent; before the change these three files carried 23 of them
+    (docs-only 9, reload-plan 9, path-fence 5), exactly as plan.md measured.
+  - `npx eslint --max-warnings 0` on the three files — 0 problems, exit 0
+  - smoke, before vs after, all four byte-identical on stdout with the same exit code:
+    `docs-only.ts --base main --branch chore/2026-08-25-static-analysis` (exit 3, code diff);
+    path-fence deny on `src/x.ts` (the deny JSON, exit 0); path-fence allow on
+    `docs/reviews/x.md` (silent, exit 0); `{"source":"compact"}` into reload-plan (exit 0)
+  - reload-plan also run old-code-against-new-code on *this* plan file after the status block was
+    written, using a pristine copy held outside the repo: identical stdout, exit 0 both ways, and
+    item 2.3 correctly drops off the pending list — so the guarded item loop really executed.
+  - **Checker verified (tsc):** put the pristine `docs-only.ts` back and `npx tsc --noEmit`
+    reported its 9 errors again — TS2345 at 233/239/250, TS2322 at 234/241/255, TS18048 at
+    239/243, TS4111 at 288. Restored the fix: grep empty again and `git status --porcelain`
+    silent, so the restore was byte-exact.
+  - **Checker verified (eslint):** changed line 22 of `path-fence.ts` to import from `path`
+    instead of `node:path`; eslint went red with 2 errors (`no-restricted-imports`,
+    `n/prefer-node-protocol`), exit 1. Restored: exit 0 and `git status` silent. Without this
+    the clean lint would only have been a claim that ESLint had looked at the files at all.
+- **Blocked on:** nothing for this item, but two findings the orchestrator needs.
+  1. **Every `Edit`/`Write` tool call from an implementer worktree is denied by rule zero** as
+     `path:outside-repo` — mine, and per `.claude/rule-zero.log` in the shared checkout items
+     2.1 and 2.2 as well. The denial I hit first:
+     `path:outside-repo C:\Users\...\worktrees\agent-a9e85815ac679c8cb\docs\plans\2026-08-25-static-analysis\phase-2.md`
+     (`rule-zero.conf:49 guard ^path:outside-repo`). All work here went through Bash instead,
+     so nothing was lost. Measured cause: `rule-zero.ts:93` tests
+     `resolved.startsWith(pyRealpath(root) + path.sep)`, a case-sensitive comparison of Windows
+     paths. Feeding the shipped hook a payload identical to the real one, it is silent when
+     `CLAUDE_PROJECT_DIR` is `C:\Users\...\cl-workflow` and denies when it is the same
+     directory with a lowercase drive letter. That is the only variant I found that reproduces
+     the symptom while still writing the log to the file the real denials landed in, so treat
+     it as the strongest hypothesis rather than proof. `rule-zero.ts` belongs to item 2.1, so I
+     did not touch it.
+  2. `path-fence.ts` (mine) has the same case-sensitive `startsWith` at line 60 — but it also
+     accepts the worktree cwd as a base, so it is less exposed. I did not change it: this item
+     is compiler errors with behaviour held constant, and a case fix is a behaviour change.
+- **Orchestrator should verify:** the full check after phase 3; that item 3.1 regenerates the
+  root copy of these three files; and what to do about the two findings above.
 
 ## Merge-back record (orchestrator)
 <!-- per item: worktree branch, commits merged, conflicts and how resolved, worktree removed -->

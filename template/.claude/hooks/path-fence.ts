@@ -41,13 +41,13 @@ function fence(argv: readonly string[]): string | null {
     return null; // unparseable input: silent, same as the Python original
   }
 
-  const toolInput = asRecord(payload.tool_input);
-  const target = asString(toolInput.file_path) || asString(toolInput.notebook_path);
+  const toolInput = asRecord(payload["tool_input"]);
+  const target = asString(toolInput["file_path"]) || asString(toolInput["notebook_path"]);
   if (target === "") return null;
 
-  const cwd = asString(payload.cwd) || process.cwd();
+  const cwd = asString(payload["cwd"]) || process.cwd();
   // Not lib's `projectRoot()`: this hook falls back to the *payload's* cwd, not the process's.
-  const root = process.env.CLAUDE_PROJECT_DIR || cwd;
+  const root = process.env["CLAUDE_PROJECT_DIR"] || cwd;
   const resolved = pyRealpath(path.resolve(cwd, expandUser(target)));
 
   // accept the path under either the project root or the current worktree root

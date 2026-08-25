@@ -228,19 +228,22 @@ function main(argv: readonly string[]): number {
   let docsOnly = true;
   for (const entry of names) {
     const parts = entry.split("\t");
-    const status = parts[0];
-    const target = parts[parts.length - 1];
+    // split always yields at least one element, so neither fallback can fire on real git
+    // output. If one ever did, the empty target falls through to commentOnly, whose
+    // unknown-language verdict is code: a read that went missing never reads as documentation.
+    const status = parts[0] ?? "";
+    const target = parts[parts.length - 1] ?? "";
     if (isDocPath(target)) {
       files.push({ path: target, class: "docs", why: "documentation path" });
       continue;
     }
     // added/deleted/renamed code file is a code change. `status` is never empty here, but an
     // empty string would make JS's `includes("")` say yes where Python's `in` raises.
-    if (status !== "" && "ADR".includes(status[0])) {
+    if (status !== "" && "ADR".includes(status.charAt(0))) {
       files.push({
         path: target,
         class: "code",
-        why: `${status[0]}: file added/deleted/renamed`,
+        why: `${status.charAt(0)}: file added/deleted/renamed`,
       });
       docsOnly = false;
       continue;
@@ -285,7 +288,7 @@ function main(argv: readonly string[]): number {
       `PR ${a.pr} ${a.branch} @ ${head.slice(0, 12)}`,
       "grant written",
     ]);
-    result.granted = lines;
+    result["granted"] = lines;
   }
   // `json.dumps(..., indent=1)` and `JSON.stringify(..., null, 1)` are byte-identical for this
   // shape (measured). Exit code, not stdout, carries the verdict.

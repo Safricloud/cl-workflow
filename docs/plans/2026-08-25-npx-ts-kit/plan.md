@@ -68,7 +68,12 @@ repo-settings writes executed (done: `main` pushed, default, ruleset live) · on
   the item goes Blocked rather than silently pinning 5.x (owner named TS 6 explicitly).
 
 ## Decisions made mid-loop — implemented; veto in the PR
-<!-- appended as the loop runs -->
+- 2026-08-25 — Accepted phase 1's five recorded deviations (see `phase-1.md` status block):
+  `@types/node` devDependency; five-pattern payload gitignore; `description`/`repository` in
+  the manifest with **no `license` field** (→ issue #1); mechanically-required tsconfig
+  extras; README written to the finished state.
+- 2026-08-25 — TypeScript pinned `^6.0.0` resolves to 6.0.3 while the registry's latest is
+  7.0.2; staying on 6 per the owner's explicit decision. Revisit only on the owner's word.
 
 ## Phasing
 Phase 1 is one serial item: it touches every magnet at once (root manifest, payload move,
@@ -93,4 +98,6 @@ into a scratch dir as the real consumer path; read the diff of every load-bearin
 `.claude/rule-zero.log` reviewed for denials implementers hit.
 
 ## Blocked on the owner
-None as of planning.
+- **#1 — Choose a licence for the kit** (licensing). Ships without a `license` field; the
+  package never reaches the registry so the npm warning is cosmetic. Unblocks: LICENSE file +
+  manifest field as a follow-up docs-only change.

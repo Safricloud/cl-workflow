@@ -5,6 +5,8 @@
 
 ## Blocked on the owner
 <!-- one line per GitHub issue: #n — what the owner has to do — which contribution waits -->
+- #1 — choose a licence for the kit — nothing waits in code; LICENSE + manifest field follow
+  as docs-only once chosen (2026-08-25-npx-ts-kit)
 
 ## Open — engineering follow-ups
 - 2026-08-25 — Measure on this install: (a) a hook `deny` holds under `bypassPermissions`;

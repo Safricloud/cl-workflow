@@ -125,5 +125,19 @@ Installed 6.0.3.
   already has it in scope.
 
 ## Merge-back record (orchestrator)
+- Item 1.1: branch `worktree-agent-a8ad969402ea80eae`, worktree clean, 7 commits
+  (`4e5f287`…`92b23cb`) merged fast-forward to `92b23cb`. No conflicts.
+- Worktree removal needed a two-step: the implementer's `pnpm install` left `node_modules/`
+  in the worktree, `git worktree remove` refused ("Directory not empty") while unregistering
+  the worktree anyway; deleted the directory, `git worktree prune`, `git branch -d` succeeded
+  (plain `-d`, post-merge). The guarded `remove --force` was not used.
 
 ## Verification (orchestrator, after this phase merged)
+- `pnpm install --frozen-lockfile` clean on pnpm 10.27.0; `npm pack --dry-run` → 33 files,
+  `template/.claude/gitignore` (65B) and `template/.claude/.gitattributes` (19B) present, no
+  root `.py` (the seven payload `.py` remain until 3.3, as planned).
+- `git grep python3 -- README.md` and `52/52` → zero matches; `git ls-files template/` → 31.
+- Read in full: `package.json`, `tsconfig.json`, `tsconfig.build.json`,
+  `template/.claude/gitignore` (five unanchored patterns), both `.gitattributes`, README head —
+  all as planned incl. the five recorded deviations, accepted.
+- Findings → none needing a phase 1.5. License gap → issue #1 (blocked-on-owner).

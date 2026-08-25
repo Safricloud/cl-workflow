@@ -142,6 +142,11 @@ function runCase(
   fs.writeFileSync(grantsPath, "", "utf8");
   if (grant !== null && grant.startsWith("BUNDLE ")) {
     const [, pr, branch] = grant.split(/\s+/);
+    // A harness fault must never read as a pass: a BUNDLE grant that does not carry both
+    // arguments throws, exactly as a failed --bundle spawn does two lines below.
+    if (pr === undefined || branch === undefined) {
+      throw new Error(`malformed BUNDLE grant: ${grant}`);
+    }
     const bundle = spawnSync(process.execPath, [HOOK, "--bundle", "merge-cleanup", pr, branch], {
       encoding: "utf8",
       env: { ...process.env, CLAUDE_PROJECT_DIR: project },
@@ -164,8 +169,8 @@ function runCase(
     tool_use_id: "toolu_selftest",
   };
   if (isAgent) {
-    payload.agent_id = "agent_selftest";
-    payload.agent_type = "implementer";
+    payload["agent_id"] = "agent_selftest";
+    payload["agent_type"] = "implementer";
   }
   const r = spawnSync(process.execPath, [HOOK], {
     input: JSON.stringify(payload),
@@ -196,10 +201,10 @@ function runCase(
     return [SILENT, ""];
   }
   try {
-    const d = asRecord(asRecord(JSON.parse(out)).hookSpecificOutput);
-    const decision = d.permissionDecision;
+    const d = asRecord(asRecord(JSON.parse(out))["hookSpecificOutput"]);
+    const decision = d["permissionDecision"];
     if (typeof decision !== "string") throw new Error("no permissionDecision");
-    return [decision, asString(d.permissionDecisionReason)];
+    return [decision, asString(d["permissionDecisionReason"])];
   } catch {
     return ["error", `unparseable stdout: ${out.slice(0, 200)}`];
   }
@@ -210,7 +215,8 @@ function main(): void {
   const verbose = args.includes("--verbose");
   let conf = DEFAULT_CONF;
   const confAt = args.indexOf("--conf");
-  if (confAt !== -1 && confAt + 1 < args.length) conf = args[confAt + 1];
+  const confArg = confAt === -1 ? undefined : args[confAt + 1];
+  if (confArg !== undefined) conf = confArg;
   const project = fs.mkdtempSync(path.join(os.tmpdir(), "rule-zero-selftest-"));
   try {
     fs.mkdirSync(path.join(project, ".claude", "worktrees", "agent-1", "src"), { recursive: true });

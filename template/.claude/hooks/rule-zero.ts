@@ -74,26 +74,26 @@ function judge(): string | null {
     return `rule-zero hook could not parse its input (${errText(e)}). Fix the hook before continuing.`;
   }
 
-  const tool = asString(payload.tool_name);
-  const toolInput = asRecord(payload.tool_input);
-  const mode = asString(payload.permission_mode, "unknown");
-  const agentType = asString(payload.agent_type) || "unknown-agent";
-  const isSubagent = Boolean(payload.agent_id);
+  const tool = asString(payload["tool_name"]);
+  const toolInput = asRecord(payload["tool_input"]);
+  const mode = asString(payload["permission_mode"], "unknown");
+  const agentType = asString(payload["agent_type"]) || "unknown-agent";
+  const isSubagent = Boolean(payload["agent_id"]);
   const who = isSubagent ? `agent:${agentType}` : "orchestrator";
 
   // --- what are we judging? ---------------------------------------------------------------
   let subjects: string[] = [];
   if (tool === "Bash") {
-    subjects = splitBashSegments(asString(toolInput.command));
+    subjects = splitBashSegments(asString(toolInput["command"]));
   } else if (TOOL_FILE.has(tool)) {
-    const target = asString(toolInput.file_path) || asString(toolInput.notebook_path);
+    const target = asString(toolInput["file_path"]) || asString(toolInput["notebook_path"]);
     if (target !== "") {
-      const cwd = asString(payload.cwd) || root;
+      const cwd = asString(payload["cwd"]) || root;
       const resolved = pyRealpath(path.resolve(cwd, expandUser(target)));
       const inside = resolved.startsWith(pyRealpath(root) + path.sep);
       // `/tmp` resolves to `C:\tmp` on Windows; that is the measured behaviour and the
       // self-test's "write to /tmp" case depends on it. Do not "fix" it.
-      const tmpRoot = pyRealpath(process.env.TMPDIR ?? "/tmp");
+      const tmpRoot = pyRealpath(process.env["TMPDIR"] ?? "/tmp");
       const tmp = resolved.startsWith("/tmp/") || resolved.startsWith(tmpRoot + path.sep);
       if (!inside && !tmp) subjects = [`path:outside-repo ${resolved}`];
     }
@@ -195,13 +195,23 @@ function grantsCli(argv: readonly string[]): number {
     process.stdout.write(`cleared ${existing.length} grant(s)\n`);
     return 0;
   }
-  let fresh: string[] = [];
+  // Read once so the --bundle branch can require both to be present: a short argv falls
+  // through to the usage/exit-2 branch below rather than granting a half-built pattern.
+  const bundlePr = argv[2];
+  const bundleBranch = argv[3];
+  let fresh: string[];
   if (cmd === "--grant") {
     fresh = argv.slice(1).filter((g) => g.trim() !== "");
     for (const g of fresh) compilePattern(g); // raise early on a bad regex
-  } else if (cmd === "--bundle" && argv.length === 4 && argv[1] === "merge-cleanup") {
-    const pr = pyEscape(argv[2]);
-    const branch = pyEscape(argv[3]);
+  } else if (
+    cmd === "--bundle" &&
+    argv.length === 4 &&
+    argv[1] === "merge-cleanup" &&
+    bundlePr !== undefined &&
+    bundleBranch !== undefined
+  ) {
+    const pr = pyEscape(bundlePr);
+    const branch = pyEscape(bundleBranch);
     fresh = [
       `^gh pr merge ${pr}\\b`,
       `^git push origin --delete ${branch}$`,

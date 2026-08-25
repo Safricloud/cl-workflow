@@ -22,6 +22,21 @@
   measured); real-PR pagination remains unmeasured until the first PR review cycle.
 
 ## Settled — do not re-open, do not "fix"
+- 2026-08-25 — ESLint sits beside `tsc`, it does not replace it: ESLint 10 + typescript-eslint 8
+  on `recommendedTypeChecked`, config in `eslint.config.mjs` (flag-free; the owner chose it over
+  `eslint.config.ts`), `pnpm lint` = `eslint --max-warnings 0 .` and a CI step. The `node:`-only
+  import convention is a rule (`no-restricted-imports`, regex form) plus `eslint-plugin-n`.
+  (owner, 2026-08-25-static-analysis, decisions 1–4, 10)
+- 2026-08-25 — `tsconfig.json` carries all eight extra strictness flags (`noUnusedLocals`,
+  `noUnusedParameters`, `noFallthroughCasesInSwitch`, `noImplicitOverride`, `noImplicitReturns`,
+  `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noPropertyAccessFromIndexSignature`)
+  and includes the generated root `.claude/hooks`; CI gates root-copy drift by re-running
+  `node dist/cli.js update .` and requiring an empty `git status --porcelain
+  --untracked-files=all -- .claude/`. (owner, 2026-08-25-static-analysis, decisions 5–6)
+- 2026-08-25 — `@typescript-eslint/no-unnecessary-condition` stays off if the strict presets are
+  ever adopted: it calls the hooks' `(r.stdout ?? "")` after `spawnSync` dead, but Node returns
+  `null` there when the spawn itself fails. Deleting that guard makes the gate fail open.
+  (measured, 2026-08-25-static-analysis investigation-eslint.md)
 - 2026-08-25 — The kit installs via `npx github:Safricloud/cl-workflow` only; it is never
   published to the npm registry. (owner)
 - 2026-08-25 — Node floor is 24; hooks ship as erasable `.ts` run natively; TypeScript 6 with

@@ -176,3 +176,32 @@ that is a claim from its settings schema, not a measurement.
 
 ---
 <!-- Appended at the Questions phase; the review is not rewritten above this line. -->
+## Decisions (recorded 2026-08-25)
+
+Three rounds with the question tool; each answer is the option label the owner selected.
+
+1. Direction → **B** — "B — TS config, conventions as rules, drift gate"
+2. ESLint preset → **`recommendedTypeChecked`** — "recommendedTypeChecked"
+3. Config file language → **`eslint.config.mjs`** — "eslint.config.mjs" (the owner chose the
+   flag-free file over the recommended `.ts`; B is otherwise unchanged)
+4. Convention rules → **both** — "Both: regex rule + eslint-plugin-n"
+5. Compiler flags → **all eight** — "All eight" (`noUnusedLocals`, `noUnusedParameters`,
+   `noFallthroughCasesInSwitch`, `noImplicitOverride`, `noImplicitReturns`,
+   `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noPropertyAccessFromIndexSignature`).
+   Measured together after the answer: **69 errors** on the nine files — 44 × TS4111
+   (index-signature property access, 18 of them in `pr-watch.ts`), 25 from unchecked index
+   access (TS2532/TS18048/TS2322/TS2345/TS2769); `src/cli.ts` 3, the eight hooks 66.
+6. Root-copy drift gate in CI → **yes** — "Yes"
+7. Uncommitted devDependency bump → **commit as the first seed on this branch** — "Commit it as
+   the first seed on this branch" (done: `1bed394`)
+8. `stash@{0}` → **drop it** — "Drop it — grant the stash drop" (the owner selected the option
+   naming the exact command; a single-use grant is written before the drop)
+9. README housekeeping → **yes** — "Yes"
+10. Lint script → **`eslint --max-warnings 0 .`** — "`eslint --max-warnings 0 .`"
+11. Merge → **on silence, squash, `--admin`** — "Merge when the review loop is silent — squash,
+    --admin"
+
+**Rule-zero grants written:** one single-use regex matching exactly the `stash@{0}` drop
+(decision 8), written before the drop. The merge bundle (`--bundle merge-cleanup <pr>
+<branch>`) is written at §9 on the strength of decision 11, once the review loop is silent and
+CI is green.

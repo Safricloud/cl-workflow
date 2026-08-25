@@ -33,7 +33,8 @@ comes from.
 - **Files touched:** `eslint.config.mjs` — header comment lines 1-2 rewritten so the reason the
   config is `.mjs` names ESLint's flag, not a Node flag; two comment lines where there was one,
   no code touched.
-- **Commits:** see below (worktree branch `worktree-agent-aba9cec2381a61166`)
+- **Commits:** `1d9e601` (the comment) + this status commit, on worktree branch
+  `worktree-agent-aba9cec2381a61166`
 - **Deviation:** the item's expected load-check output is wrong. `config loads: 3 entries` is the
   count of top-level elements in the source array; `defineConfig` expands the `extends:
   [tseslint.configs.recommendedTypeChecked]` block, so the loaded array is **6 entries** — before

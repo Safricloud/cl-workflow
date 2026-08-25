@@ -15,6 +15,11 @@
   `docs/guides/agent-workflow.md` §5.
 - 2026-08-25 — Measure Copilot's latency, trigger and suppressed-section location on the first
   PR; fill in §10 "Know your reviewer".
+- 2026-08-25 — Watch npm upstream: 11.12.0's git-install regression (breaks every `npx
+  github:` consumer on that version) and npm 12's `allow-git=none` default. Revisit the README
+  install caveats when either moves; `pnpm dlx` is the measured always-works path today.
+- 2026-08-25 — `pr-watch.ts` has run only against a fake `gh` (news/quiet/head-change all
+  measured); real-PR pagination remains unmeasured until the first PR review cycle.
 
 ## Settled — do not re-open, do not "fix"
 - 2026-08-25 — The kit installs via `npx github:Safricloud/cl-workflow` only; it is never

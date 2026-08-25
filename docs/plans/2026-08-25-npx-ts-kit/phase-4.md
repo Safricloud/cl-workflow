@@ -285,5 +285,32 @@ by its absence.
   only `.github/` and this file.
 
 ## Merge-back record (orchestrator)
+- Item 4.2 first: worktree clean, 1 commit (`4b91a6b`), merge commit `b5005e7`. No conflicts.
+- Item 4.1: first merge attempt **aborted** — the main checkout carried uncommitted local
+  modifications to `package.json`/`pnpm-lock.yaml` (devDependency ranges narrowed to installed
+  versions by some tool during verification; origin not identified). Resolved by `git stash`
+  (kept, not dropped — `restore`/`checkout --` are rule-zero-guarded); second merge clean,
+  merge commit `e0f03b9`. **Orchestrator error recorded:** the first attempt's command chain
+  ran the worktree cleanup even though the merge failed, deleting the worktree directory
+  prematurely — the branch preserved all five commits and nothing was lost, but cleanup must
+  never be chained behind an unverified merge again.
+- Both worktrees removed, branches `-d` deleted after their merges.
 
 ## Verification (orchestrator, after this phase merged)
+- `pnpm install --frozen-lockfile && pnpm typecheck && pnpm build && git diff --exit-code
+  dist/` → clean. Root selftest **60/60**; template selftest 60/60; root gate live: guarded
+  command → deny JSON naming `rule-zero.conf:35` at exit 0, `deny` line appended to
+  `.claude/rule-zero.log`; `git grep python3 -- .claude` empty.
+- CLI load-bearing regions read: `OWNED` = the investigation's 9; `sha256-lf` normalisation;
+  `EXPECTED_SELFTEST_CASES = 60`; `hooksManifest` in the lock. All as specced.
+- **Real consumer path measured, three ways** (branch pushed, genuine network fetches):
+  `pnpm dlx github:…#feat/…` → init 33 written, doctor **6/6** incl. self-test 60/60;
+  `npx` on local npm **11.12.0** → fails before our code runs (upstream git-dep preparation
+  regression, contradictory internal flags; no consumer-side workaround);
+  `npm@12` → git deps **disabled by default** (`EALLOWGIT`, config `allow-git = "none"`),
+  works with `--allow-git=all` (37-file tarball packed from the branch).
+- 4.1's six deviations and 4.2's five accepted — notably the `settings.json` merge-on-init
+  (the literal `.new` rule would ship a fail-open) and the skip-proof `ci-ok`
+  (`if: always()` + result assert; a skipped required check reports success).
+- 4.2's remaining acceptance (both matrix legs + `ci-ok` green, check name literal in
+  `gh pr checks`) transfers to PR time, §7–§8.

@@ -96,6 +96,15 @@ repo-settings writes executed (done: `main` pushed, default, ruleset live) · on
 - 2026-08-25 — Phase 4 dispatch order: 4.2 (CI workflow, `.github/` only) launched alongside
   3.5 — it consumes no template state; 4.1 (CLI + self-init) waits for 3.5's merge so the
   committed dist and the lock hashes are built from the final template.
+- 2026-08-25 — **Install-command reality** (measured at phase-4 verification): README leads
+  with `pnpm dlx github:…` and documents the npx form with its two measured caveats — npm 12
+  needs `--allow-git=all` (git deps disabled by default), npm 11.12.0 is broken upstream for
+  all git installs. The owner's decision (GitHub-only, no registry) is preserved in substance;
+  the npx-first phrasing is adjusted to what actually works — **veto in the PR** if npx-first
+  wording matters. README's stale "Managed (20 files)" → 23 in the same pass.
+- 2026-08-25 — The aborted-merge manifest drift (`package.json` devDep ranges narrowed by an
+  unidentified tool) is parked in `git stash` rather than dropped (`stash drop` is guarded);
+  the committed ranges (`^6.0.0`, `^24.0.0`) remain canonical.
 
 ## Phasing
 Phase 1 is one serial item: it touches every magnet at once (root manifest, payload move,

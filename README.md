@@ -16,13 +16,20 @@ stripping — there is no build step and no runtime dependency in a target proje
 
 ```
 cd your-project
-npx github:Safricloud/cl-workflow init
-node .claude/hooks/rule-zero-selftest.ts     # must print 60/60 and exit 0
+pnpm dlx github:Safricloud/cl-workflow init          # or the npx form below
+node .claude/hooks/rule-zero-selftest.ts             # must print 60/60 and exit 0
 ```
 
 Put that self-test in CI. A hook whose script path is wrong is reported by Claude Code as a
 **non-blocking** error and the tool call proceeds — the self-test is the only thing that proves
 the gate is live. `doctor` runs it for you.
+
+**npx works too, with two measured caveats** (2026-08-25). npm 12 disables git dependencies by
+default — pass the opt-in: `npx --allow-git=all github:Safricloud/cl-workflow init` (or set it
+once: `npm config set allow-git all`). npm **11.12.0** has an upstream regression that breaks
+every git install with no consumer-side workaround (its internal git-dep preparation passes
+itself contradictory flags) — use `pnpm dlx`, or move off that npm version. `pnpm dlx` needs
+no flags on any version measured.
 
 ## The three commands
 
@@ -32,14 +39,14 @@ the gate is live. `doctor` runs it for you.
 | `cl-workflow update [dir]` | Refreshes the **managed** files only. A managed file still matching a shipped version is overwritten; one you have edited gets a `<name>.new` beside it and a warning. **Owned** files are never touched. `settings.json` is merged, not replaced — only `worktree.baseRef` and the kit's three hook entries. |
 | `cl-workflow doctor [dir]` | Checks Node ≥ 24, that the lock file is present and parseable, that every hook command in `settings.json` points at a file that exists, and runs the self-test to 60/60. |
 
-Run them through `npx github:Safricloud/cl-workflow <command>`, or install the package and use
-the `cl-workflow` bin.
+Run them through `pnpm dlx github:Safricloud/cl-workflow <command>` (or the npx form from
+Install), or install the package and use the `cl-workflow` bin.
 
 ### Managed, owned, merged
 
 `update` only works because the payload is classified up front.
 
-- **Managed** (20 files) — the mechanism: the hooks, the rules, the skill and its templates, the
+- **Managed** (23 files) — the mechanism: the hooks, the rules, the skill and its templates, the
   two agent definitions, the process guide. Yours to read, not to edit; `update` replaces them.
 - **Owned** (9 files) — seeded once and then yours: `rule-zero.conf`, `CLAUDE.md`, `mem/index.md`,
   `mem/outstanding.md`, `docs/history/index.md`, and the empty `docs/` scaffolding.

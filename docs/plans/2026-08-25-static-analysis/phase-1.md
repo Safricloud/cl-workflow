@@ -66,7 +66,10 @@ packages it added). **Must FAIL if reverted / checker verified:** (a) with a scr
 flags removed from `tsconfig.json`, the hook errors vanish (proves the flags are the source) —
 then restore. Record all three results in the status block.
 #### Status — item 1.1
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**In progress** (implementer, 2026-08-25).
+- Read the item, `plan.md` facts and decisions, `CLAUDE.md`, `.claude/rules/process.md`,
+  `docs/guides/agent-workflow.md`, `mem/index.md`, `mem/outstanding.md`. Starting with the
+  devDependency install.
 
 ## Merge-back record (orchestrator)
 <!-- worktree branch, commits merged, conflicts and how resolved, worktree removed -->

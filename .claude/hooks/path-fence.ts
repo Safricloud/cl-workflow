@@ -21,7 +21,7 @@
  */
 import * as path from "node:path";
 
-import { asRecord, asString, emitDeny, expandUser, isRecord, pyRealpath, readStdinJson } from "./lib.ts";
+import { asRecord, asString, emitDeny, expandUser, isRecord, isWithin, pyRealpath, readStdinJson } from "./lib.ts";
 
 /** `p.strip("/")` — plus backslashes, so a prefix written `docs\reviews\` also fences. */
 function stripSeparators(prefix: string): string {
@@ -41,13 +41,13 @@ function fence(argv: readonly string[]): string | null {
     return null; // unparseable input: silent, same as the Python original
   }
 
-  const toolInput = asRecord(payload.tool_input);
-  const target = asString(toolInput.file_path) || asString(toolInput.notebook_path);
+  const toolInput = asRecord(payload["tool_input"]);
+  const target = asString(toolInput["file_path"]) || asString(toolInput["notebook_path"]);
   if (target === "") return null;
 
-  const cwd = asString(payload.cwd) || process.cwd();
+  const cwd = asString(payload["cwd"]) || process.cwd();
   // Not lib's `projectRoot()`: this hook falls back to the *payload's* cwd, not the process's.
-  const root = process.env.CLAUDE_PROJECT_DIR || cwd;
+  const root = process.env["CLAUDE_PROJECT_DIR"] || cwd;
   const resolved = pyRealpath(path.resolve(cwd, expandUser(target)));
 
   // accept the path under either the project root or the current worktree root
@@ -55,9 +55,9 @@ function fence(argv: readonly string[]): string | null {
   for (const base of bases) {
     for (const prefix of prefixes) {
       // Both sides go through node:path, so both carry the platform separator — this is the
-      // line the Python version got wrong.
-      const allowed = path.join(base, prefix) + path.sep;
-      if (resolved.startsWith(allowed)) return null;
+      // line the Python version got wrong. `isWithin` adds the separator and, on Windows,
+      // compares case-insensitively.
+      if (isWithin(resolved, path.join(base, prefix))) return null;
     }
   }
 

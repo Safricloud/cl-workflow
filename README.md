@@ -1,7 +1,7 @@
 # The contribution kit (v0.6)
 
 A Claude Code process — the ten-phase `/contribute` loop — plus the mechanisms that hold it up:
-a permission gate, five hooks, two sub-agent definitions, and the guide they all refer to.
+a permission gate, seven hooks, two sub-agent definitions, and the guide they all refer to.
 Permissive by design: nothing here prompts, and nothing fires on ordinary work. The only things
 that ever block are the shapes in `rule-zero.conf`, and for the orchestrator those are unlocked
 by a single-use grant that records the owner's "yes".
@@ -157,10 +157,12 @@ Node ≥ 24, pnpm, TypeScript 6.
 
 ```
 pnpm install
-pnpm typecheck                   # tsc --noEmit over src/ and the payload's hooks
+pnpm lint                        # eslint --max-warnings 0 . — both hook copies, src/, the config
+pnpm typecheck                   # tsc --noEmit over src/, the payload's hooks and the generated root copy
 pnpm build                       # tsc -p tsconfig.build.json → dist/cli.js
 git diff --exit-code dist/       # the drift gate CI enforces
 pnpm selftest                    # must print 62/62 and exit 0
+node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/   # prints nothing
 ```
 
 Line endings are LF everywhere, enforced by the root `.gitattributes` (`* text=auto eol=lf`).
@@ -173,9 +175,9 @@ hashes LF-normalised content so `update` is correct either way.
 
 `.github/workflows/ci.yml` runs on `pull_request` into `main` and on nothing else — there is no
 post-merge run. The `test` job is a matrix of `ubuntu-latest` and `windows-latest` on Node 24:
-install, typecheck, build, `dist/` drift check, self-test, and a CLI smoke test that inits into
-a temp directory and runs `doctor`. An aggregate job **`ci-ok`** (`needs: test`) is the single
-required check.
+install, lint, typecheck, build, `dist/` drift check, generated-`.claude/` drift check,
+self-test, and a CLI smoke test that inits into a temp directory and runs `doctor`. An
+aggregate job **`ci-ok`** (`needs: test`) is the single required check.
 
 The `main` ruleset requires exactly that check name and grants **repository admins bypass**, so
 a merge is never hard-blocked — but an unbypassed PR does not merge until `ci-ok` is green.

@@ -65,9 +65,9 @@ function mayStop(): boolean {
   } catch {
     return true; // malformed stdin: fail open, unlike rule-zero
   }
-  if (payload.stop_hook_active) return true;
+  if (payload["stop_hook_active"]) return true;
 
-  const cwd = asString(payload.cwd) || process.cwd();
+  const cwd = asString(payload["cwd"]) || process.cwd();
   // `glob.glob(os.path.join(cwd,"docs","plans","*","plan.md"))` — the pattern stays relative and
   // forward-slashed because a Windows path is full of backslashes, which are glob escapes.
   const plans = fs.globSync("docs/plans/*/plan.md", { cwd }).sort();
@@ -77,7 +77,11 @@ function mayStop(): boolean {
   for (const rel of plans) {
     try {
       const m = BRANCH_RE.exec(fs.readFileSync(path.join(cwd, rel), "utf8"));
-      if (m !== null) bases.push(m[1]);
+      // The pattern has no optional group, so a match always carries group 1; the compiler
+      // cannot know that. A missing capture contributes no candidate, exactly as a plan.md
+      // with no **Branch:** line does — the fallbacks below still apply.
+      const branch = m?.[1];
+      if (branch !== undefined) bases.push(branch);
     } catch {
       // OSError: pass
     }

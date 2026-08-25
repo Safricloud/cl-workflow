@@ -1,0 +1,61 @@
+name: CI
+
+# PR-gated only: nothing runs after a merge (owner decision 2).
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      # No version input: pnpm/action-setup reads the packageManager pin in package.json.
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm typecheck
+
+      - run: pnpm build
+
+      # dist/ is committed; the build must reproduce it byte for byte.
+      - name: dist/ drift gate
+        run: git diff --exit-code -- dist/
+
+      - name: Self-test (must print 60/60)
+        run: pnpm selftest
+
+      - name: CLI smoke (init + doctor)
+        shell: bash
+        run: |
+          SMOKE="$RUNNER_TEMP/cl-workflow-smoke"
+          rm -rf "$SMOKE"
+          mkdir -p "$SMOKE"
+          node dist/cli.js init "$SMOKE"
+          node dist/cli.js doctor "$SMOKE"
+
+  # The single check name required by the live ruleset main-pr-gate (id 21458765).
+  # The job id and this name must both stay exactly `ci-ok`.
+  ci-ok:
+    name: ci-ok
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every matrix leg passed
+        run: |
+          echo "test result: ${{ needs.test.result }}"
+          [ "${{ needs.test.result }}" = "success" ]

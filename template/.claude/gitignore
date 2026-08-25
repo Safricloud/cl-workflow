@@ -1,0 +1,5 @@
+rule-zero.grants
+rule-zero.log
+worktrees/
+pr-watch/
+__pycache__/

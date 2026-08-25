@@ -25,12 +25,12 @@ import { asString, errText, isRecord, pyEscape, readFileLines, readStdinJson } f
 function section(text: string, headingRe: string): string {
   // `re.S` → the `s` flag. `\Z` → `$` without `m`, which in JS matches only at the very end.
   const m = new RegExp(headingRe + "[^\\n]*\\n(.*?)(?=\\n## |$)", "s").exec(text);
-  return m !== null ? m[1].trim() : "";
+  return m?.[1]?.trim() ?? "";
 }
 
 /** Python's `str.splitlines()[0]` for the common case — the first line, however it is ended. */
 function firstLine(text: string): string {
-  return text.split(/\r\n|\r|\n/)[0];
+  return text.split(/\r\n|\r|\n/)[0] ?? "";
 }
 
 /** `"# Plan — x".lstrip("# ")` — strip any run of leading `#` and space characters. */
@@ -47,7 +47,7 @@ function report(): string[] {
     payload = {};
   }
   // Not lib's `projectRoot()`: the payload's cwd sits between the env var and the process cwd.
-  const root = process.env.CLAUDE_PROJECT_DIR || asString(payload.cwd) || process.cwd();
+  const root = process.env["CLAUDE_PROJECT_DIR"] || asString(payload["cwd"]) || process.cwd();
   // The glob pattern stays relative and forward-slashed: backslashes are glob escapes.
   const plans = fs.globSync("docs/plans/*/plan.md", { cwd: root }).sort();
   const out: string[] = [];
@@ -66,7 +66,8 @@ function report(): string[] {
     out.push(`Live plan: \`${relDir}/\` — ${title}`);
     for (const key of ["Source review", "Branch", "Owner go-ahead"]) {
       const m = new RegExp("\\*\\*" + key + ":\\*\\*\\s*([^\\n]+)").exec(text);
-      if (m !== null) out.push(`  ${key}: ${m[1].trim()}`);
+      const value = m?.[1];
+      if (value !== undefined) out.push(`  ${key}: ${value.trim()}`);
     }
     const decisions = section(text, "\\n## Owner decisions");
     if (decisions !== "") {
@@ -81,11 +82,14 @@ function report(): string[] {
       for (const item of ptext.matchAll(/### Item (\d+\.\d+) — ([^\n]+)/g)) {
         const num = item[1];
         const name = item[2];
+        // Both groups are present whenever the pattern matched. If one were somehow absent the
+        // item is skipped rather than half-reported: this hook only supplies context.
+        if (num === undefined || name === undefined) continue;
         const m = new RegExp(
           "#### Status — item " + pyEscape(num) + "\\n(.*?)(?=\\n### |\\n## |$)",
           "s",
         ).exec(ptext);
-        const body = m !== null ? m[1].trim() : "";
+        const body = m?.[1]?.trim() ?? "";
         if (body === "" || body.startsWith("*(implement")) {
           pending.push(`${num} — ${name.trim()}`);
         } else if (body.toLowerCase().startsWith("**in progress")) {

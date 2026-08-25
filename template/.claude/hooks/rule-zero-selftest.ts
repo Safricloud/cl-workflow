@@ -24,6 +24,18 @@ const SILENT = "silent";
 const DENY = "deny";
 
 /**
+ * Placeholders that stand in a case's `file_path` for the temp project directory, which does
+ * not exist when `CASES` is built. `runCase` substitutes them.
+ *
+ * `PROJECT_FLIPPED` is the project path with the case of its first character flipped — a
+ * lowercase drive letter on Windows, a no-op on POSIX. `PROJECT_NATIVE` is the project path as
+ * `fs.realpathSync.native` spells it — the long form, while `CLAUDE_PROJECT_DIR` keeps the
+ * `os.tmpdir()` spelling, which on Windows is 8.3 (`...\KEATON~1\...`).
+ */
+const PROJECT_FLIPPED = "<project-flipped-case>";
+const PROJECT_NATIVE = "<project-native>";
+
+/**
  * "orch" | "agent" | [role, grant_regex] | [role, grant_regex, extra_conf_line]
  *
  * The magic grant "BUNDLE <pr> <branch>" runs --bundle; "" means no grant at all. The optional
@@ -119,7 +131,40 @@ const CASES: readonly Case[] = [
   // `\Z` is an end-of-string anchor in Python and a literal `Z` in JS. Locked here rather than
   // left as folklore: under the JS reading `npm run deployZ` matches (and would not in Python).
   ["conf line with \\Z matches a literal Z", "Bash", { command: "npm run deployZ" }, ["orch", "", "guard ^npm run deploy\\Z"], DENY],
+
+  // --- the path fence must not depend on how CLAUDE_PROJECT_DIR is spelled ----------------
+  // Both are edits an implementer really makes, inside its own worktree, and both were denied
+  // as `path:outside-repo` before `pyRealpath` used `realpathSync.native` and the comparison
+  // moved to `isWithin` (13 denials in one loop; plan 2026-08-25-static-analysis, phase 2.5).
+  // The placeholders are substituted at run time, once the temp project directory exists.
+  ["edit in worktree, drive letter case flipped", "Edit", { file_path: PROJECT_FLIPPED + "/.claude/worktrees/agent-1/src/a.ts" }, "agent", SILENT],
+  ["edit in worktree, long name while the root is 8.3", "Edit", { file_path: PROJECT_NATIVE + "/.claude/worktrees/agent-1/src/a.ts" }, "agent", SILENT],
 ];
+
+/** Flip the case of the first character; on POSIX, where it is `/`, this changes nothing. */
+function flipFirstCase(target: string): string {
+  const first = target.slice(0, 1);
+  const flipped = first === first.toLowerCase() ? first.toUpperCase() : first.toLowerCase();
+  return flipped + target.slice(1);
+}
+
+/**
+ * Substitute a `file_path` placeholder with a real absolute path built from `project`. The
+ * case's own tuple is never mutated — `CASES` is shared and read-only.
+ */
+function withProject(project: string, toolInput: Record<string, unknown>): Record<string, unknown> {
+  const target = toolInput["file_path"];
+  if (typeof target !== "string") return toolInput;
+  if (target.startsWith(PROJECT_FLIPPED)) {
+    const tail = target.slice(PROJECT_FLIPPED.length);
+    return { ...toolInput, file_path: flipFirstCase(project) + tail };
+  }
+  if (target.startsWith(PROJECT_NATIVE)) {
+    const tail = target.slice(PROJECT_NATIVE.length);
+    return { ...toolInput, file_path: fs.realpathSync.native(project) + tail };
+  }
+  return toolInput;
+}
 
 function runCase(
   project: string,
@@ -142,6 +187,11 @@ function runCase(
   fs.writeFileSync(grantsPath, "", "utf8");
   if (grant !== null && grant.startsWith("BUNDLE ")) {
     const [, pr, branch] = grant.split(/\s+/);
+    // A harness fault must never read as a pass: a BUNDLE grant that does not carry both
+    // arguments throws, exactly as a failed --bundle spawn does two lines below.
+    if (pr === undefined || branch === undefined) {
+      throw new Error(`malformed BUNDLE grant: ${grant}`);
+    }
     const bundle = spawnSync(process.execPath, [HOOK, "--bundle", "merge-cleanup", pr, branch], {
       encoding: "utf8",
       env: { ...process.env, CLAUDE_PROJECT_DIR: project },
@@ -160,12 +210,12 @@ function runCase(
     hook_event_name: "PreToolUse",
     permission_mode: "bypassPermissions",
     tool_name: tool,
-    tool_input: toolInput,
+    tool_input: withProject(project, toolInput),
     tool_use_id: "toolu_selftest",
   };
   if (isAgent) {
-    payload.agent_id = "agent_selftest";
-    payload.agent_type = "implementer";
+    payload["agent_id"] = "agent_selftest";
+    payload["agent_type"] = "implementer";
   }
   const r = spawnSync(process.execPath, [HOOK], {
     input: JSON.stringify(payload),
@@ -196,10 +246,10 @@ function runCase(
     return [SILENT, ""];
   }
   try {
-    const d = asRecord(asRecord(JSON.parse(out)).hookSpecificOutput);
-    const decision = d.permissionDecision;
+    const d = asRecord(asRecord(JSON.parse(out))["hookSpecificOutput"]);
+    const decision = d["permissionDecision"];
     if (typeof decision !== "string") throw new Error("no permissionDecision");
-    return [decision, asString(d.permissionDecisionReason)];
+    return [decision, asString(d["permissionDecisionReason"])];
   } catch {
     return ["error", `unparseable stdout: ${out.slice(0, 200)}`];
   }
@@ -210,7 +260,8 @@ function main(): void {
   const verbose = args.includes("--verbose");
   let conf = DEFAULT_CONF;
   const confAt = args.indexOf("--conf");
-  if (confAt !== -1 && confAt + 1 < args.length) conf = args[confAt + 1];
+  const confArg = confAt === -1 ? undefined : args[confAt + 1];
+  if (confArg !== undefined) conf = confArg;
   const project = fs.mkdtempSync(path.join(os.tmpdir(), "rule-zero-selftest-"));
   try {
     fs.mkdirSync(path.join(project, ".claude", "worktrees", "agent-1", "src"), { recursive: true });

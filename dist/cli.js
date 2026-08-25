@@ -43,7 +43,7 @@ const LOCK_REL = ".claude/cl-workflow.lock";
 const HASH_ALGO = "sha256-lf";
 const MIN_NODE_MAJOR = 24;
 /** The self-test's case count. Bump this with the suite; `doctor` asserts it exactly. */
-const EXPECTED_SELFTEST_CASES = 60;
+const EXPECTED_SELFTEST_CASES = 62;
 /** Printed whenever a wired hook script is missing. The failure mode is the quiet one. */
 const FAILS_OPEN = "A hook whose script path is wrong fails OPEN — Claude Code reports it as a non-blocking\n" +
     "        error and runs the tool call anyway. The gate is not protecting this project until\n" +
@@ -143,7 +143,7 @@ function installedSha(root, name) {
     for (const candidate of candidates) {
         if (!fs.existsSync(candidate))
             continue;
-        let parsed = null;
+        let parsed;
         try {
             parsed = JSON.parse(fs.readFileSync(candidate, "utf8"));
         }
@@ -202,7 +202,7 @@ function loadLock(targetDir) {
     const file = abs(targetDir, LOCK_REL);
     if (!fs.existsSync(file))
         return null;
-    let parsed = null;
+    let parsed;
     try {
         parsed = JSON.parse(fs.readFileSync(file, "utf8"));
     }
@@ -232,8 +232,11 @@ function loadLock(targetDir) {
 }
 function writeLock(targetDir, lock) {
     const ordered = {};
-    for (const key of Object.keys(lock.files).sort())
-        ordered[key] = lock.files[key];
+    for (const key of Object.keys(lock.files).sort()) {
+        const value = lock.files[key];
+        if (value !== undefined)
+            ordered[key] = value;
+    }
     const body = {
         kitVersion: lock.kitVersion,
         hashAlgo: lock.hashAlgo,
@@ -258,7 +261,7 @@ function hookScripts(entry) {
     const fields = [entry["command"]];
     const args = entry["args"];
     if (Array.isArray(args))
-        fields.push(...args);
+        fields.push(...args.filter((a) => typeof a === "string"));
     const out = [];
     for (const field of fields) {
         if (typeof field === "string" && HOOK_PATH.test(toPosix(field)))
@@ -268,8 +271,8 @@ function hookScripts(entry) {
 }
 function isKitHookEntry(entry, stems) {
     for (const script of hookScripts(entry)) {
-        const match = HOOK_PATH.exec(toPosix(script));
-        if (match !== null && stems.has(match[1].replace(/\.[^.]*$/, "")))
+        const stem = HOOK_PATH.exec(toPosix(script))?.[1];
+        if (stem !== undefined && stems.has(stem.replace(/\.[^.]*$/, "")))
             return true;
     }
     return false;
@@ -544,7 +547,7 @@ function cmdDoctor(targetDir) {
         fail(state, `${MERGED} missing`, FAILS_OPEN);
     }
     else {
-        let settings = null;
+        let settings;
         try {
             settings = JSON.parse(readLf(settingsPath));
         }
@@ -597,7 +600,7 @@ function cmdDoctor(targetDir) {
         fail(state, `.claude/hooks/package.json missing`, `without {"type":"module"} the hooks break in a "type":"commonjs" project. ` + FAILS_OPEN);
     }
     else {
-        let type = undefined;
+        let type;
         try {
             const parsed = JSON.parse(readLf(shim));
             type = isRecord(parsed) ? parsed["type"] : undefined;
@@ -674,7 +677,7 @@ function main(argv) {
         return 0;
     }
     const rest = argv.slice(1).filter((a) => !a.startsWith("-"));
-    const targetDir = path.resolve(rest.length > 0 ? rest[0] : ".");
+    const targetDir = path.resolve(rest[0] ?? ".");
     if (command === "init") {
         fs.mkdirSync(targetDir, { recursive: true });
         return cmdInit(targetDir);

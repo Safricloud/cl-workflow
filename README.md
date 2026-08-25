@@ -1,7 +1,7 @@
 # The contribution kit (v0.6)
 
 A Claude Code process — the ten-phase `/contribute` loop — plus the mechanisms that hold it up:
-a permission gate, five hooks, two sub-agent definitions, and the guide they all refer to.
+a permission gate, seven hooks, two sub-agent definitions, and the guide they all refer to.
 Permissive by design: nothing here prompts, and nothing fires on ordinary work. The only things
 that ever block are the shapes in `rule-zero.conf`, and for the orchestrator those are unlocked
 by a single-use grant that records the owner's "yes".
@@ -17,7 +17,7 @@ stripping — there is no build step and no runtime dependency in a target proje
 ```
 cd your-project
 pnpm dlx github:Safricloud/cl-workflow init          # or the npx form below
-node .claude/hooks/rule-zero-selftest.ts             # must print 60/60 and exit 0
+node .claude/hooks/rule-zero-selftest.ts             # must print 62/62 and exit 0
 ```
 
 Put that self-test in CI. A hook whose script path is wrong is reported by Claude Code as a
@@ -37,7 +37,7 @@ no flags on any version measured.
 | --- | --- |
 | `cl-workflow init [dir]` | Copies the payload into `dir` (default `.`). Never clobbers: an existing file with different content is written beside it as `<name>.new`; identical content is skipped silently. Renames the shipped `gitignore` to `.claude/.gitignore`. Writes `.claude/cl-workflow.lock`. |
 | `cl-workflow update [dir]` | Refreshes the **managed** files only. A managed file still matching a shipped version is overwritten; one you have edited gets a `<name>.new` beside it and a warning. **Owned** files are never touched. `settings.json` is merged, not replaced — only `worktree.baseRef` and the kit's three hook entries. |
-| `cl-workflow doctor [dir]` | Checks Node ≥ 24, that the lock file is present and parseable, that every hook command in `settings.json` points at a file that exists, and runs the self-test to 60/60. |
+| `cl-workflow doctor [dir]` | Checks Node ≥ 24, that the lock file is present and parseable, that every hook command in `settings.json` points at a file that exists, and runs the self-test to 62/62. |
 
 Run them through `pnpm dlx github:Safricloud/cl-workflow <command>` (or the npx form from
 Install), or install the package and use the `cl-workflow` bin.
@@ -69,7 +69,7 @@ Install), or install the package and use the `cl-workflow` bin.
   hooks/package.json            {"type":"module"} — keeps the hooks ESM even in a "type":"commonjs" project
   hooks/lib.ts                  shared: stdin JSON, conf parsing, pattern compilation, grants, log
   hooks/rule-zero.ts            PreToolUse — deny > allow > guard; grants (--grant, --bundle, --list, --clear); log
-  hooks/rule-zero-selftest.ts   proves the gate fires and only when it should (60 cases + negative control)
+  hooks/rule-zero-selftest.ts   proves the gate fires and only when it should (62 cases + negative control)
   hooks/status-block.ts         SubagentStop (implementer) — no status block, no finishing
   hooks/reload-plan.ts          SessionStart (compact|resume) — live plan, owner decisions, unused grants back in context
   hooks/path-fence.ts           PreToolUse (investigator frontmatter) — writes only under docs/reviews/
@@ -157,10 +157,12 @@ Node ≥ 24, pnpm, TypeScript 6.
 
 ```
 pnpm install
-pnpm typecheck                   # tsc --noEmit over src/ and the payload's hooks
+pnpm lint                        # eslint --max-warnings 0 . — both hook copies, src/, the config
+pnpm typecheck                   # tsc --noEmit over src/, the payload's hooks and the generated root copy
 pnpm build                       # tsc -p tsconfig.build.json → dist/cli.js
 git diff --exit-code dist/       # the drift gate CI enforces
-pnpm selftest                    # must print 60/60 and exit 0
+pnpm selftest                    # must print 62/62 and exit 0
+node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/   # prints nothing
 ```
 
 Line endings are LF everywhere, enforced by the root `.gitattributes` (`* text=auto eol=lf`).
@@ -173,9 +175,9 @@ hashes LF-normalised content so `update` is correct either way.
 
 `.github/workflows/ci.yml` runs on `pull_request` into `main` and on nothing else — there is no
 post-merge run. The `test` job is a matrix of `ubuntu-latest` and `windows-latest` on Node 24:
-install, typecheck, build, `dist/` drift check, self-test, and a CLI smoke test that inits into
-a temp directory and runs `doctor`. An aggregate job **`ci-ok`** (`needs: test`) is the single
-required check.
+install, lint, typecheck, build, `dist/` drift check, generated-`.claude/` drift check,
+self-test, and a CLI smoke test that inits into a temp directory and runs `doctor`. An
+aggregate job **`ci-ok`** (`needs: test`) is the single required check.
 
 The `main` ruleset requires exactly that check name and grants **repository admins bypass**, so
 a merge is never hard-blocked — but an unbypassed PR does not merge until `ci-ok` is green.

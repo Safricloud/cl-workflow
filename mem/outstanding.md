@@ -20,8 +20,43 @@
   install caveats when either moves; `pnpm dlx` is the measured always-works path today.
 - 2026-08-25 — `pr-watch.ts` has run only against a fake `gh` (news/quiet/head-change all
   measured); real-PR pagination remains unmeasured until the first PR review cycle.
+- 2026-08-25 — Confirm on the first loop after `2026-08-25-static-analysis` merges that an
+  implementer's `Edit`/`Write` work inside its worktree (the spelling fix in `pyRealpath` /
+  `isWithin` was verified by probe and self-test, never by a live sub-agent — the live session
+  ran the stale root copy throughout that loop). If a `path:outside-repo` denial on a worktree
+  path still appears in `.claude/rule-zero.log`, reopen: the next suspect is the form of
+  `CLAUDE_PROJECT_DIR` the sub-agent receives.
+- 2026-08-25 — `isWithin`'s case-insensitive win32 branch has no self-test case of its own
+  (`realpathSync.native` already canonicalises the drive letter); it only matters for
+  `pyRealpath`'s no-ancestor fallback. Add a case if that fallback ever bites.
+- 2026-08-25 — Kit ergonomics seen this loop, not fixed: (a) `git worktree remove` fails with
+  "Directory not empty" when the implementer ran `pnpm install` in its worktree — delete the
+  worktree's `node_modules` first, then remove; (b) the gate judges every *line* of a Bash
+  command as a segment, so a heredoc or `git commit -m` whose text quotes a guarded shape
+  (`path:outside-repo …`, a hard-reset command) is denied — write such text through the file
+  tools or from a variable; (c) an `allow` line like `^git branch -d worktree-` needs the
+  literal name — `git branch -d "$BR"` is judged on the variable and denied; (d) Claude Code's
+  own worktree-isolation check for sub-agents (not the kit's hook) refuses `git -C <path
+  outside the worktree>`, `cd <absolute path>` before `git`, and any Bash text containing a
+  bare `<` (a heredoc with `i < n` is read as a redirect) — implementers needing a scratch
+  clone make it inside their worktree and delete it; the kit cannot change this.
 
 ## Settled — do not re-open, do not "fix"
+- 2026-08-25 — ESLint sits beside `tsc`, it does not replace it: ESLint 10 + typescript-eslint 8
+  on `recommendedTypeChecked`, config in `eslint.config.mjs` (flag-free; the owner chose it over
+  `eslint.config.ts`), `pnpm lint` = `eslint --max-warnings 0 .` and a CI step. The `node:`-only
+  import convention is a rule (`no-restricted-imports`, regex form) plus `eslint-plugin-n`.
+  (owner, 2026-08-25-static-analysis, decisions 1–4, 10)
+- 2026-08-25 — `tsconfig.json` carries all eight extra strictness flags (`noUnusedLocals`,
+  `noUnusedParameters`, `noFallthroughCasesInSwitch`, `noImplicitOverride`, `noImplicitReturns`,
+  `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noPropertyAccessFromIndexSignature`)
+  and includes the generated root `.claude/hooks`; CI gates root-copy drift by re-running
+  `node dist/cli.js update .` and requiring an empty `git status --porcelain
+  --untracked-files=all -- .claude/`. (owner, 2026-08-25-static-analysis, decisions 5–6)
+- 2026-08-25 — `@typescript-eslint/no-unnecessary-condition` stays off if the strict presets are
+  ever adopted: it calls the hooks' `(r.stdout ?? "")` after `spawnSync` dead, but Node returns
+  `null` there when the spawn itself fails. Deleting that guard makes the gate fail open.
+  (measured, 2026-08-25-static-analysis investigation-eslint.md)
 - 2026-08-25 — The kit installs via `npx github:Safricloud/cl-workflow` only; it is never
   published to the npm registry. (owner)
 - 2026-08-25 — Node floor is 24; hooks ship as erasable `.ts` run natively; TypeScript 6 with

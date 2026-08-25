@@ -48,7 +48,7 @@ jobs:
           status="$(git status --porcelain --untracked-files=all -- .claude/)"
           if [ -n "$status" ]; then printf '%s\n' "$status"; exit 1; fi
 
-      - name: Self-test (must print 60/60)
+      - name: Self-test (must print 62/62)
         run: pnpm selftest
 
       - name: CLI smoke (init + doctor)

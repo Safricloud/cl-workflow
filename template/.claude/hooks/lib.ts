@@ -226,7 +226,16 @@ export function expandUser(target: string): string {
  * `os.path.realpath` — the *non-strict* one. `fs.realpathSync` throws ENOENT on a path that
  * does not exist yet, and both path-judging hooks resolve paths that usually do not (a Write
  * to a new file), so walk up to the nearest existing ancestor, canonicalise that, and put the
- * tail back. On Windows this also expands 8.3 short names, exactly as Python's does.
+ * tail back.
+ *
+ * The ancestor is canonicalised with `fs.realpathSync.native`, not `fs.realpathSync`. Plain
+ * `realpathSync` on Windows hands back whatever spelling it was given — measured on Node
+ * v24.4.1: an 8.3 short path and a lowercase drive letter both come back unchanged, while
+ * `.native` returns the long name with the drive letter upper-cased. The two path hooks
+ * compare this output against a project root that arrives in whatever spelling
+ * `CLAUDE_PROJECT_DIR` carries, so without `.native` the verdict depended on the spelling and
+ * a file inside the repo was judged outside it. Compare the result with `isWithin`, never
+ * with a bare `startsWith`.
  */
 export function pyRealpath(target: string): string {
   const resolved = path.resolve(target);
@@ -234,7 +243,7 @@ export function pyRealpath(target: string): string {
   let current = resolved;
   for (;;) {
     try {
-      const real = fs.realpathSync(current);
+      const real = fs.realpathSync.native(current);
       return tail.length === 0 ? real : path.join(real, ...tail);
     } catch {
       const parent = path.dirname(current);
@@ -243,6 +252,26 @@ export function pyRealpath(target: string): string {
       current = parent;
     }
   }
+}
+
+/**
+ * Is `resolved` inside the directory `base`? Both arguments must already be canonical — the
+ * callers pass `pyRealpath` output — because this is a *string* test, not a filesystem one.
+ *
+ * On Windows the comparison is case-insensitive: NTFS is case-insensitive, so two spellings
+ * that differ only in case name the same directory, and a case-sensitive test would put a
+ * file inside the repo outside it. Elsewhere the comparison is exact, because there two
+ * spellings that differ in case are two different files.
+ *
+ * `base` itself is not "within" itself: the separator is required, so a sibling directory
+ * whose name merely starts with `base` (`/repo-old` against `/repo`) is correctly outside.
+ */
+export function isWithin(resolved: string, base: string): boolean {
+  const prefix = base.endsWith(path.sep) ? base : base + path.sep;
+  if (process.platform === "win32") {
+    return resolved.toLowerCase().startsWith(prefix.toLowerCase());
+  }
+  return resolved.startsWith(prefix);
 }
 
 /* ------------------------------------------------------------------------ grants and log */

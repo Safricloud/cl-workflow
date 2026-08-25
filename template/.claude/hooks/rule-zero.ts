@@ -42,6 +42,7 @@ import {
   findGrant,
   firstMatch,
   isRecord,
+  isWithin,
   loadConf,
   projectRoot,
   pyEscape,
@@ -90,11 +91,11 @@ function judge(): string | null {
     if (target !== "") {
       const cwd = asString(payload["cwd"]) || root;
       const resolved = pyRealpath(path.resolve(cwd, expandUser(target)));
-      const inside = resolved.startsWith(pyRealpath(root) + path.sep);
+      const inside = isWithin(resolved, pyRealpath(root));
       // `/tmp` resolves to `C:\tmp` on Windows; that is the measured behaviour and the
       // self-test's "write to /tmp" case depends on it. Do not "fix" it.
       const tmpRoot = pyRealpath(process.env["TMPDIR"] ?? "/tmp");
-      const tmp = resolved.startsWith("/tmp/") || resolved.startsWith(tmpRoot + path.sep);
+      const tmp = resolved.startsWith("/tmp/") || isWithin(resolved, tmpRoot);
       if (!inside && !tmp) subjects = [`path:outside-repo ${resolved}`];
     }
   } else if (tool.startsWith("mcp__")) {

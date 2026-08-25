@@ -43,7 +43,7 @@ const LOCK_REL = ".claude/cl-workflow.lock";
 const HASH_ALGO = "sha256-lf";
 const MIN_NODE_MAJOR = 24;
 /** The self-test's case count. Bump this with the suite; `doctor` asserts it exactly. */
-const EXPECTED_SELFTEST_CASES = 60;
+const EXPECTED_SELFTEST_CASES = 62;
 /** Printed whenever a wired hook script is missing. The failure mode is the quiet one. */
 const FAILS_OPEN = "A hook whose script path is wrong fails OPEN — Claude Code reports it as a non-blocking\n" +
     "        error and runs the tool call anyway. The gate is not protecting this project until\n" +

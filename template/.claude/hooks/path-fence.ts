@@ -21,7 +21,7 @@
  */
 import * as path from "node:path";
 
-import { asRecord, asString, emitDeny, expandUser, isRecord, pyRealpath, readStdinJson } from "./lib.ts";
+import { asRecord, asString, emitDeny, expandUser, isRecord, isWithin, pyRealpath, readStdinJson } from "./lib.ts";
 
 /** `p.strip("/")` — plus backslashes, so a prefix written `docs\reviews\` also fences. */
 function stripSeparators(prefix: string): string {
@@ -55,9 +55,9 @@ function fence(argv: readonly string[]): string | null {
   for (const base of bases) {
     for (const prefix of prefixes) {
       // Both sides go through node:path, so both carry the platform separator — this is the
-      // line the Python version got wrong.
-      const allowed = path.join(base, prefix) + path.sep;
-      if (resolved.startsWith(allowed)) return null;
+      // line the Python version got wrong. `isWithin` adds the separator and, on Windows,
+      // compares case-insensitively.
+      if (isWithin(resolved, path.join(base, prefix))) return null;
     }
   }
 

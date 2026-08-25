@@ -17,7 +17,7 @@ stripping — there is no build step and no runtime dependency in a target proje
 ```
 cd your-project
 pnpm dlx github:Safricloud/cl-workflow init          # or the npx form below
-node .claude/hooks/rule-zero-selftest.ts             # must print 60/60 and exit 0
+node .claude/hooks/rule-zero-selftest.ts             # must print 62/62 and exit 0
 ```
 
 Put that self-test in CI. A hook whose script path is wrong is reported by Claude Code as a
@@ -37,7 +37,7 @@ no flags on any version measured.
 | --- | --- |
 | `cl-workflow init [dir]` | Copies the payload into `dir` (default `.`). Never clobbers: an existing file with different content is written beside it as `<name>.new`; identical content is skipped silently. Renames the shipped `gitignore` to `.claude/.gitignore`. Writes `.claude/cl-workflow.lock`. |
 | `cl-workflow update [dir]` | Refreshes the **managed** files only. A managed file still matching a shipped version is overwritten; one you have edited gets a `<name>.new` beside it and a warning. **Owned** files are never touched. `settings.json` is merged, not replaced — only `worktree.baseRef` and the kit's three hook entries. |
-| `cl-workflow doctor [dir]` | Checks Node ≥ 24, that the lock file is present and parseable, that every hook command in `settings.json` points at a file that exists, and runs the self-test to 60/60. |
+| `cl-workflow doctor [dir]` | Checks Node ≥ 24, that the lock file is present and parseable, that every hook command in `settings.json` points at a file that exists, and runs the self-test to 62/62. |
 
 Run them through `pnpm dlx github:Safricloud/cl-workflow <command>` (or the npx form from
 Install), or install the package and use the `cl-workflow` bin.
@@ -69,7 +69,7 @@ Install), or install the package and use the `cl-workflow` bin.
   hooks/package.json            {"type":"module"} — keeps the hooks ESM even in a "type":"commonjs" project
   hooks/lib.ts                  shared: stdin JSON, conf parsing, pattern compilation, grants, log
   hooks/rule-zero.ts            PreToolUse — deny > allow > guard; grants (--grant, --bundle, --list, --clear); log
-  hooks/rule-zero-selftest.ts   proves the gate fires and only when it should (60 cases + negative control)
+  hooks/rule-zero-selftest.ts   proves the gate fires and only when it should (62 cases + negative control)
   hooks/status-block.ts         SubagentStop (implementer) — no status block, no finishing
   hooks/reload-plan.ts          SessionStart (compact|resume) — live plan, owner decisions, unused grants back in context
   hooks/path-fence.ts           PreToolUse (investigator frontmatter) — writes only under docs/reviews/
@@ -160,7 +160,7 @@ pnpm install
 pnpm typecheck                   # tsc --noEmit over src/ and the payload's hooks
 pnpm build                       # tsc -p tsconfig.build.json → dist/cli.js
 git diff --exit-code dist/       # the drift gate CI enforces
-pnpm selftest                    # must print 60/60 and exit 0
+pnpm selftest                    # must print 62/62 and exit 0
 ```
 
 Line endings are LF everywhere, enforced by the root `.gitattributes` (`* text=auto eol=lf`).

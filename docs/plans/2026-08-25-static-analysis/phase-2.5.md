@@ -198,7 +198,43 @@ case-sensitive again on win32 only, case 61 fails and 62 passes — record it, r
   phase and it cannot be proved from inside this worktree.
 
 ## Merge-back record (orchestrator)
-<!-- worktree branch, commits merged, conflicts and how resolved, worktree removed -->
+- **Item 2.5.1** — `worktree-agent-a351d628dd8a8adfe`, clean; `20f8a16`, `dec5986`, `ace4e24`;
+  `git merge --no-edit` fast-forwarded `1c7e3b8` → `ace4e24`, no conflicts. Worktree
+  `node_modules` deleted, worktree removed, branch deleted; `git worktree list` → main only.
+
+### Correction (2026-08-25)
+The item's second checker ("`isWithin` case-sensitive on win32 only → case 61 fails") was a
+wrong prediction: `realpathSync.native` already canonicalises the drive letter, so case 61
+passes on either half alone. The implementer's experiment 3 (only `.native` reverted → 61/62,
+case 62 failing) is the separation that holds. The case-insensitive branch of `isWithin` is
+kept as defence in depth for `pyRealpath`'s fallback (no ancestor resolves → input spelling
+returned) and **has no test of its own** — recorded as a mid-loop decision in `plan.md`.
 
 ## Verification (orchestrator, after this phase merged)
-<!-- selftest 62/62 both copies after phase 3; the probes T3/T5/T7 re-run silent; the diff re-read -->
+On `ace4e24`, this Windows machine, Node 24.4.1:
+- `pnpm selftest` — `62/62 cases passed`, exit 0.
+- `npx tsc --noEmit` — `template` 0, `src` 0, `.claude` 66 (the stale root copy; phase 3).
+- `npx eslint --max-warnings 0 template src eslint.config.mjs` — clean.
+- `pnpm build && git diff --exit-code --stat dist/` — clean.
+- **Probes re-run by me** (payload built with `JSON.stringify`, `Write` on
+  `<repo>\docs\probe.md`, piped into `node template/.claude/hooks/rule-zero.ts`):
+  `CLAUDE_PROJECT_DIR` = long form → silent; `c:\…` lowercase drive → **silent** (was deny,
+  T5); `C:\Users\KEATON~1\…` 8.3 → **silent** (was deny, T3). The same lowercase-drive probe
+  against the **root** copy (`node .claude/hooks/rule-zero.ts`) still → deny, as expected
+  until phase 3 regenerates it.
+- **Checker (mine, cruder):** `template/.claude/hooks/lib.ts` replaced by its `1c7e3b8`
+  version with everything else at HEAD → every case `got=error exit 1 … rule-zero.ts:45`
+  (the hook cannot import `isWithin`), i.e. the suite goes red loudly rather than silently;
+  restored from HEAD, `git diff --stat template/` empty, `62/62`. **Checker (implementer's,
+  precise):** `lib.ts` + `rule-zero.ts` reverted, cases kept → `60/62`, the two new cases
+  `expected=silent got=deny`; only `.native` reverted → `61/62`, case 62 failing. Both
+  recorded verbatim in the status block above.
+- **Diff re-read:** `isWithin` appends the separator (a sibling `repo-old` is outside `repo`);
+  the `"/tmp/"` literal and the `C:\tmp` comment survive; `path-fence.ts` uses the helper for
+  every base × prefix; the self-test substitutes placeholders on a copy of the tuple and
+  appends the two cases after the `\Z` case, so cases 1–60 keep their numbers; `src/cli.ts`
+  only changes the constant; `dist/cli.js` one line; README four lines; `ci.yml` one line.
+- **Not proven here:** that an implementer dispatched after phase 3 gets `Edit`/`Write` back
+  in its worktree — the live session runs the root copy, which is regenerated in phase 3; the
+  phase-3 implementer is told to expect denials and the first post-merge loop will be the
+  evidence. Recorded for the ledger.

@@ -126,6 +126,12 @@ single-use grant (done, grant consumed) · 9 README housekeeping **yes** · 10
   the seen-set, making the item look new on every poll); a `<details>` capture that is
   somehow absent yields `""` and the section stays visible. Both are the fail-closed
   direction; veto in the PR.
+- 2026-08-25 — Phase 2.5 landed (`ace4e24`): `pyRealpath` canonicalises with
+  `fs.realpathSync.native`, the two path hooks compare through `isWithin`, self-test 60 → 62.
+  **Accepted as unverified:** `isWithin`'s case-insensitive win32 branch is not covered by any
+  case on its own (`.native` already canonicalises the drive letter; the branch only matters
+  for `pyRealpath`'s no-ancestor fallback). Kept as defence in depth; veto in the PR if a
+  branch without a test is unwanted.
 
 ## Phasing
 Phase 1 is one serial item: it touches every magnet at once — `package.json`, the lock,

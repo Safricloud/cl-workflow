@@ -78,10 +78,124 @@ new cases FAIL on this Windows machine (61: `deny` where SILENT expected; 62 lik
 exits 1 — record the two FAIL lines verbatim; restore, 62/62. Also: with `isWithin` made
 case-sensitive again on win32 only, case 61 fails and 62 passes — record it, restore.
 #### Status — item 2.5.1
-**In progress** (implementer, 2026-08-25).
-- **Measured first, as the item asks** (worktree root, `node`, v24.4.1): plain
-  `fs.realpathSync` returns the *input* spelling for all three forms; `fs.realpathSync.native`
-  returns the canonical long form for all three.
+**Done** (implementer, 2026-08-25).
+- **Files touched:**
+  - `template/.claude/hooks/lib.ts` — `pyRealpath` canonicalises with `fs.realpathSync.native`;
+    its doc comment rewritten (the old "expands 8.3 short names, exactly as Python's does" was
+    false); new exported `isWithin(resolved, base)` — requires the separator, compares
+    case-insensitively on `win32` and exactly elsewhere. No other exported signature changed.
+  - `template/.claude/hooks/rule-zero.ts` — imports `isWithin`; `inside` and the `tmp` test use
+    it. The literal `"/tmp/"` test and the `/tmp` to `C:\tmp` comment are unchanged.
+  - `template/.claude/hooks/path-fence.ts` — imports `isWithin`; the allowed-prefix test is
+    `isWithin(resolved, path.join(base, prefix))`; the comment about both sides going through
+    `node:path` kept and extended.
+  - `template/.claude/hooks/rule-zero-selftest.ts` — two cases appended at the end of `CASES`
+    (no existing case or number moved); `PROJECT_FLIPPED` / `PROJECT_NATIVE` placeholder
+    constants; `flipFirstCase` and `withProject` helpers; `runCase` substitutes at payload
+    build. `CASES.length` = 62.
+  - `src/cli.ts` — `EXPECTED_SELFTEST_CASES = 62`.
+  - `dist/cli.js` — rebuilt (`pnpm build`), one line changed, committed.
+  - `README.md` — lines 20, 40, 163 `60/60` to `62/62`; line 72 "60 cases" to "62 cases".
+  - `.github/workflows/ci.yml` — line 51 step name `must print 60/60` to `62/62`.
+- **Commits:** `20f8a16` (status block + measurement), `dec5986` (the fix), on
+  `worktree-agent-a351d628dd8a8adfe`.
+- **Deviation:**
+  - **The item's second checker prediction does not hold on this machine, and I did not force
+    it to.** The item expected that making `isWithin` case-sensitive on win32 only would fail
+    case 61. Measured: **62/62, exit 0** — because `realpathSync.native` already upper-cases the
+    drive letter *before* the comparison, so both sides are canonical either way. Case 61 is
+    therefore a regression test for the canonicalisation, not for the case-insensitive branch,
+    unless `.native` is also absent (experiment 3 below separates them cleanly). The
+    case-insensitive branch is kept as the item specifies — defence in depth for `pyRealpath`'s
+    fallback return, which hands back the input spelling when no ancestor resolves — but
+    **nothing in the suite covers it on its own**. Veto or accept as unverified.
+  - **`CLAUDE.md:18` still reads `60/60`** and is outside my Files list (the item says it is the
+    orchestrator's). So the `git grep` validation below has exactly one hit outside `docs/`.
+  - The smoke project at `C:\Users\KEATON~1\AppData\Local\Temp\cl-wf-smoke25` is left in place;
+    removing it would be a delete outside the repo.
+  - No lint suppression added.
+- **Verified against the installed package before writing:** Node **v24.4.1** — the thing under
+  test is the `node:fs` builtin, not a dependency. Measured from the worktree root, before any
+  edit:
+  - `C:\Users\KEATON~1\Documents\GitHub\cl-workflow\.claude\worktrees\agent-a351d628dd8a8adfe`
+    to plain `realpathSync`: returned **unchanged**; to `.native`:
+    `C:\Users\Keaton Forrest\Documents\GitHub\cl-workflow\.claude\worktrees\agent-a351d628dd8a8adfe`
+  - `c:\Users\Keaton Forrest\...` (lowercase drive) to plain: returned **unchanged**; to
+    `.native`: the same path with `C:`
+  - the long form: both return the long form
+  - `os.tmpdir()` = `C:\Users\KEATON~1\AppData\Local\Temp`; `TMPDIR` **unset** (only `TEMP` and
+    `TMP` are set), so the self-test's `/tmp` escape hatch in `rule-zero.ts` cannot mask the two
+    new cases — checked before relying on them.
+  - typescript **6.0.3**, eslint **10.9.1**, typescript-eslint **8.68.0**, eslint-plugin-n
+    **18.3.0**, @types/node **24.13.3** (`pnpm install --frozen-lockfile`, lockfile up to date).
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm install --frozen-lockfile` — "Lockfile is up to date", done in 1.9s
+  - `pnpm selftest` — `62/62 cases passed; 39 lines logged to rule-zero.log`, exit 0
+  - `npx tsc --noEmit 2>&1 | grep -cE 'template/|src/'` — **0** (the root copy's errors remain,
+    as the item says they should)
+  - `npx eslint --max-warnings 0 template src eslint.config.mjs` — exit 0, no output
+  - `pnpm build && git diff --exit-code dist/` — exit 0 after the `dist/` commit
+  - `node dist/cli.js init <tmp>/cl-wf-smoke25` — `init: 33 written, 0 skipped, 0 left beside as
+    .new`; `node dist/cli.js doctor <tmp>/cl-wf-smoke25` — `ok     self-test 62/62` and
+    `doctor: 6 passed, 0 failed`, exit 0. The smoke dir is itself an 8.3 path, so this also
+    exercises the fix from a target project.
+  - direct probes: payload built by `node` as
+    `{"tool_name":"Write","tool_input":{"file_path":"<worktree long form>\template\.claude\hooks\probe-target.ts"},"permission_mode":"probe"}`,
+    piped into `node template/.claude/hooks/rule-zero.ts` with `CLAUDE_PROJECT_DIR` set to
+    (a) `C:\Users\Keaton Forrest\...\agent-a351d628dd8a8adfe`,
+    (b) `c:\Users\Keaton Forrest\...\agent-a351d628dd8a8adfe`,
+    (c) `C:\Users\KEATON~1\...\agent-a351d628dd8a8adfe`
+    — **all three: no output, exit 0**
+  - `git grep -n -E '\b60/60\b|60 cases' -- . ':!docs/'` — one hit, `CLAUDE.md:18`, out of scope
+    (see Deviation); zero hits in `README.md`, `.github/`, `src/`, `template/`, `dist/`
+- **Checker verified — four experiments, output recorded verbatim:**
+  1. **`lib.ts` and `rule-zero.ts` reverted to HEAD, the new self-test cases kept**
+     (`git show HEAD:<file> > <file>`), `pnpm selftest`:
+     ```
+     FAIL  edit in worktree, drive letter case flipped   expected=silent got=deny    Rule zero — sub-agents cannot take this action, with or without a grant (rule-zero.conf:49 guard ^path:outside
+     FAIL  edit in worktree, long name while the root is 8.3 expected=silent got=deny    Rule zero — sub-agents cannot take this action, with or without a grant (rule-zero.conf:49 guard ^path:outside
+
+     60/62 cases passed; 41 lines logged to rule-zero.log
+      ELIFECYCLE  Command failed with exit code 1.
+     ```
+     exit 1. Restored: `62/62 cases passed; 39 lines logged to rule-zero.log`, exit 0.
+  2. **`isWithin` made case-sensitive on win32 only** (the win32 branch put back to
+     `resolved.startsWith(prefix)`): `62/62 cases passed`, exit 0 — the item predicted case 61
+     would fail here; it does not. See Deviation. Restored, `62/62`.
+  3. **Only the `.native` call reverted** (`fs.realpathSync(current)`), `isWithin` left
+     case-insensitive — this is what separates the two halves:
+     ```
+     FAIL  edit in worktree, long name while the root is 8.3 expected=silent got=deny    Rule zero — sub-agents cannot take this action, with or without a grant (rule-zero.conf:49 guard ^path:outside
+
+     61/62 cases passed; 40 lines logged to rule-zero.log
+     ```
+     exit 1. So case 61 is covered by *either* half and case 62 only by `.native`. Restored,
+     `62/62`.
+  4. **The direct probe harness can produce a deny**, so its three silences are evidence and not
+     a mis-wired pipe: with the `.native` call reverted, probe (c) printed
+     `{"hookSpecificOutput":{...,"permissionDecision":"deny",...,"Command: path:outside-repo C:\Users\Keaton Forrest\...\probe-target.ts"}}`
+     at exit 0. Restored: silent.
+- **Blocked on:** nothing I needed was denied. Two things the orchestrator should know:
+  - The rule-zero denial reproduced exactly as the preamble promised, on a file in my own
+    worktree, both before and **after** this fix. Exact denial: `Write` on
+    `C:\Users\Keaton Forrest\Documents\GitHub\cl-workflow\.claude\worktrees\agent-a351d628dd8a8adfe\probe1.txt`
+    to `Rule zero — sub-agents cannot take this action, with or without a grant
+    (rule-zero.conf:49 guard ^path:outside-repo)`. **Expected, and not a failure of the fix:**
+    the live session runs the *root* `.claude/hooks/` copy, which is the generated one
+    (`.claude/hooks/lib.ts:236` is still `fs.realpathSync(current)`, no `isWithin`) and is phase
+    3's to regenerate. Implementers get their file tools back only once phase 3 merges. Every
+    edit here was made through Bash.
+  - The worktree-isolation hook refuses any Bash command whose text it cannot parse: a heredoc
+    body containing a `for` line (a shell keyword), an absolute Windows path anywhere in the
+    command, or a body long enough to be truncated, all read as "too complex to verify". All
+    edits used `head`/`tail`/`printf`/`sed` on paths relative to the worktree root for that
+    reason. Worth a line in `mem/` for the next loop.
+- **Orchestrator should verify:** the full check after phase 3 (`pnpm lint` over the whole repo
+  including the regenerated root copy, `pnpm typecheck` at 0); `CLAUDE.md:18` `60/60` to
+  `62/62`, which is yours, not mine; whether to keep the case-insensitive win32 branch of
+  `isWithin` given experiment 2 shows it is not independently covered; and that an implementer
+  dispatched after phase 3 actually gets `Edit`/`Write` back — that is the whole point of this
+  phase and it cannot be proved from inside this worktree.
 
 ## Merge-back record (orchestrator)
 <!-- worktree branch, commits merged, conflicts and how resolved, worktree removed -->

@@ -99,7 +99,7 @@ report per SKILL §7–§10.
 ## Orchestrator validation (after each phase merge, and at the end)
 Per phase: the phase file's scoped validations re-run on the merged branch. End-to-end:
 `pnpm typecheck` (tsc 6, `--noEmit`, covers hooks `.ts` and CLI src); `pnpm build` + clean
-`git diff --exit-code dist/`; selftest 57/57 on this Windows machine; checker verification —
+`git diff --exit-code dist/`; selftest 60/60 on this Windows machine; checker verification —
 break the deny path in `rule-zero.ts`, watch the selftest go red, restore; `init` smoke test
 into a scratch dir + `doctor` green; `npx "github:Safricloud/cl-workflow#feat/2026-08-25-npx-ts-kit" init`
 into a scratch dir as the real consumer path; read the diff of every load-bearing file;

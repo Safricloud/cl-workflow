@@ -98,5 +98,13 @@ will misfire after this merge: `plan.md:102` (end-to-end orchestrator validation
 `phase-4.md:38` (the self-init smoke test). Both mean the current count, now 60/60.
 
 ## Merge-back record (orchestrator)
+- Item 2.5.1: branch `worktree-agent-a2c1102b1206b4430`, worktree clean, 2 commits
+  (`d262f1b`, `96af6f6`) merged fast-forward. No conflicts. Worktree removed, branch `-d`.
 
 ## Verification (orchestrator, after this phase merged)
+- Orchestrator's own run: `pnpm typecheck` clean; selftest **60/60, exit 0**;
+  `git grep "57/57"` excluding `docs/plans`/`docs/reviews` → empty.
+- Deviations 1–3 accepted (the `Context` third element is one generic mechanism; the two
+  extra README counts were the same fact; historical documents keep the old number).
+- The two stale live instructions it flagged (`plan.md` validation, `phase-4.md` 4.1) fixed
+  to 60/60 in this commit.

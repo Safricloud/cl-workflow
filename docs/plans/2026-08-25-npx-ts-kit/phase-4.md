@@ -35,7 +35,7 @@ tsconfig.build.json` to committed `dist/cli.js`.
 **Scoped validation:** `pnpm typecheck && pnpm build && git diff --exit-code dist/`;
 `node dist/cli.js init "$TMP/smoke"` then `node dist/cli.js doctor "$TMP/smoke"` green and
 re-running `init` reports all-skips (idempotent); edit one managed file in the smoke dir,
-`update` writes `.new` and warns; root: `node .claude/hooks/rule-zero-selftest.ts` → 57/57,
+`update` writes `.new` and warns; root: `node .claude/hooks/rule-zero-selftest.ts` → 60/60,
 `git grep -l "python3" -- .claude` empty.
 **Acceptance:** smoke init+doctor green on this Windows machine; self-inited root gates
 actually fire: piping a guarded command into root `.claude/hooks/rule-zero.ts` denies at

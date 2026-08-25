@@ -1,0 +1,50 @@
+{
+  "kitVersion": {
+    "version": "0.6.0",
+    "sha": null
+  },
+  "hashAlgo": "sha256-lf",
+  "files": {
+    ".claude/.gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
+    ".claude/.gitignore": "dda7eeeb0fdfbcc920f870f2bfd7238b32ebe2d7fe721b25c711368c3d968a43",
+    ".claude/agents/implementer.md": "29fc08f4624d5d98f420de52280a04b099be12c22c3dfc2315e13b6f24971096",
+    ".claude/agents/investigator.md": "3bb41eead1759ac8f69879151b949c5fe1c9134248f0df47382c87658168bbdb",
+    ".claude/hooks/docs-only.ts": "5dc8f6c78399d887c893fa944a132886f44963f44dad699d333a9e1521a0cf60",
+    ".claude/hooks/lib.ts": "0165132e5fa9221c80a6bd1c813a2c3f573a35f8a013e2bb6e4be3261f480c8f",
+    ".claude/hooks/package.json": "1239d4d885dcad42201a27ed9324f8f0f760b78700d8db9ced39a511cffe7eae",
+    ".claude/hooks/path-fence.ts": "2b505e8c9094a54b84a8fdc85de31868bf3d12bec35388ced94f32e70b0f63bd",
+    ".claude/hooks/pr-watch.ts": "cdd48f12edb98c4bb1d0114418dd618bcc4e90ac7aaadcdb001505f4fc80cb1f",
+    ".claude/hooks/reload-plan.ts": "6dbb5a8c5851083ba801dec9cbfeef41da57f39e3f646526d70998c2910147ea",
+    ".claude/hooks/rule-zero-selftest.ts": "8aa98c9d1d5b1fb816ac41dd0dc3204e555a1bbc08b528aba2c678e567a2993c",
+    ".claude/hooks/rule-zero.ts": "2d465c97728b1a2edb6b095948c250193361e0dd5afeac71eff2d0f5900f1c56",
+    ".claude/hooks/status-block.ts": "edfaf2eeb1ad9019f69b9a942b38d7fdf9773023a03328d9c95e7a62ae4101cf",
+    ".claude/rule-zero.conf": "63402b3d6582dfd6445bec88fe85660625ba0a9520e3a86cbd8ad7404f90b26a",
+    ".claude/rules/process.md": "8851cb0d7f52b35e26b36670c9f584c60b91f0621fa1482ea6efe2502e9efc82",
+    ".claude/settings.json": "0e52d4c865808bc6f2c4cde7d62e85638c1876091e530fa7666029068394bcb8",
+    ".claude/skills/contribute/SKILL.md": "95a3a0f5f11941195d0e0a464d69afbb9564f5fdb8419e0f8d54d652063c7280",
+    ".claude/skills/contribute/templates/blocked-issue.md": "2603ac2946c04c4464d7e709f26f4c93af6d82145d70439cb2c7b949cedf213c",
+    ".claude/skills/contribute/templates/investigation.md": "ea321db01e7ef03bd4b85e98e911f44bf84c79d5d0d9cd8e3e5d7edf13bc5f8e",
+    ".claude/skills/contribute/templates/issue-comment.md": "7338fac3d2e364e12bbaba6000c4108e359912925ff39ca03f11bb831569ba30",
+    ".claude/skills/contribute/templates/phase.md": "4fdbf6cd1206c8ccaf7409b2676c1838bee6e0df3747443ee91951134f768dab",
+    ".claude/skills/contribute/templates/plan.md": "f326bbe0c0ffcbb9787908ba75f26bfd5794b4186b9f9b27c9660a313fd83ef4",
+    ".claude/skills/contribute/templates/pr-body.md": "984dcb41b66b3d2fc5e9813e963aa7be46506c2a856723a365ce7f2aed012292",
+    ".claude/skills/contribute/templates/review.md": "80564b61a017854b152838d71c05993846c43aa69a5aa7baab7bae44196b8ca8",
+    "CLAUDE.md": "8286222d4bff30c3f4bda141073ad7d95ead05ea2d0759cf52c46f21892b5bbe",
+    "docs/guides/agent-workflow.md": "bbe629aab469ec7f31c15767e603f31ef85ca202b670f6b98efe9f4378a67464",
+    "docs/history/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/history/index.md": "fe2f9fa93cbe93a950f637b87be297d4e80e64061fe4c6dbccf39ccf7d353cb4",
+    "docs/plans/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/reports/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "docs/reviews/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mem/index.md": "a9335ab45a66de365247bbd2c9c1d065a5c529333ae857fe3514d3adf9c505f6"
+  },
+  "hooksManifest": [
+    "docs-only.ts",
+    "path-fence.ts",
+    "pr-watch.ts",
+    "reload-plan.ts",
+    "rule-zero-selftest.ts",
+    "rule-zero.ts",
+    "status-block.ts"
+  ]
+}

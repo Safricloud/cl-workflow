@@ -1,4 +1,5 @@
-.claude/rule-zero.grants
-.claude/rule-zero.log
-.claude/worktrees/
-.claude/pr-watch/
+rule-zero.grants
+rule-zero.log
+worktrees/
+pr-watch/
+__pycache__/

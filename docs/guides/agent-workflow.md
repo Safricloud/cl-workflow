@@ -69,7 +69,7 @@ discards work: non-`GET` calls to live services, migrations against a shared dat
 volume. Holds under bypassed permission prompts and under "work autonomously". Approval for one
 action is not approval for the next; delegation is not approval. Reads are unrestricted.
 
-**The mechanism.** A `PreToolUse` hook (`.claude/hooks/rule-zero.py`) judges every Bash
+**The mechanism.** A `PreToolUse` hook (`.claude/hooks/rule-zero.ts`) judges every Bash
 command, file edit and MCP call against `.claude/rule-zero.conf`. It is silent on everything
 except the configured shapes and it never prompts — the kit runs in bypass mode. Three verbs:
 
@@ -83,7 +83,7 @@ except the configured shapes and it never prompts — the kit runs in bypass mod
 
 **How the "yes" reaches the hook.** At the Questions phase the orchestrator asks for every
 rule-zero action the plan can foresee; on yes it writes the grant
-(`python3 .claude/hooks/rule-zero.py --grant '<regex>'`) before any code that performs it.
+(`node .claude/hooks/rule-zero.ts --grant '<regex>'`) before any code that performs it.
 At merge time one command writes the whole cleanup bundle
 (`--bundle merge-cleanup <pr> <branch>`). An unforeseen rule-zero need mid-loop is not a
 prompt: it becomes a `blocked-on-owner` issue and the loop continues with everything else.
@@ -91,7 +91,7 @@ prompt: it becomes a `blocked-on-owner` issue and the loop continues with everyt
 The kit is permissive on purpose. A false positive costs the owner a question outside the one
 phase where questions belong, and that is the failure mode that gets the kit thrown away. Name
 exact scripts and flags in the project-specific section of the conf rather than guarding
-general shapes. `python3 .claude/hooks/rule-zero-selftest.py` proves the gate is live; run it
+general shapes. `node .claude/hooks/rule-zero-selftest.ts` proves the gate is live; run it
 after every conf edit and in CI.
 
 ### 0.4 The three working habits every phase depends on
@@ -340,7 +340,7 @@ not written into the repo; `gh pr list --search <id>` finds it.
 **Purpose:** treat Copilot exactly as §6 treats implementers — claims, verified before acted on —
 and stop only when a cycle returns nothing.
 
-**The waiting is a script.** `python3 .claude/hooks/pr-watch.py --pr <n>` polls the PR head,
+**The waiting is a script.** `node .claude/hooks/pr-watch.ts --pr <n>` polls the PR head,
 the inline comments and the review bodies every minute and returns as soon as there is
 something new since it last reported, or `"new": []` after **five quiet minutes** — and the
 quiet window restarts whenever the head changes, so every push gets its full five minutes of
@@ -380,7 +380,7 @@ nothing still counts). Expect it to catch documentation accuracy disproportionat
 unasked when nothing but documentation changed.
 
 **On the owner's word.** The owner merges, or says "merge and clean up". On that word the
-orchestrator writes the bundle grant (`rule-zero.py --bundle merge-cleanup <pr> <branch>` —
+orchestrator writes the bundle grant (`rule-zero.ts --bundle merge-cleanup <pr> <branch>` —
 merge, delete the remote branch, `-D` the local branch, since `-d` refuses after a squash
 merge), runs `gh pr merge <n> --<method> --admin --delete-branch`, switches to the default
 branch and pulls, deletes the local branch, clears any unused grants, and quotes the owner's
@@ -389,7 +389,7 @@ words in its report. No further question is asked, and nothing in the repo recor
 **The docs-only standing rule.** A PR whose changes are documentation or comments only — no
 code — is merged by the orchestrator once the review loop is silent, without the owner's word,
 and its CI is cancelled first because it proves nothing. The decision is a measurement, not a
-judgement: `.claude/hooks/docs-only.py` classifies every changed file against the default
+judgement: `.claude/hooks/docs-only.ts` classifies every changed file against the default
 branch — documentation paths (`*.md`, `*.rst`, `*.txt`, `docs/`, `mem/`), or code files whose
 added and removed lines are all blank or whole-line comments — and writes the merge-cleanup
 grant itself only when every file passes. Anything it cannot classify is code. `.claude/` is
@@ -491,7 +491,7 @@ An entry moves between sections; it is deleted only when it is no longer true.
 | Archive after commit, before push | Archive **before the PR is opened**, into `docs/history/<id>/` with an index line; **no record commits after the PR opens** | Records land with the PR; a loop that records its own cycles in the repo triggers its own reviews |
 | Review/plan named by date(+time) and slug, flat history | One id per contribution; plan split into `plan.md` + `phase-<n>.md`; directory per contribution in history; `index.md` changelog | The name is the same everywhere it appears; phases can be worked concurrently |
 | Deferred findings in the ledger | Anything blocked on the owner is a **GitHub issue**, labelled `blocked-on-owner` + kind + area, created before the archive | Findable and clearable by kind; the ledger holds the number |
-| "Wait for the reviewer's latency" | `pr-watch.py`: one-minute polling, returns on news or after five quiet minutes, window restarts on push, extracts collapsed sections | Waiting is a script, not an agent counting minutes |
-| Merge only on the owner's explicit ask | + the **docs-only standing rule**: `docs-only.py` measures the diff and writes the grant itself; CI cancelled; `--admin` always | One standing approval, made mechanical and conservative |
+| "Wait for the reviewer's latency" | `pr-watch.ts`: one-minute polling, returns on news or after five quiet minutes, window restarts on push, extracts collapsed sections | Waiting is a script, not an agent counting minutes |
+| Merge only on the owner's explicit ask | + the **docs-only standing rule**: `docs-only.ts` measures the diff and writes the grant itself; CI cancelled; `--admin` always | One standing approval, made mechanical and conservative |
 | One issue per branch | An ask may name several issues; one PR or split is a Questions-phase decision | The owner's asks come in batches |
 | Loop ends at "report and stop" | + **Merge** on the owner's word (bundle grant) + **Deploy** per `CLAUDE.md` | The loop closes on the running system |

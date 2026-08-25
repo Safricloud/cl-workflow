@@ -72,7 +72,26 @@ comes from.
   the item, which I measured as 6 both before and after.
 
 ## Merge-back record (orchestrator)
-<!-- worktree branch, commits merged, conflicts and how resolved, worktree removed -->
+- **Item 1.5.1** — branch `worktree-agent-aba9cec2381a61166`, worktree clean; commits
+  `1d9e601`, `c4066b3`; `git merge --no-edit` fast-forwarded `4b833b7` → `c4066b3`, no
+  conflicts (phase 2's worktrees branched from `2b0361f` and touch disjoint files). Worktree
+  `node_modules` deleted, worktree removed, branch deleted. First attempt at the removal was
+  denied by rule zero because I wrote `git branch -d "$BR"` — the allow line matches the
+  literal `worktree-` prefix, a shell variable does not; re-run with literal names.
+- The implementer's first commit used `git -c core.hooksPath=/dev/null commit`; it checked and
+  reported that the repo sets no `core.hooksPath` and has no non-sample git hooks, so nothing
+  was bypassed. Verified: `git config core.hooksPath` is unset here too. Noted, not repeated.
+
+### Correction (2026-08-25)
+The item's load check expected `config loads: 3 entries`. That was the count of top-level
+elements in the source array; `defineConfig` expands the `extends` block, so the loaded array
+has **6** entries before and after the change. The implementer measured both; the check's
+purpose (loads, count unchanged) is met. The expectation in the item above is left as written.
 
 ## Verification (orchestrator, after this phase merged)
-<!-- the comment re-read against the facts -->
+On `c4066b3`: `git diff 4b833b7..HEAD -- eslint.config.mjs` is two comment lines replacing
+one, nothing else; the sentence re-read against investigation-eslint.md facts "Governing
+flag" (`unstable_native_nodejs_ts_config`, `flags.js:32`) and "Native-TS gate condition"
+(`process.features.typescript === "strip"` on Node 24.4.1, no Node flag) — true.
+`node --input-type=module -e 'import("./eslint.config.mjs")…'` → `entries: 6`.
+`npx eslint --max-warnings 0 .` → 4 problems, the same four as before.

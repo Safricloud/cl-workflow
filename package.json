@@ -1,0 +1,32 @@
+{
+  "name": "@safricloud/cl-workflow",
+  "version": "0.6.0",
+  "private": false,
+  "description": "The contribution kit: a Claude Code process, its hooks and its installer.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Safricloud/cl-workflow.git"
+  },
+  "type": "module",
+  "bin": {
+    "cl-workflow": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "template"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@10.27.0",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "selftest": "node template/.claude/hooks/rule-zero-selftest.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^6.0.0"
+  }
+}

@@ -44,7 +44,7 @@ LF.
 in `rule-zero.ts` (e.g. make the guard branch `continue`) → `pnpm selftest` goes red; restore
 both and see green. Record results.
 #### Status — item 2.1
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**In progress** (implementer, 2026-08-25). Item read, facts inherited, before-smoke captured.
 
 ### Item 2.2 — `pr-watch.ts` and `status-block.ts`
 **Files:** `template/.claude/hooks/pr-watch.ts`, `template/.claude/hooks/status-block.ts`

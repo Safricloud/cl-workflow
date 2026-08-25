@@ -94,5 +94,14 @@ scope. Flagging for the orchestrator in case a later item wants that sweep delib
   which the block could not name before the commit existed
 
 ## Merge-back record (orchestrator)
+- Item 3.5.1: worktree clean, 3 commits merged fast-forward to `bce86be`. No conflicts.
+  Worktree removed, branch `-d`.
 
 ## Verification (orchestrator, after this phase merged)
+- Orchestrator's own run: typecheck clean; selftest **60/60**; the refined grep
+  (`python3` + the seven `<hook>.py` names, over `template/`) → empty.
+- Scope judgement accepted: the ~35 generic Python behaviour-equivalence comments stay — they
+  are constraints, name no deleted file, and are consistent port-wide. No further sweep this
+  contribution.
+- The unrunnable `git diff -G"^(?!\s*[/*])"` in this item's validation text is noted as a
+  plan-authoring error; the implementer's two substitute checks are the record.

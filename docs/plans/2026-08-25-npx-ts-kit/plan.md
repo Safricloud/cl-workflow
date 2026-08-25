@@ -6,8 +6,9 @@
 **Branch:** `feat/2026-08-25-npx-ts-kit` off `main` (`dc189da`)
 **Owner go-ahead:** 2026-08-25 at the Questions phase — CLI as ".ts source, committed dist";
 repo-settings writes "Yes, all three"; "One PR, phased"
-**Phases:** `phase-1.md` (1 item, serial) · `phase-2.md` (1 item, serial) · `phase-3.md`
-(3 items, parallel) · `phase-4.md` (2 items, parallel)
+**Phases:** `phase-1.md` (1 item, serial) · `phase-2.md` (1 item, serial) · `phase-2.5.md`
+(1 item, from phase-2 verification) · `phase-3.md` (3 items, parallel) · `phase-4.md`
+(2 items, parallel)
 
 ## Measured facts (from the investigations; do not re-derive)
 | Fact | Value | Where measured |
@@ -74,6 +75,13 @@ repo-settings writes executed (done: `main` pushed, default, ruleset live) · on
   extras; README written to the finished state.
 - 2026-08-25 — TypeScript pinned `^6.0.0` resolves to 6.0.3 while the registry's latest is
   7.0.2; staying on 6 per the owner's explicit decision. Revisit only on the owner's word.
+- 2026-08-25 — Accepted phase 2's deviations 1–5 (fail-closed where Python failed open;
+  cosmetic JSON/EOL/CLI-text differences; four Python-only regex features fail closed and
+  loud). Deviation 6 became **phase 2.5**: self-test grows cases 58–60 so the no-`u`-flag
+  choice is defended inside the suite; every "57/57" claim becomes "60/60".
+- 2026-08-25 — Phase 2's ESM finding: a consumer project with `"type": "commonjs"` silently
+  breaks `node .claude/hooks/*.ts` (gate fails open). Fix shipped via item 3.3:
+  `template/.claude/hooks/package.json` = `{"type":"module"}` (measured working).
 
 ## Phasing
 Phase 1 is one serial item: it touches every magnet at once (root manifest, payload move,

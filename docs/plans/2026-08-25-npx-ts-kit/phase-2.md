@@ -118,5 +118,16 @@ way this port exists to end. Measured fix: ship `.claude/hooks/package.json` con
 whoever owns the payload file list — 3.3 or `init` in phase 4.
 
 ## Merge-back record (orchestrator)
+- Item 2.1: branch `worktree-agent-a46ebaacc7d35ea02`, worktree clean, 4 commits
+  (`c8b2f6c`…`6468b39`) merged fast-forward to `6468b39`. No conflicts. Worktree removed
+  (same node_modules two-step as phase 1), branch `-d` deleted.
 
 ## Verification (orchestrator, after this phase merged)
+- `pnpm typecheck` clean; selftest run by the orchestrator: **57/57, exit 0**.
+- Checker inversion by the orchestrator: `rule-zero.ts` moved aside → selftest **exit 1**;
+  restored → 57/57. (`mv`, not the guarded `git checkout --`.)
+- Live fixtures by the orchestrator against a scratchpad project: `git reset --hard` →
+  deny JSON naming `rule-zero.conf:33` at **exit 0**; `git add -A` → silent **exit 0**.
+- Deviations 1–5 accepted (1 is the plan's own non-negotiable; 2–5 cosmetic or the safe
+  direction). Deviation 6 → **phase-2.5.md** (cases 58–60). ESM finding → item 3.3 amended to
+  ship `.claude/hooks/package.json` (`{"type":"module"}`).

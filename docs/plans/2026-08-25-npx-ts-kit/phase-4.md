@@ -22,8 +22,8 @@ tsconfig.build.json` to committed `dist/cli.js`.
   never touched; `settings.json` → deep-merge only `worktree.baseRef` + the kit's three hook
   entries.
 - `doctor [dir]`: Node ≥ 24; lock present and parseable; settings.json hook commands point at
-  files that exist; selftest run and 57/57 — say loudly that a hook with a broken path fails
-  OPEN (the README's own warning, now mechanised).
+  files that exist; selftest run and **60/60** (phase 2.5 grew the suite) — say loudly that a
+  hook with a broken path fails OPEN (the README's own warning, now mechanised).
 - Self-init: run the built CLI's `init` on this repo root. Expected effect: root
   `.claude/hooks/*.py` deleted first (they are not in template), `.ts` kit + fixed
   `.gitignore` + settings.json land, `mem/` and live `docs/` records untouched (owned/absent
@@ -50,7 +50,7 @@ so nothing runs after a merge (owner decision 2). Jobs: `test` — matrix
 `os: [ubuntu-latest, windows-latest]`, Node 24 (`actions/setup-node@v4`),
 `pnpm/action-setup@v4` reading the `packageManager` pin, then: `pnpm install --frozen-lockfile`,
 `pnpm typecheck`, `pnpm build`, `git diff --exit-code dist/` (dist drift gate),
-`pnpm selftest` (must print 57/57), CLI smoke (`node dist/cli.js init` into a temp dir +
+`pnpm selftest` (must print 60/60), CLI smoke (`node dist/cli.js init` into a temp dir +
 `doctor`). Aggregate job `ci-ok`: `needs: test`, ubuntu-latest, one no-op step — **the job id
 and name must be exactly `ci-ok`**; the live ruleset (id 21458765) already requires that
 check name, so a mismatch makes every PR unmergeable without bypass.

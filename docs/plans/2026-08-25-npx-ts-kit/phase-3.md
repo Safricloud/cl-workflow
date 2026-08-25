@@ -55,20 +55,24 @@ docs-only merge path in SKILL §8 point at a missing file (grep proves the call 
 #### Status — item 3.2
 *(implementer keeps this current: In progress → Done | Blocked)*
 
-### Item 3.3 — Call sites, conf header, gitignore, and retiring the .py files
+### Item 3.3 — Call sites, conf header, gitignore, ESM shim, and retiring the .py files
 **Files:** `template/.claude/settings.json`, `template/.claude/agents/investigator.md`,
 `template/.claude/agents/implementer.md` (read; touch only if a `.py` reference exists),
 `template/.claude/skills/contribute/SKILL.md`, `template/.claude/rules/process.md`,
 `template/.claude/rule-zero.conf` (header comment only),
 `template/docs/guides/agent-workflow.md`, `template/mem/outstanding.md` (line 39 docs-only
-reference only), `template/.claude/gitignore`; deletions: `template/.claude/hooks/*.py`.
+reference only), `template/.claude/gitignore`,
+`template/.claude/hooks/package.json` (new: exactly `{"type":"module"}` — the ESM shim from
+phase 2's finding; a consumer project with `"type": "commonjs"` otherwise breaks every hook,
+fail-open); deletions: `template/.claude/hooks/*.py`.
 **Approach:** Every `python3 …/<hook>.py` becomes `node …/<hook>.ts` (exec form in
 settings.json: `"command": "node", "args": ["${CLAUDE_PROJECT_DIR}/.claude/hooks/<hook>.ts"]`,
 timeouts preserved). investigator.md frontmatter: path-fence wiring → `.ts`. SKILL.md: all
 command examples (`--grant`, `pr-watch`, `docs-only`, bundle/clear in §4, §8, §9). process.md
 and agent-workflow.md: command examples only — no reasoning rewrites. rule-zero.conf header:
 "Python re" → "JavaScript RegExp, compiled without the u flag; existing patterns keep their
-meaning". Fix remaining 52→57 claims outside README (grep the tree). Verify
+meaning". Fix stale selftest-count claims outside README to **60/60** — phase 2.5 grew the
+suite; grep the tree for `52/52` and `57/57`. Verify
 `template/.claude/gitignore` patterns are the unanchored set from phase 1 (fix if not).
 Delete the seven `.py` files from `template/` — the working root copies stay until phase 4.
 **Conventions that will fail your lint:** JSON valid after every settings.json edit; no

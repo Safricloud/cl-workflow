@@ -52,7 +52,77 @@ enforces); JSON files two-space indented; no `python3` mention may survive in RE
 shows only the gitignore rename and gitattributes addition); four duplicates gone; reverting
 the change removes `package.json` → `npm pack --dry-run` fails, and restores the duplicates.
 #### Status — item 1.1
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** — 2026-08-25. Branch `worktree-agent-a8ad969402ea80eae`, 6 commits (`4e5f287`…`a17c8c5`).
+
+**Not Blocked:** `typescript@^6.0.0` resolves to stable **6.0.3** (registry `latest` is `7.0.2`).
+Installed 6.0.3.
+
+**Scoped validation — actual outputs**
+| Check | Result |
+| --- | --- |
+| `pnpm install` | exit **0**; `+ typescript 6.0.3`, `+ @types/node 24.13.3`; `pnpm install --frozen-lockfile` → "Lockfile is up to date", exit **0** |
+| `git status --short` after commit | **clean** (only this phase file, committed last) |
+| `node -e "JSON.parse(…package.json…)"` | exit **0**, "package.json parses OK" |
+| `grep -r "python3" README.md` | **no matches**. Also `52/52` → no matches, `\.py\b` → no matches |
+| `npm pack --dry-run` | exit **0**, **33 files**. `template/.claude/gitignore` (65B) **listed**; `template/.claude/.gitattributes` (19B) listed. Root-level tarball entries are exactly `README.md` + `package.json` — **no `.py` at root**. (The 7 `.py` under `template/.claude/hooks/` are payload until 3.3 deletes them.) |
+
+**Acceptance — evidence**
+- `template/` complete: **31 files** = the 30-file payload inventory + the new
+  `template/.claude/.gitattributes`.
+- Blob-level diff of root `.claude` vs `template/.claude` (`git ls-files -s`, paths normalised)
+  shows **exactly two** differences, both intended: `.gitignore`→`gitignore` (rename + rewrite)
+  and the added `.gitattributes`. Every other blob id is **identical**.
+- `CLAUDE.md`, `docs/guides/agent-workflow.md`, `docs/history/index.md`, `mem/index.md` are
+  byte-identical to their root originals. `template/mem/outstanding.md` is `81cfb92` = the
+  pristine `dc189da` seed, **not** the live ledger (`e7d333f`) — as the plan requires.
+- Four duplicates gone; blob identity re-verified in the index before deleting
+  (`0cd3a0a`, `5c14931`, `cd70e47`, `0046dcf` each matched its canonical copy).
+- This contribution's own `docs/reviews/…` and `docs/plans/…` records are **not** in `template/`.
+
+**Deviations (all deliberate; veto in the PR)**
+1. **Added `@types/node@^24.0.0` to devDependencies** — not named in the item. Phase 2's scoped
+   validation runs `pnpm typecheck` over hooks importing `node:` builtins, which cannot resolve
+   without ambient Node types; `package.json` is in no later phase's Files list except 4.1
+   ("only if a script needs correcting"), so phase 1 is the only place it fits.
+2. **`template/.claude/gitignore` carries five patterns**, not the three the item text lists:
+   `rule-zero.grants`, `rule-zero.log`, `worktrees/`, `pr-watch/`, `__pycache__/`. The three
+   named are an abbreviation of the four originals; `pr-watch/` is the fourth
+   (investigation §1(d)) and `__pycache__/` is the addition the investigation explicitly
+   recommends ("currently untracked-and-unignored"). All rewritten unanchored.
+3. **`package.json` also carries `description` and `repository`** (conventional, factual).
+   **`license` is deliberately absent** — the repo has no LICENSE file and no owner decision
+   records a licence; asserting MIT would invent one. **Owner call needed.** npm's
+   missing-license warning is cosmetic since the kit never reaches the registry.
+4. **tsconfig files carry mechanically-required extras** beyond the item's list:
+   `moduleResolution: nodenext`, `lib`, `types: ["node"]`, `skipLibCheck`,
+   `forceConsistentCasingInFileNames`; and in `tsconfig.build.json` `outDir`/`rootDir`/
+   `declaration: false`/`sourceMap: false` — without these "emit only `src/cli.ts` → `dist/`"
+   is not expressible.
+5. **README names the hooks as `.ts`, including `lib.ts`** (the finished state). No later phase
+   edits `README.md`, so writing it to the pre-phase-2 state would leave it permanently stale.
+
+**Observations for the orchestrator**
+- **`pnpm typecheck` currently exits 1 with TS18003** ("No inputs were found in config file") —
+  both of its inputs (`src/`, and `.ts` under `template/.claude/hooks/`) land in later phases.
+  Not part of this item's scoped validation; goes green at phase 2. Same for `pnpm build`.
+- **Skill discovery under `template/` — measured, partially answers investigation-structure's
+  open "Not done" item.** After the copy, Claude Code did surface
+  `template/.claude/skills/contribute/SKILL.md`, but as a **directory-scoped** skill named
+  `<worktree>/template:contribute`, disambiguated from the unscoped `contribute` — not a
+  colliding duplicate. Agent-definition discovery under `template/.claude/agents/` was not
+  re-measured (the agent roster is fixed at session start).
+- **Re-verifying the rewritten ignore patterns with `git check-ignore` was refused** by the
+  worktree-isolation guard (it blocks git operations outside this worktree, and the test needs
+  a scratch repo). Relying on investigation-structure Observation B, which measured exactly
+  this unanchored rewrite in a sandbox: `git check-ignore -v` names the matching line for each.
+- **This worktree's on-disk files are still CRLF** (they were checked out before
+  `.gitattributes` existed). The **index is LF** for every entry and `git ls-files --eol`
+  reports `attr/text=auto eol=lf` throughout, so every future checkout — CI, and the phase 2–4
+  worktrees — gets LF. Forcing a re-checkout here would mean deleting every tracked file, which
+  is not worth the risk for zero effect on committed bytes.
+- `docs-only.py`'s `DOC_DIRS = ("docs/", "mem/")` prefix match does not cover `template/docs/`
+  or `template/mem/` (investigation §3 class 5). Harmless today; phase 3.2 owns the fix and
+  already has it in scope.
 
 ## Merge-back record (orchestrator)
 

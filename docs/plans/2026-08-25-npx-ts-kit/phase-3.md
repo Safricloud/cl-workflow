@@ -369,5 +369,24 @@ not break lib imports).
   `rule-zero.ts` — the load-bearing one — is live now.
 
 ## Merge-back record (orchestrator)
+- Item 3.3 first (`25b7c7d`, fast-forward), then 3.1 (`9150fed`, merge commit `a1528ce`),
+  then 3.2 (`ac9d934`, merge commit `024648e`). All three worktrees clean before merge; no
+  conflicts anywhere — the three parallel status blocks in this file merged untouched (the
+  kit's "adjacent sections merge cleanly" claim, holding in production). Worktrees removed,
+  branches `-d` deleted.
 
 ## Verification (orchestrator, after this phase merged)
+- `pnpm typecheck` clean; selftest **60/60**; all seven `.ts` hooks + `lib.ts` +
+  `package.json` shim present under `template/.claude/hooks/`.
+- Deviations accepted: 3.1's 1–8 (the fence fail-open-on-internal-error matches the Python
+  contract; the `\Z`→`$`+`s` translation is the correct dialect move) and 3.2's 1–6 —
+  including the one judgement call: **a comment-only edit to a shipped hook remains
+  auto-mergeable under the standing docs-only rule**, exactly as the Python behaved; tightening
+  that would be a rule change, offered for veto in the PR.
+- 3.2's incident recorded: one unintended read-only `gh repo view` while probing PATH shims
+  (a `.cmd` shim is ignored by `spawnSync` without a shell — noted for phase 4's tests);
+  hardened afterwards with an `.exe` shim + scratch `GH_CONFIG_DIR`.
+- **Finding → phase 3.5:** the phase-level grep `python3|\.py\b -- template/` is no longer
+  empty — five "Ported from <hook>.py" doc comments in the 3.1/3.2 files reference files 3.3
+  deleted (the sixth match, `.py` in docs-only's comment-syntax extension map, is correct
+  domain data and stays). The enforceable invariant is refined in `phase-3.5.md`.

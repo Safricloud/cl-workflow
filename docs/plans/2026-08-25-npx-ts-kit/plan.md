@@ -89,6 +89,13 @@ repo-settings writes executed (done: `main` pushed, default, ruleset live) · on
   list, so the shim and the seven `.ts` files cannot be silently omitted.
 - 2026-08-25 — 3.3's vestigial `__pycache__/` ignore pattern left in place (harmless in
   consumer repos; pruning it is not worth a diff line now).
+- 2026-08-25 — Phase-3 verification: five dead "Ported from `<hook>.py`" comments →
+  **phase 3.5** (comment-only strip; invariant refined to allow `.py` as classified extension
+  data). 3.2's judgement call accepted: comment-only edits to shipped hooks stay
+  auto-mergeable under the standing rule, as in Python — veto in the PR if unwanted.
+- 2026-08-25 — Phase 4 dispatch order: 4.2 (CI workflow, `.github/` only) launched alongside
+  3.5 — it consumes no template state; 4.1 (CLI + self-init) waits for 3.5's merge so the
+  committed dist and the lock hashes are built from the final template.
 
 ## Phasing
 Phase 1 is one serial item: it touches every magnet at once (root manifest, payload move,

@@ -260,8 +260,8 @@ export function pyRealpath(target: string): string {
  *
  * On Windows the comparison is case-insensitive: NTFS is case-insensitive, so two spellings
  * that differ only in case name the same directory, and a case-sensitive test would put a
- * file inside the repo outside it. Elsewhere the comparison is exact, because there two
- * spellings that differ in case are two different files.
+ * file inside the repo outside it. Elsewhere the comparison is exact: on a case-sensitive
+ * filesystem, two spellings that differ in case are two different files.
  *
  * `base` itself is not "within" itself: the separator is required, so a sibling directory
  * whose name merely starts with `base` (`/repo-old` against `/repo`) is correctly outside.

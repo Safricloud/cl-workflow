@@ -101,8 +101,9 @@ function mayStop(): boolean {
 
   const diff = git(cwd, "diff", "--stat", base, "--", "docs/plans/");
   if (diff === null) return true; // as above: fail open
+  if (diff.code !== 0) return true; // git could not diff against that base: cannot tell; fail open
   // the plan file changed since base: status block present (or at least attempted)
-  return diff.code === 0 && diff.out.trim() !== "";
+  return diff.out.trim() !== "";
 }
 
 let allowed: boolean;

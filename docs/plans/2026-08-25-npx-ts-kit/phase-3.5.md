@@ -89,8 +89,9 @@ with `lib.ts` and `rule-zero-selftest.ts` and gone outside this item's "header c
 scope. Flagging for the orchestrator in case a later item wants that sweep deliberately.
 
 **Commits** (worktree branch `worktree-agent-a03c5d524f0a63a38`; not pushed):
-- `3e042c6` Hook headers state their constraints, not their provenance
-- `<this commit>` Record item 3.5.1 status
+- `3e042c6` Hook headers state their constraints, not their provenance — the five hook files
+- `d5af2bf` Record item 3.5.1 status — this block; a trailing commit substitutes this sha,
+  which the block could not name before the commit existed
 
 ## Merge-back record (orchestrator)
 

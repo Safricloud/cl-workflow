@@ -40,7 +40,7 @@ export function errText(err: unknown): string {
 
 /** `CLAUDE_PROJECT_DIR` if set, else the process cwd — the root every hook resolves against. */
 export function projectRoot(): string {
-  return process.env.CLAUDE_PROJECT_DIR || process.cwd();
+  return process.env["CLAUDE_PROJECT_DIR"] || process.cwd();
 }
 
 /* -------------------------------------------------------------------------- hook stdout */
@@ -163,7 +163,8 @@ export function loadConf(confPath: string): ConfLoad {
   const lines = readLines(fs.readFileSync(confPath, "utf8"));
   for (let i = 0; i < lines.length; i++) {
     const n = i + 1;
-    const line = lines[i].trim();
+    // Absent would read as blank, and a blank line is skipped by the next test anyway.
+    const line = (lines[i] ?? "").trim();
     if (line === "" || line.startsWith("#")) continue;
     const cut = line.indexOf(" ");
     const verb = cut === -1 ? line : line.slice(0, cut);

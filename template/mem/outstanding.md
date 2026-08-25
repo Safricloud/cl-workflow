@@ -5,7 +5,6 @@
 
 ## Blocked on the owner
 <!-- one line per GitHub issue: #n — what the owner has to do — which contribution waits -->
-<!-- #1 resolved 2026-08-25: owner delegated, MIT chosen; lands with 2026-08-25-npx-ts-kit -->
 
 ## Open — engineering follow-ups
 - 2026-08-25 — Measure on this install: (a) a hook `deny` holds under `bypassPermissions`;
@@ -15,24 +14,8 @@
   `docs/guides/agent-workflow.md` §5.
 - 2026-08-25 — Measure Copilot's latency, trigger and suppressed-section location on the first
   PR; fill in §10 "Know your reviewer".
-- 2026-08-25 — Watch npm upstream: 11.12.0's git-install regression (breaks every `npx
-  github:` consumer on that version) and npm 12's `allow-git=none` default. Revisit the README
-  install caveats when either moves; `pnpm dlx` is the measured always-works path today.
-- 2026-08-25 — `pr-watch.ts` has run only against a fake `gh` (news/quiet/head-change all
-  measured); real-PR pagination remains unmeasured until the first PR review cycle.
 
 ## Settled — do not re-open, do not "fix"
-- 2026-08-25 — The kit installs via `npx github:Safricloud/cl-workflow` only; it is never
-  published to the npm registry. (owner)
-- 2026-08-25 — Node floor is 24; hooks ship as erasable `.ts` run natively; TypeScript 6 with
-  `tsc` is the checker; pnpm is the kit repo's package manager. (owner)
-- 2026-08-25 — The CLI is authored in `.ts` and compiled by tsc into a committed
-  `dist/cli.mjs`; CI fails when dist drifts from src. Node cannot strip types under
-  `node_modules`, so the shipped bin must be JS. (owner, 2026-08-25-npx-ts-kit Q1)
-- 2026-08-25 — CI runs on pull_request into main only — never on push to main. Merging is
-  gated by a `main` ruleset requiring check `ci-ok`, with repository-admin bypass. (owner)
-- 2026-08-25 — Licence is MIT, copyright "Safricloud". Owner delegated the choice: "I don't
-  mind what people do with this repo." Do not re-ask. (owner, issue #1)
 - 2026-08-25 — Sub-agents are Opus, not "the strongest model available". (owner)
 - 2026-08-25 — Sub-agents commit to their own worktree branch; only the orchestrator pushes,
   opens PRs, and — with the owner's yes — merges and deletes feature branches. (owner)
@@ -53,7 +36,7 @@
   deploy are reported in the conversation. Otherwise the loop triggers its own reviews. (owner)
 - 2026-08-25 — Anything blocked on the owner becomes a GitHub issue labelled `blocked-on-owner`
   + kind + area, created before the archive. (owner)
-- 2026-08-25 — Standing merge approval: a docs/comments-only PR (measured by `docs-only.py`)
+- 2026-08-25 — Standing merge approval: a docs/comments-only PR (measured by `docs-only.ts`)
   is merged by the orchestrator after the review loop is silent, CI cancelled. (owner)
 - 2026-08-25 — `gh pr merge --admin` is always used; branch protection is not the gate. (owner)
 - 2026-08-25 — PR review quiet window is 5 minutes, restarting on every push. (owner)

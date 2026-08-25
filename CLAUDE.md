@@ -1,21 +1,37 @@
-# <project name>
+# cl-workflow — the contribution kit
 
-<One paragraph: what this repo is, the stack, the default branch.>
+The `/contribute` loop packaged as an npm package installed straight from GitHub
+(`npx --yes github:Safricloud/cl-workflow init`) and never published to the registry.
+`template/` is the payload exactly as it lands in a target project — the permission gate,
+seven TypeScript hooks, two sub-agent definitions, the skill and the process guide; `src/cli.ts`
+is the installer that copies it in and keeps it current. TypeScript 6 compiled by `tsc`,
+Node >= 24, pnpm; default branch `main`. This repo runs the kit on itself and its root
+`.claude/` is **generated** by the CLI — edit `template/.claude/**` and re-run `update`, never
+the root copy.
 
 ## Commands
-- Install: `<cmd>`
-- Full check (lint + typecheck + unit): `<cmd>`
-- Build: `<cmd>`
-- E2E: `<cmd>` (`<which suites cover which surfaces>`)
-- Container: `<cmd>`
+- Install: `pnpm install`
+- Full check (lint + typecheck + unit): `pnpm typecheck && pnpm build && git diff --exit-code dist/ && pnpm selftest`
+- Build: `pnpm build` — `tsc -p tsconfig.build.json` → `dist/cli.js`, which is committed
+- E2E: `node dist/cli.js init <tmp>/smoke` then `node dist/cli.js doctor <tmp>/smoke` (the CLI
+  smoke: `doctor` checks Node, the lock, the hook wiring and the ESM shim, then runs the gate's
+  own self-test to 60/60)
+- Container: none
 
 ## Conventions that will fail your lint
-- <the two or three that bite most>
+- `erasableSyntaxOnly` — no enums, no runtime `namespace`, no parameter properties, no
+  decorators, in `src/` or in `template/.claude/hooks/`. Node strips these types, it does not
+  compile them; sibling imports carry the explicit `.ts` extension.
+- Zero runtime dependencies, `node:` builtins only — a target project installs nothing, and
+  the CLI must keep running from inside `node_modules` where nothing was built for it.
+- LF everywhere (`* text=auto eol=lf`), and `dist/cli.js` must be byte-exactly what
+  `pnpm build` emits: CI runs `git diff --exit-code dist/` and fails on drift.
 
 ## Deploy
-Mode: `production-ci` | `local-containers` | `none yet`
-- production-ci: workflow `<name>`; `gh run list --workflow <name> --branch <default> -L1` then `gh run watch <id>`
-- local-containers: rebuild `<cmd>`; checks: `<how to see user id, migrations, bound port, stderr>`
+Mode: `none yet`
+- Nothing is deployed and nothing runs after a merge: `.github/workflows/ci.yml` triggers on
+  `pull_request` into `main` and on nothing else. A release is a git tag, which is what makes
+  `npx github:Safricloud/cl-workflow#vX.Y.Z` resolvable — there is no publish step.
 
 ## Process
 Every contribution runs `/contribute` (`.claude/skills/contribute/SKILL.md`). Rule zero, the

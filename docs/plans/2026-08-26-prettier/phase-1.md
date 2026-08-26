@@ -393,7 +393,38 @@ left alone by Prettier at width 100 and the churn in those two files drops (repo
 the investigation predicted 283 → ~0 and 54 → ~0 inside the literals); 62/62. Tests: none —
 comments; say so.
 #### Status — item 1.6
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26).
+- **Files touched:** `template/.claude/hooks/rule-zero-selftest.ts` — two reason lines plus
+  `// prettier-ignore` directly above `const CASES` (was `:50`, now `:53`);
+  `template/.claude/hooks/docs-only.ts` — the same directly above `const COMMENT` (was `:52`,
+  now `:55`), under the existing JSDoc so the ignore stays the last leading comment.
+- **Commits:** `12a2d00` (this status line amended in a follow-up commit)
+- **Deviation:** the item reads "a `// prettier-ignore` line directly above `const CASES` …
+  followed by a short comment saying why". Both halves cannot hold at once, so the reason lines
+  are written *above* the directive and the directive sits directly above the `const`. Measured
+  both orders (`docs-only.ts`, reason after the directive): Prettier honours it either way —
+  0 diff lines both times — so this is a readability choice, not a mechanism one.
+- **Verified against the installed package before writing:** prettier 3.9.6 via `pnpm dlx`
+  (no local install yet — item 1.1 adds it); `pnpm dlx prettier@3.9.6 --version` → `3.9.6`.
+  Prettier is not in this worktree's `node_modules/`.
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm install --frozen-lockfile` — lockfile up to date, 100 packages
+  - `pnpm dlx prettier@3.9.6 --print-width 100 <file> | diff <file> -` — **selftest 283 → 0**
+    diff lines (baseline: 16 hunks, every one inside `CASES` `:50-142`); **docs-only 54 → 0**
+    (baseline: one hunk, `53,54c53,102`, inside `COMMENT` `:52-58`). Both files are now
+    byte-identical to their formatted output, so the rest of each file was already clean and the
+    entire churn was the two literals.
+  - `pnpm lint` — clean, 0 warnings · `pnpm typecheck` — clean · `pnpm selftest` — **62/62**
+  - **Checker verified:** the measurement above *is* the reverted/restored pair — without the
+    `// prettier-ignore` (the committed text at branch head) Prettier rewrote 283 and 54 lines
+    inside the literals; with it, `diff` is empty. The comment-order variant was measured too and
+    is equally clean (see Deviation) — the directive, not its placement, is what does the work.
+- **Tests:** none — the change is two comments and carries no logic; the self-test (62/62) is the
+  behavioural evidence that the literal still parses and still drives the gate.
+- **Blocked on:** nothing.
+- **Orchestrator should verify:** at the close-out `pnpm format` run, that these two line ranges
+  come back unchanged (plan's validation list already names this), and that
+  `git grep -n "prettier-ignore" template/` is exactly two hits.
 
 ## Merge-back record (orchestrator)
 <!-- per item: worktree branch, commits merged, conflicts and how resolved, worktree removed -->

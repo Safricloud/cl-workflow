@@ -21,7 +21,16 @@
  */
 import * as path from "node:path";
 
-import { asRecord, asString, emitDeny, expandUser, isRecord, isWithin, pyRealpath, readStdinJson } from "./lib.ts";
+import {
+  asRecord,
+  asString,
+  emitDeny,
+  expandUser,
+  isRecord,
+  isWithin,
+  pyRealpath,
+  readStdinJson,
+} from "./lib.ts";
 
 /** `p.strip("/")` — plus backslashes, so a prefix written `docs\reviews\` also fences. */
 function stripSeparators(prefix: string): string {
@@ -29,7 +38,10 @@ function stripSeparators(prefix: string): string {
 }
 
 function fence(argv: readonly string[]): string | null {
-  const prefixes = argv.filter((p) => p.trim() !== "").map(stripSeparators).filter((p) => p !== "");
+  const prefixes = argv
+    .filter((p) => p.trim() !== "")
+    .map(stripSeparators)
+    .filter((p) => p !== "");
   if (prefixes.length === 0) return null; // no prefixes configured: nothing to fence
 
   let payload: Record<string, unknown>;

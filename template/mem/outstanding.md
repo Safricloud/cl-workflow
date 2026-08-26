@@ -1,12 +1,15 @@
 # Outstanding — the live ledger
 
 ## Open — owner follow-ups
+
 <!-- dated; content/product decisions, not engineering; nothing in code blocked on these -->
 
 ## Blocked on the owner
+
 <!-- one line per GitHub issue: #n — what the owner has to do — which contribution waits -->
 
 ## Open — engineering follow-ups
+
 - 2026-08-25 — Measure on this install: (a) a hook `deny` holds under `bypassPermissions`;
   (b) `worktree.baseRef: "head"` is honoured by subagent worktrees (spawn one implementer from
   a feature branch and check `git -C .claude/worktrees/<slug> merge-base HEAD <branch>`);
@@ -16,6 +19,7 @@
   PR; fill in §10 "Know your reviewer".
 
 ## Settled — do not re-open, do not "fix"
+
 - 2026-08-25 — Sub-agents are Opus, not "the strongest model available". (owner)
 - 2026-08-25 — Sub-agents commit to their own worktree branch; only the orchestrator pushes,
   opens PRs, and — with the owner's yes — merges and deletes feature branches. (owner)
@@ -26,7 +30,9 @@
   elsewhere. Mid-loop the orchestrator decides, sub-agents implement everything, decisions are
   recorded for veto. Nothing is deferred except what the owner must personally do. (owner)
 - 2026-08-25 — The orchestrator edits documents only; every code change goes through an
-  implementer — except on the small path, below. (owner)
+  implementer — with two exceptions: the small path, below, and the formatter run before the
+  final Orchestrate commit (SKILL §6), a tool run over the repo, not an edit. (owner; the second
+  exception: owner, 2026-08-26-prettier, decision 2)
 - 2026-08-26 — The small path (SKILL §11): a change of a few lines, no new dependency, no gate
   or hook logic, declared small by the owner or proposed by the orchestrator and accepted. The
   orchestrator edits directly; the full check is the gate; the record is the PR plus one
@@ -40,8 +46,8 @@
   phases can be worked concurrently. (owner)
 - 2026-08-25 — No record commits after `gh pr create`: review cycles are PR comments; merge and
   deploy are reported in the conversation. Otherwise the loop triggers its own reviews. (owner)
-- 2026-08-25 — Anything blocked on the owner becomes a GitHub issue labelled `blocked-on-owner`
-  + kind + area, created before the archive. (owner)
+- 2026-08-25 — Anything blocked on the owner becomes a GitHub issue labelled
+  `blocked-on-owner` + kind + area, created before the archive. (owner)
 - 2026-08-25 — Standing merge approval: a docs/comments-only PR (measured by `docs-only.ts`)
   is merged by the orchestrator after the review loop is silent, CI cancelled. (owner)
 - 2026-08-26 — Second standing merge approval: a small-path PR is merged by the orchestrator

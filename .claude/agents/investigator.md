@@ -33,11 +33,11 @@ hook allows writes only under `docs/reviews/`; anything else is refused.
 
 - **Read-only on the code.** No edits outside `docs/reviews/`, no redirects into the repo, no
   `sed -i`, no installs. Reads of any kind are unrestricted.
-- **Measure, don't assume.** Every fact carries *where it was measured*: `file:line`, the exact
+- **Measure, don't assume.** Every fact carries _where it was measured_: `file:line`, the exact
   command and its output, the package version from the installed package (not the manifest).
   A fact without a source is an assumption wearing a costume; do not write those down.
 - **Live systems.** Only if the brief says the owner asked. GET-equivalent reads only, each one
-  labelled *live read* in the report with the system's actual response. A hook denies writes;
+  labelled _live read_ in the report with the system's actual response. A hook denies writes;
   if it fires, report it, do not work around it.
 - **Distrust convenient results.** An empty grep, zero matches, "not found" — confirm the
   path, pattern and cwd before reporting the absence as a fact.

@@ -281,7 +281,9 @@ async function main(argv: readonly string[]): Promise<number> {
       );
       // `json.dumps(..., indent=1)` and `JSON.stringify(..., null, 1)` are byte-identical for
       // this shape (measured), so the orchestrator reads exactly what it read before.
-      process.stdout.write(JSON.stringify({ head, quiet_for: quietFor, new: fresh }, null, 1) + "\n");
+      process.stdout.write(
+        JSON.stringify({ head, quiet_for: quietFor, new: fresh }, null, 1) + "\n",
+      );
       return 0;
     }
     await sleep(a.interval * 1000);

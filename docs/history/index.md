@@ -29,3 +29,18 @@ One entry per contribution (one logical line, wrapped like the rest), newest las
   tree line that listed it; the CLI's retirement of a legacy `python3 …/rule-zero.py` settings
   entry and the hooks' "Python original" comments stay, being migration and documentation, not
   tooling · blocked: none
+
+- 2026-08-26 · 2026-08-26-prettier · Prettier 3.9.6 as a devDependency (`printWidth` 100, embedded
+  formatting off; `dist/`, the lockfile, the generated root copies, `settings.json` and every
+  process record ignored); `pnpm format` / `pnpm format:check` first in the full check and in CI;
+  the orchestrator runs the formatter before the final commit (owner amends documents-only);
+  `Format:` line in the owned skeleton, tool-agnostic payload prose; `reload-plan.ts` reads
+  `**Review:**` and the `_(…)_` placeholder; first `node:test` suite in `test/` (`pnpm test`,
+  3 tests) · blocked: none
+
+- 2026-08-26 · 2026-08-26-outstanding-to-issues · small: the twelve open engineering follow-ups
+  in `mem/outstanding.md` moved to GitHub issues #8–#19, each labelled kind + area (labels
+  `hooks`, `process`, `measurement` added beside the existing ones); the ledger keeps one line
+  per issue and a settled entry records that open engineering work is tracked as issues; #14's
+  measurement taken at the move (no worktree-path denial since PR #3, two six-worktree loops
+  in between) · blocked: none

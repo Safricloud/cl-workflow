@@ -64,7 +64,8 @@ function report(): string[] {
     const relDir = path.relative(root, planDir);
     const title = text !== "" ? stripHeadingMarks(firstLine(text)).trim() : relDir;
     out.push(`Live plan: \`${relDir}/\` — ${title}`);
-    for (const key of ["Source review", "Branch", "Owner go-ahead"]) {
+    // `Review` is the key `templates/plan.md` writes; `Source review` never matched a plan.
+    for (const key of ["Review", "Branch", "Owner go-ahead"]) {
       const m = new RegExp("\\*\\*" + key + ":\\*\\*\\s*([^\\n]+)").exec(text);
       const value = m?.[1];
       if (value !== undefined) out.push(`  ${key}: ${value.trim()}`);
@@ -90,7 +91,9 @@ function report(): string[] {
           "s",
         ).exec(ptext);
         const body = m?.[1]?.trim() ?? "";
-        if (body === "" || body.startsWith("*(implement")) {
+        // Both markers: a formatter (Prettier) re-prints the `*(implementer keeps…)*`
+        // placeholder as `_(implementer keeps…)_`, and either form means "not written yet".
+        if (body === "" || body.startsWith("*(implement") || body.startsWith("_(implement")) {
           pending.push(`${num} — ${name.trim()}`);
         } else if (body.toLowerCase().startsWith("**in progress")) {
           pending.push(`${num} — ${name.trim()} (in progress)`);

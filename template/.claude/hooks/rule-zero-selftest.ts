@@ -47,6 +47,9 @@ type Context = string | readonly [string, string, string?];
 /** (label, tool, tool_input, context, expected) */
 type Case = readonly [string, string, Record<string, unknown>, Context, string];
 
+// A truth table, and it is read as a table: one case per line, the five columns lining up down
+// the block. Prettier would break every row across many lines (owner decision 5).
+// prettier-ignore
 const CASES: readonly Case[] = [
   // --- everyday work must be silent -------------------------------------------------
   ["tests run", "Bash", { command: "npm test" }, "orch", SILENT],

@@ -19,7 +19,7 @@ Approval for one action is not approval for the next. Delegation is not approval
 
 A hook enforces this, silently, with no prompts. When it denies: a sub-agent records the
 command under **Blocked** and moves on; the orchestrator either had the yes at the Questions
-phase (grant already written) or records the need under *Blocked on the owner* and continues
+phase (grant already written) or records the need under _Blocked on the owner_ and continues
 with everything else. Grants: `node .claude/hooks/rule-zero.ts --grant '<regex>'` /
 `--bundle merge-cleanup <pr> <branch>`.
 
@@ -79,8 +79,9 @@ the **Files** of the item that generalizes it.
   will need and their copies among the rest — writes the review and the plan, asks the
   questions, dispatches implementers, merges their worktree branches, verifies, decides
   mid-loop, archives, opens the PR, runs the review loop, merges on the owner's word,
-  deploys per `CLAUDE.md`. Edits documents only — never code — except on the small path
-  (SKILL §11), where it makes the change itself.
+  deploys per `CLAUDE.md`. Edits documents only — never code — with two exceptions: the small
+  path (SKILL §11), where it makes the change itself, and the formatter run before the final
+  Orchestrate commit (§6), a tool run over the repo, not an edit.
 - **Sub-agents** (Opus): `investigator` writes reports under `docs/reviews/<id>/` and nothing
   else; `implementer` works in its own worktree, commits to its branch, writes tests for the
   logic it adds, never pushes, never takes a rule-zero action, keeps its status block in the

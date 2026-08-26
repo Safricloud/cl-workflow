@@ -33,11 +33,11 @@ no flags on any version measured.
 
 ## The three commands
 
-| Command | What it does |
-| --- | --- |
-| `cl-workflow init [dir]` | Copies the payload into `dir` (default `.`). Never clobbers: an existing file with different content is written beside it as `<name>.new`; identical content is skipped silently. Renames the shipped `gitignore` to `.claude/.gitignore`. Writes `.claude/cl-workflow.lock`. |
+| Command                    | What it does                                                                                                                                                                                                                                                                                                  |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cl-workflow init [dir]`   | Copies the payload into `dir` (default `.`). Never clobbers: an existing file with different content is written beside it as `<name>.new`; identical content is skipped silently. Renames the shipped `gitignore` to `.claude/.gitignore`. Writes `.claude/cl-workflow.lock`.                                 |
 | `cl-workflow update [dir]` | Refreshes the **managed** files only. A managed file still matching a shipped version is overwritten; one you have edited gets a `<name>.new` beside it and a warning. **Owned** files are never touched. `settings.json` is merged, not replaced — only `worktree.baseRef` and the kit's three hook entries. |
-| `cl-workflow doctor [dir]` | Checks Node ≥ 24, that the lock file is present and parseable, that every hook command in `settings.json` points at a file that exists, and runs the self-test to 62/62. |
+| `cl-workflow doctor [dir]` | Checks Node ≥ 24, that the lock file is present and parseable, that every hook command in `settings.json` points at a file that exists, and runs the self-test to 62/62.                                                                                                                                      |
 
 Run them through `pnpm dlx github:Safricloud/cl-workflow <command>` (or the npx form from
 Install), or install the package and use the `cl-workflow` bin.
@@ -113,7 +113,7 @@ shipped conf contains.
 
 The `allow` lines are the process's own recorded "yes": commits, plain pushes, `gh pr create`,
 PR and issue comments, `gh api` reads, and any HTTP call to a local host. Add to them freely;
-that is cheaper than a question. Two standing *merge* approvals sit beside them: a docs-only
+that is cheaper than a question. Two standing _merge_ approvals sit beside them: a docs-only
 PR merges once the review loop is silent, with its CI cancelled because it proves nothing; a
 small-path PR (below) merges once the review loop is silent **and** `ci-ok` is green.
 
@@ -178,11 +178,13 @@ Node ≥ 24, pnpm, TypeScript 6.
 
 ```
 pnpm install
+pnpm format:check                # prettier --check . — first step of the full check; pnpm format writes
 pnpm lint                        # eslint --max-warnings 0 . — both hook copies, src/, the config
 pnpm typecheck                   # tsc --noEmit over src/, the payload's hooks and the generated root copy
 pnpm build                       # tsc -p tsconfig.build.json → dist/cli.js
 git diff --exit-code dist/       # the drift gate CI enforces
 pnpm selftest                    # must print 62/62 and exit 0
+pnpm test                        # node --test over test/**/*.test.ts
 node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/ docs/guides/
 ```
 
@@ -201,32 +203,32 @@ hashes LF-normalised content so `update` is correct either way.
 
 `.github/workflows/ci.yml` runs on `pull_request` into `main` and on nothing else — there is no
 post-merge run. The `test` job is a matrix of `ubuntu-latest` and `windows-latest` on Node 24:
-install, lint, typecheck, build, the **dist/ drift gate**, the **generated copy drift gate**
-(`-- .claude/ docs/guides/`), the self-test, and a CLI smoke test that inits into a temp
-directory and runs `doctor`. An aggregate job **`ci-ok`** (`needs: test`) is the single
-required check.
+install, the format check, lint, typecheck, build, the **dist/ drift gate**, the **generated
+copy drift gate** (`-- .claude/ docs/guides/`), the self-test, the `node:test` suite, and a CLI
+smoke test that inits into a temp directory and runs `doctor`. An aggregate job **`ci-ok`**
+(`needs: test`) is the single required check.
 
 The `main` ruleset requires exactly that check name and grants **repository admins bypass**, so
 a merge is never hard-blocked — but an unbypassed PR does not merge until `ci-ok` is green.
 
 ## Verify on your install (measured here where possible; the rest is yours)
 
-| Claim | Status |
-| --- | --- |
-| Two worktree branches editing adjacent status sections of one plan file merge cleanly | Measured, sandbox git |
-| `git branch -d` refuses while the worktree is attached; remove the worktree first | Measured |
-| Hook denies in a sub-agent, allows once with a grant, consumes it, never honours a grant for `deny` lines | Measured, self-test |
-| A missing guard line makes the self-test go red | Measured |
-| Conf patterns keep their meaning compiled as JS `RegExp` without the `u` flag | Measured, every shipped pattern |
-| `docs-only.ts` accepts docs paths and whole-line-comment diffs, rejects trailing comments, new code files, unknown extensions, shebangs, and anything under `.claude/` that is not markdown | Measured, sandbox git, 10 diff shapes |
-| `pr-watch.ts` returns on news, goes quiet after the window, and restarts the window when the head changes | Measured, fake `gh` |
-| Node ≥ 24 strips types from a hook `.ts` outside `node_modules` with zero stderr | Measured, Node 22.18 and 24.4 |
-| Hooks from `.claude/settings.json` fire inside subagents with `agent_id` / `agent_type` | Official hooks reference |
-| A hook `deny` holds in `bypassPermissions` mode | Official SDK docs; confirm once on your install |
-| `worktree.baseRef: "head"` is the settings key, and subagent worktrees then branch from the orchestrator's HEAD | Official worktrees page names the setting; confirm the key placement |
-| Claude Code ≥ 2.1.218 — before that a subagent's `git -C` / `GIT_DIR` could reach the parent checkout | Third-party changelog report; check `claude --version` and the changelog |
-| Sub-agents inherit the main session's permission mode when `permissionMode` is unset | Official sub-agents page; the agent files leave it unset on purpose |
-| `model: opus` resolves to the Opus you want; pin the full model id in both agent files if not | Yours |
+| Claim                                                                                                                                                                                       | Status                                                                   |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Two worktree branches editing adjacent status sections of one plan file merge cleanly                                                                                                       | Measured, sandbox git                                                    |
+| `git branch -d` refuses while the worktree is attached; remove the worktree first                                                                                                           | Measured                                                                 |
+| Hook denies in a sub-agent, allows once with a grant, consumes it, never honours a grant for `deny` lines                                                                                   | Measured, self-test                                                      |
+| A missing guard line makes the self-test go red                                                                                                                                             | Measured                                                                 |
+| Conf patterns keep their meaning compiled as JS `RegExp` without the `u` flag                                                                                                               | Measured, every shipped pattern                                          |
+| `docs-only.ts` accepts docs paths and whole-line-comment diffs, rejects trailing comments, new code files, unknown extensions, shebangs, and anything under `.claude/` that is not markdown | Measured, sandbox git, 10 diff shapes                                    |
+| `pr-watch.ts` returns on news, goes quiet after the window, and restarts the window when the head changes                                                                                   | Measured, fake `gh`                                                      |
+| Node ≥ 24 strips types from a hook `.ts` outside `node_modules` with zero stderr                                                                                                            | Measured, Node 22.18 and 24.4                                            |
+| Hooks from `.claude/settings.json` fire inside subagents with `agent_id` / `agent_type`                                                                                                     | Official hooks reference                                                 |
+| A hook `deny` holds in `bypassPermissions` mode                                                                                                                                             | Official SDK docs; confirm once on your install                          |
+| `worktree.baseRef: "head"` is the settings key, and subagent worktrees then branch from the orchestrator's HEAD                                                                             | Official worktrees page names the setting; confirm the key placement     |
+| Claude Code ≥ 2.1.218 — before that a subagent's `git -C` / `GIT_DIR` could reach the parent checkout                                                                                       | Third-party changelog report; check `claude --version` and the changelog |
+| Sub-agents inherit the main session's permission mode when `permissionMode` is unset                                                                                                        | Official sub-agents page; the agent files leave it unset on purpose      |
+| `model: opus` resolves to the Opus you want; pin the full model id in both agent files if not                                                                                               | Yours                                                                    |
 
 ## Ergonomics
 

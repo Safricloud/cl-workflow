@@ -23,11 +23,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
 
       - run: pnpm install --frozen-lockfile
 
       # Cheapest gate first.
+      - run: pnpm format:check
+
       - run: pnpm lint
 
       - run: pnpm typecheck
@@ -54,6 +56,8 @@ jobs:
 
       - name: Self-test (must print 62/62)
         run: pnpm selftest
+
+      - run: pnpm test
 
       - name: CLI smoke (init + doctor)
         shell: bash

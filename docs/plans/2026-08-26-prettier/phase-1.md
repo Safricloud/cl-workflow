@@ -76,7 +76,71 @@ excludes exactly the paths above (measure with `pnpm exec prettier --file-info <
 path of each family: `"ignored": true`); CI has the two new steps in the stated positions. Tests:
 none — configuration; say so.
 #### Status — item 1.1
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26).
+- **Files touched:** `package.json` (three scripts added per P4, `prettier ^3.9.6` in
+  devDependencies); `pnpm-lock.yaml` (written by `pnpm add`, +10 lines, one importer entry and one
+  `prettier@3.9.6` package entry); `.prettierrc` (new, P1 verbatim); `.prettierignore` (new, P2
+  verbatim with its comments); `.github/workflows/ci.yml` (`pnpm format:check` first under
+  `# Cheapest gate first.`, `pnpm test` after the self-test — plus Prettier's own `'24'` → `"24"`
+  on `node-version`); `README.md` (Development block gains two command lines, the CI paragraph
+  gains "the format check" and "the `node:test` suite" — plus table re-padding and one `*merge*`
+  → `_merge_` from formatting).
+- **Commits:** `cfa73d5` on `worktree-agent-ab6f2692213830880` (one commit, all seven files).
+- **Deviation:** the item's scoped validation says the red list includes
+  `template/.claude/hooks/rule-zero.ts`. **It does not, and the expectation is wrong:** measured,
+  `rule-zero.ts` is already Prettier-clean at `printWidth: 100` (`prettier --check` exit 0, and
+  `prettier <file> | diff - <file>` = 0 lines), as are `reload-plan.ts`, `status-block.ts` and
+  `eslint.config.mjs`. Six `.ts`/`.mjs` files are dirty, not ten — consistent with the fact table's
+  467 diff lines, which never claimed every file contributed. No plan fact is wrong; only this
+  one validation expectation. Nothing else deviates; no lint suppressions.
+- **Verified against the installed package before writing:** prettier 3.9.6; `"dependencies"`
+  absent and `engines.node >= 14` at `node_modules/prettier/package.json` (read via
+  `require(...)`, not the manifest); `pnpm exec prettier --version` prints `3.9.6`.
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm exec prettier --write package.json .prettierrc README.md .github/workflows/ci.yml` —
+    `package.json` and `.prettierrc` unchanged, `README.md` and `ci.yml` rewritten; then
+    `pnpm exec prettier --check` on the same four — clean, exit 0
+  - `pnpm install` (unfrozen, once) then `pnpm install --frozen-lockfile` — "Lockfile is up to
+    date", exit 0
+  - `pnpm format:check` — **exit 1**, 23 of 35 checked paths dirty (25 before I formatted my
+    two). Includes `src/cli.ts`, `CLAUDE.md`, `template/CLAUDE.md`,
+    `template/docs/guides/agent-workflow.md`, the five other dirty hooks, `mem/outstanding.md`,
+    both `tsconfig*.json`. Excludes, as required: `dist/cli.js`, `pnpm-lock.yaml`,
+    `.claude/settings.json`, `template/.claude/settings.json`, `.claude/pr-watch/*`, and
+    everything under `docs/history/`, `docs/reviews/`, `docs/plans/`, `docs/reports/`
+  - **Checked paths measured, not guessed:** `prettier.getFileInfo` over all 115 tracked files →
+    **35** checked, 80 ignored or unsupported. Note `template/docs/history/index.md`,
+    `template/mem/*.md` and `template/.claude/**` *are* checked — the ignore entries for the
+    records are root-anchored (`/docs/history/`), which is what P2 intends
+  - `.prettierignore` measured per family with `pnpm exec prettier --file-info` —
+    `"ignored": true` for `dist/cli.js`, `pnpm-lock.yaml`, `.claude/settings.json`,
+    `.claude/hooks/rule-zero.ts`, `.claude/pr-watch/7.json`, `.claude/worktrees/x/README.md`,
+    `docs/guides/agent-workflow.md`, `template/.claude/settings.json`, `docs/history/index.md`,
+    `docs/reviews/…`, `docs/plans/…`, `docs/reports/…`; `"ignored": false` for `src/cli.ts`,
+    `CLAUDE.md`, `template/CLAUDE.md`, `package.json`, `.prettierrc` (parser **yaml**, not json —
+    Prettier's inference for an extensionless rc file; the JSON text is valid YAML and is
+    idempotent under it), `README.md`, `ci.yml`, `template/.claude/hooks/rule-zero.ts`
+  - **The ignore lines are load-bearing, measured:** `prettier --ignore-path .gitignore --check
+    dist/cli.js .claude/settings.json template/.claude/settings.json pnpm-lock.yaml` flags all
+    four — each would be rewritten if it were not ignored
+  - `pnpm lint` — clean, `--max-warnings 0`; `pnpm typecheck` — clean
+  - `pnpm test` today: `tests 0 … fail 0`, **exit 0** (no `test/` yet — item 1.2 lands it). CI is
+    therefore not broken by the new step, but the step proves nothing until 1.2 merges
+  - **Checker verified:** with `node-version: "24"` reverted to `'24'` in `ci.yml`,
+    `prettier --check` on my four files printed `[warn] .github/workflows/ci.yml` and exited 1;
+    restored, "All matched files use Prettier code style!", exit 0. (`pnpm format:check` was also
+    seen red at 25 files before I formatted mine and at 23 after — the gate is live either way.)
+- **Tests:** none — this item is configuration, scripts and prose; there is no logic to test. The
+  checker for it is `pnpm format:check` itself, seen failing and passing above.
+- **Blocked on:** nothing. Two commands were refused by the worktree-isolation hook for being
+  "too complex to verify" (a `cat > .prettierignore <<'EOF' …` heredoc chained after `printf`,
+  and `pnpm install --frozen-lockfile 2>&1 | tail -8; echo "EXIT=${PIPESTATUS[0]}"`); both were
+  re-run as plain single commands and succeeded. No rule-zero denial.
+- **Orchestrator should verify:** the full check (`pnpm build` + `dist/` drift + `pnpm selftest` +
+  the generated-copy gate were not in my scope and I did not run them); that `pnpm test` gains a
+  real suite from item 1.2 before this PR is judged green; and, at the P7 close-out, that
+  `pnpm format` leaves nothing under an ignored prefix changed — including the sibling worktrees
+  under `.claude/worktrees/`, which `--file-info` reports ignored.
 
 ### Item 1.2 — `reload-plan.ts`: accept the underscore placeholder, read `**Review:**`; tests in `test/`
 **Files:** `template/.claude/hooks/reload-plan.ts`, `test/reload-plan.test.ts`, `tsconfig.json`

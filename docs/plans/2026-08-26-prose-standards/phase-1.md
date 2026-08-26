@@ -70,7 +70,11 @@ stop payload, per the docs), and it is not one today. (c) §2 tier two: a brief 
 when the item generalizes a function, the shared module". (e) §6 verify: "`git grep` the names
 of functions the phase added for a second definition". (f) §8 inline briefs: "each opens with
 'You are `I-r<cycle>.<k>`'". (g) Appendix C: the Investigate line gains "copies listed"; the
-Orchestrate line gains "duplicates grepped". (h) Appendix D: the row from `plan.md`.
+Orchestrate line gains "duplicates grepped". (h) Appendix D: the row from `plan.md`. (i) §1:
+the branch is created with no upstream — `git switch -c <branch> --no-track origin/main` —
+with the why in a clause: a branch tracking `origin/main` is pushed *to* `main` by an IDE
+sync, and the loop's record commits must land with the PR, never before it (mid-loop decision
+in `plan.md`).
 **Conventions that will fail your lint:** none for `.md`; PR #4's §11 and its appendix rows
 are in your base — leave them.
 **Scoped validation:** `pnpm lint && pnpm typecheck`; `grep -n '^## \|^### ' template/docs/guides/agent-workflow.md` shows §0.5 between §0.4 and §1
@@ -86,8 +90,11 @@ also names "the functions the change will need and their existing copies". §5 r
 **Files** bullet gains "— including the shared module when the item generalizes a function; the
 investigation's copies list says which". §6 **Verify**: add "`git grep` the names of functions
 the phase added for a second definition" to the list. §8: "Each inline brief opens with 'You
-are `I-r<cycle>.<k>`' (review cycle, brief number); the implementer signs with it." Nothing in
-§11. The dispatch line in §6 is unchanged — the agent definition carries the identity.
+are `I-r<cycle>.<k>`' (review cycle, brief number); the implementer signs with it." §1: the
+branch-creation bullet becomes `git switch -c <branch> --no-track origin/main`, then
+`git config --get branch.<branch>.merge` must print nothing — one sentence of why (an IDE sync
+pushes a tracking branch to `main`; mid-loop decision in `plan.md`). Nothing in §11. The
+dispatch line in §6 is unchanged — the agent definition carries the identity.
 **Conventions that will fail your lint:** the frontmatter `description:` is what Claude Code
 shows; PR #4 extended it — leave it.
 **Scoped validation:** `pnpm lint && pnpm typecheck`; `git diff -U0 <base> -- template/.claude/skills/contribute/SKILL.md | grep -c '^[-+]description:'` prints 0

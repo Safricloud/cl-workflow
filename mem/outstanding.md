@@ -2,9 +2,6 @@
 
 ## Open — owner follow-ups
 <!-- dated; content/product decisions, not engineering; nothing in code blocked on these -->
-- 2026-08-26 — Merge PR #4 (the small path). `2026-08-26-prose-standards` waits at its plan
-  until `origin/main` carries it, then rebases and dispatches (owner: "Merge #4 first; I rebase
-  before dispatch"). Remove this line when #4 is on `main`.
 
 ## Blocked on the owner
 <!-- one line per GitHub issue: #n — what the owner has to do — which contribution waits -->

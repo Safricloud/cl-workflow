@@ -94,9 +94,35 @@ them.
   validation and deleted before finishing.
 
 ## Merge-back record (orchestrator)
-<worktree branch, commits merged, conflicts, worktree removed.>
+`worktree-agent-a36a8245baed6698e`, branched from `d7a03ca`; status clean; commits `946f1e7`,
+`4a248a0`, `baddb96` read; fast-forward merge to `baddb96`, no conflict; worktree removed,
+branch deleted with `-d`. Deviation (README line 66 gloss gains "voice, code") accepted: the
+gloss enumerates the file's sections and the file gained two. The acceptance grep
+`grep -c 'Managed (23 files)'` was my error (the README bolds the word); the implementer's
+`'\*\*Managed\*\* (23 files)'` → 1 is the check that means what I meant.
 
 ## Verification (orchestrator, after this phase merged)
-<Full check; README re-read against `ci.yml` and `CLAUDE.md`; **live measurement**: the
-implementer's final message prefix and its transcript's narration rate, with the transcript
-path.>
+On `baddb96`, 2026-08-26, by the orchestrator:
+- **Full check:** `pnpm lint` clean, `pnpm typecheck` clean, `pnpm build` reproduces `dist/cli.js`,
+  `pnpm selftest` 62/62; `node dist/cli.js update .` → *0 refreshed, 24 already current, 0
+  `.new`*; the gate `-- .claude/ docs/guides/` prints nothing; tree clean.
+- **README re-read** against `ci.yml` (step names "dist/ drift gate" and "Generated copy drift
+  gate", pathspec `-- .claude/ docs/guides/`) and root `CLAUDE.md` (same pathspec, same
+  grounds): consistent. The new paragraph uses the canonical terms and points at
+  `.claude/rules/process.md`. `**Managed** (23 files)` / `**Owned** (9 files)` unchanged;
+  `git ls-files template/ | wc -l` = 33.
+- **§11 rewrap:** words identical before and after (implementer's token diff, 2887 = 2887);
+  the root copy and the lock moved for that one file. Remaining lines over 100 bytes in
+  `SKILL.md` are the frontmatter `description:` and pre-existing fenced command blocks — exempt.
+- **Live measurement — the first implementer under the regenerated `implementer.md`.**
+  Transcript `~/.claude/projects/c--Users-Keaton-Forrest-Documents-GitHub-cl-workflow/324b5e61-1fc3-4cf0-a391-940a1fd78cb1/subagents/agent-a36a8245baed6698e.jsonl`,
+  blocks grouped by `message.id` (one block per JSONL record, as investigation-mechanisms.md
+  §4 warns): 46 assistant turns, 45 with a tool call; **22 of 23 text blocks began `I-3.1:`
+  (96%)**, the final message included; **22 of 45 tool-calling turns had a text block before
+  the first tool call (49%)**. Baseline this morning, old definition: sub-agents 0% prefixed,
+  16–78% narrated. Verdict: the name rule took; the one-line-before-each-tool-call rule took
+  half-way — many tool calls follow another tool call in the same turn with no line between.
+  Under direction A there is no mechanism to close that gap; recorded in the PR and the ledger
+  for the owner to judge, not fixed here.
+- **`.claude/rule-zero.log`:** no denial for this item.
+- **No phase 3.5.** Not done: no UI, no container.

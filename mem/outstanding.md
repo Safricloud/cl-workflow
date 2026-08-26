@@ -8,6 +8,12 @@
 <!-- #1 resolved 2026-08-25: owner delegated, MIT chosen; lands with 2026-08-25-npx-ts-kit -->
 
 ## Open — engineering follow-ups
+- 2026-08-25 — `rule-zero.ts` spends a single-use grant while *judging*, segment by segment, so
+  when a later segment of the same Bash command is denied the whole command does not run but
+  the earlier grant is already consumed (measured at the merge of PR #3: log shows `grant-used
+  gh pr merge 3 …` then the deny of `git branch -D … 2>&1`, PR still OPEN; re-bundled to
+  proceed). Fix: consume grants only after every segment is allowed. Until then, write merge
+  sequences as exact segments — no trailing `2>&1`, no variables.
 - 2026-08-25 — Measure on this install: (a) a hook `deny` holds under `bypassPermissions`;
   (b) `worktree.baseRef: "head"` is honoured by subagent worktrees (spawn one implementer from
   a feature branch and check `git -C .claude/worktrees/<slug> merge-base HEAD <branch>`);

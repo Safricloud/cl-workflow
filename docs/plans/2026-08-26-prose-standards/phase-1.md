@@ -93,9 +93,14 @@ are in your base — leave them.
   `I-r<cycle>.<k>`"; Appendix C Investigate/Orchestrate lines gain copies-listed and
   duplicates-grepped; Appendix D gains the row from `plan.md`.
 - **Commits:** `37bdf2c` on `worktree-agent-a95b8ae8581dacb99` (this status update follows it)
-- **Deviation:** none. Two small re-wraps of pre-existing lines in §1 and §6 were needed to keep
-  the ~95-column wrap after inserting text mid-paragraph; no wording of those sentences changed
+- **Deviation:** two small re-wraps of pre-existing lines in §1 and §6 were needed to keep the
+  ~95-column wrap after inserting text mid-paragraph; no wording of those sentences changed
   beyond the inserted clauses. PR #4's §11 and its two appendix rows are untouched.
+  **Reported, not hidden:** before the orchestrator's correction arrived I had already run the
+  item's `git stash push` / `git stash pop` once (shared `refs/stash` across worktrees). The pop
+  dropped the entry I had pushed (`794f0c7`, its message naming this worktree branch) and
+  restored exactly my two files; `git stash list` is now empty here and `git status --porcelain`
+  is clean. If a phase-mate lost a stash entry in that window, this is the place to look.
 - **Tests:** none: no logic — prose only; the acceptance grep is the checker.
 - **Validation (scoped; full check left to the orchestrator):**
   - `pnpm lint` — clean, 0 problems (`node_modules` was absent in the worktree; `pnpm install
@@ -104,9 +109,10 @@ are in your base — leave them.
   - `grep -n '^## \|^### '` — `### 0.5 …` at line 111, between `### 0.4` (102) and `## 1. The
     ask` (165)
   - Appendix D rows 21 → 22 (base + 1); whole-file `grep -c '^| '` 38 → 39
-  - **Checker verified:** the item's acceptance grep exits 0 with the change; with
-    `git stash push -- template/docs/guides/agent-workflow.md` it exits 1; after `git stash pop`
-    it exits 0 again
+  - **Checker verified (safe method, per the orchestrator's correction):** the base file exported
+    with `git show HEAD~2:template/docs/guides/agent-workflow.md` into the scratchpad — the
+    acceptance grep against it exits **1** (`grep -c '^| '` = 38); against the working file it
+    exits **0** (39). No `git stash` and no `git checkout --` involved.
 - **Blocked on:** nothing
 - **Orchestrator should verify:** the full check and the generated-copy gate — the root
   `docs/guides/agent-workflow.md` is deliberately untouched here (phase 2 regenerates it), so

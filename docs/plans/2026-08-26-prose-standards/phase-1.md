@@ -100,7 +100,54 @@ shows; PR #4 extended it — leave it.
 **Scoped validation:** `pnpm lint && pnpm typecheck`; `git diff -U0 <base> -- template/.claude/skills/contribute/SKILL.md | grep -c '^[-+]description:'` prints 0
 **Acceptance:** `grep -q 'begins .Orchestrator:' template/.claude/skills/contribute/SKILL.md && grep -q 'I-r<cycle>.<k>' template/.claude/skills/contribute/SKILL.md && grep -q 'second definition' template/.claude/skills/contribute/SKILL.md && grep -q 'existing copies' template/.claude/skills/contribute/SKILL.md` exits 0; on stash exits 1.
 #### Status — item 1.4
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26).
+- **Files touched:** `template/.claude/skills/contribute/SKILL.md` — six prose edits: W1/W2 for
+  the orchestrator as a new paragraph after the role sentence; §1 gains a `git switch -c
+  <branch> --no-track origin/main` bullet with the `branch.<branch>.merge` check and one
+  sentence of why; §2 tier two asks the brief for the functions the change will need and their
+  existing copies with `file:line`; §5's item rule names the shared module under **Files**;
+  §6 **Verify** adds the `git grep` for a second definition; §8 names inline briefs
+  `I-r<cycle>.<k>`. Frontmatter, the §6 dispatch line and §11 untouched.
+- **Commits:** on branch `worktree-agent-ad3daf37e9486284b`
+- **Deviation:** none in the prose. Two mechanical notes: the §6 **Verify** and §8 paragraphs
+  were re-wrapped so the inserted clauses sit inside the ~95-column flow, so their diffs are
+  larger than the sentences added; `pnpm install --frozen-lockfile` was run in the worktree
+  because it had no `node_modules` (gitignored, nothing committed).
+- **Tests:** none: no logic — prose only. The acceptance grep is the "must fail if reverted".
+- **Verified before writing:** no package API is involved, so nothing in `node_modules` bears on
+  it. Facts inherited from `plan.md` (canonical wording W1, W2, W9; the mid-loop no-track
+  decision) and checked against the file: PR #4's §11 and its `description:` line are in the
+  base and are unchanged — the `description:` diff count prints 0, the §11 hunk count 0.
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm lint` — exit 0, no output (`eslint --max-warnings 0 .`)
+  - `pnpm typecheck` — exit 0, no output; neither reads `.md`, they prove nothing else broke
+  - `git diff -U0 -- template/.claude/skills/contribute/SKILL.md | grep -c '^[-+]description:'`
+    — prints **0**
+  - the item's four-grep acceptance chain, with the change — exit **0**, each term count 1
+  - **Checker verified:** the same chain against the unchanged file — all four counts **0**,
+    chain exit **1**. Run twice: first via `git stash push`/`pop` (which collided across
+    worktrees — see **Blocked on**), then safely via
+    `git show HEAD:...SKILL.md > <scratchpad copy>` — 284 lines, all four terms 0.
+- **Blocked on:** `git checkout -- template/.claude/rules/process.md` — denied by rule zero
+  (`rule-zero.conf:36 guard git checkout (-- |\.( |$))`). It was needed because **`git stash` is
+  shared across worktrees**: `refs/stash` is one repository-wide ref, so the stash this item
+  pushed for its revert check was popped by the item 1.1 worktree
+  (`worktree-agent-ade9f5e0e4ce4cce7`), and this worktree's `git stash pop` took *their*
+  `process.md` stash instead. Consequences — all recorded, nothing destroyed:
+  - item 1.1's `process.md` change is sitting **uncommitted in this worktree** and is *not* in
+    this item's commits (committed by path). It is also preserved in the dropped stash commit
+    `45d1c157c480b1a99e4f5c38f0e7d31e1e1c16e7` (`git stash apply 45d1c15`, or
+    `git show 45d1c15:template/.claude/rules/process.md`) and copied to the session scratchpad
+    as `process.md.leaked-from-ade9f5e0.txt`;
+  - this item's own SKILL.md stash was popped into the item 1.1 worktree by the same mechanism;
+    the edits here were re-applied deterministically from the edit script, so nothing is lost.
+- **Orchestrator should verify:** (a) `git -C <this worktree> status --short` shows
+  `template/.claude/rules/process.md` modified — that is item 1.1's leaked work, not this
+  item's, deliberately left uncommitted; decide whether item 1.1 needs `45d1c15` recovered
+  before this worktree is removed. (b) The full check and the generated-copy gate. (c) Whether
+  any other phase-1 item verified its acceptance with `git stash` — the shared `refs/stash`
+  makes stash unsafe while worktrees run in parallel; `git show HEAD:<path>` into a temp file
+  is the safe form and is worth a line in the guide.
 
 ### Item 1.5 — templates and the owned `CLAUDE.md` skeleton
 **Files:** `template/.claude/skills/contribute/templates/investigation.md`,

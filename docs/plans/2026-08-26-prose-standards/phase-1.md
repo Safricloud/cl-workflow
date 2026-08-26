@@ -28,7 +28,49 @@ session; if a sentence can go, it goes.
 **Scoped validation:** `pnpm lint && pnpm typecheck`; `grep -c 'Orchestrator:' template/.claude/rules/process.md`
 **Acceptance:** `grep -q 'I-<n.m>:' template/.claude/rules/process.md && grep -q 'Investigator-<topic>:' template/.claude/rules/process.md && grep -q 'I-r<cycle>.<k>:' template/.claude/rules/process.md && grep -q 'one concern per file' template/.claude/rules/process.md` exits 0; on `git stash` of your change it exits 1. The file's first eight lines (PR #4's small-path sentence) are unchanged.
 #### Status — item 1.1
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26).
+- **Files touched:** `template/.claude/rules/process.md` — `## Voice` (W1 + W2, all four
+  prefixes) and `## Code` (W3–W7 as five bullets, closing with W4's investigation/plan
+  sentence) spliced between **Three habits** and **Roles**; the **Roles** orchestrator bullet
+  gains "briefs investigators — for the functions a change will need and their copies among
+  the rest" and the sub-agents bullet "writes tests for the logic it adds". +35/−5 lines; the
+  file grows 62 → 92 lines.
+- **Commits:** `88504a2` on `worktree-agent-ade9f5e0e4ce4cce7`, plus one follow-up commit
+  recording that sha here
+- **Deviation:** the canonical W5 sentence is spelled "Keep to one concern per file; a file you
+  cannot summarize in one sentence is two files" rather than opening with "One concern per
+  file." — the acceptance grep is case-sensitive and the sentence-initial capital made it exit
+  1. Term unchanged, capitalization only. W7's second half (the orchestrator appraises the
+  screenshots) is dropped here — it is the orchestrator's duty, not the implementer's, and this
+  file is loaded into every session; it survives in full in `implementer.md` (item 1.2).
+- **Tests:** none: no logic — prose only. Acceptance is the grep below.
+- **Verified against the installed package before writing:** n/a — no package API used; the
+  base text was read from `template/.claude/rules/process.md` at `8e29e80`+plan commit, and
+  PR #4's small-path text was preserved (first 8 lines sha256 `da8b0db…` identical before and
+  after; the diff is a single hunk at line 44).
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm lint` — exit 0 (needed `pnpm install --frozen-lockfile` first: the worktree had no
+    `node_modules`)
+  - `pnpm typecheck` — exit 0
+  - `grep -c 'Orchestrator:' template/.claude/rules/process.md` — **2** (base: 0)
+  - Acceptance (four greps, `&&`-chained) — exit **0**
+  - **Checker verified:** with the file restored to its `HEAD` content the same chain exits
+    **1** and `grep -c 'Orchestrator:'` prints **0**; restored, exit 0 and 2 again. Done twice
+    — once via `git stash` (see below) and once by copying `git show HEAD:<path>` over the file
+    and back, which is the run recorded here.
+- **Blocked on:** nothing denied by the hook. **But:** `git stash push`/`git stash pop` is
+  unsafe in this repo while siblings run — `refs/stash` is shared by all worktrees. My
+  `git stash pop` popped item 1.4's entry (`14cbd83 WIP on worktree-agent-ad3daf37e9486284b`,
+  `template/.claude/skills/contribute/SKILL.md`, +31/−15) into *this* worktree and dropped it
+  from the stack; my own entry was taken by that agent's pop. I did not discard either: item
+  1.4's hunks are saved as a patch at
+  `C:/Users/KEATON~1/AppData/Local/Temp/claude/c--Users-Keaton-Forrest-Documents-GitHub-cl-workflow/324b5e61-1fc3-4cf0-a391-940a1fd78cb1/scratchpad/item-1.4-SKILL.md.patch` and the file is left modified-but-uncommitted here
+  (my commit adds explicit paths only, so it does not ride along); its stash commit `14cbd83`
+  is still reachable via `git fsck --unreachable`. My own change was rebuilt from my draft, not
+  recovered from git.
+- **Orchestrator should verify:** the full check; that item 1.4's SKILL.md work survived in its
+  own worktree (it lost its stash to this race — the patch above is the backup); and that no
+  other phase-1 item used `git stash`.
 
 ### Item 1.2 — the two agent definitions
 **Files:** `template/.claude/agents/implementer.md`, `template/.claude/agents/investigator.md`

@@ -24,7 +24,7 @@ unchanged by this contribution; confirm with `git ls-files template/ | wc -l` = 
 them.
 **Conventions that will fail your lint:** none for `.md`; ~95-column wrap, LF.
 **Scoped validation:** `pnpm lint && pnpm typecheck`; `grep -n 'docs/guides/' README.md`; `grep -c 'Orchestrator:' README.md`
-**Acceptance:** `grep -q -- '-- .claude/ docs/guides/' README.md && grep -q 'I-<n.m>:' README.md && grep -q 'Playwright' README.md` exits 0; on stash exits 1. `grep -c 'Managed (23 files)' README.md` prints 1 (unchanged).
+**Acceptance:** `grep -q -- '-- .claude/ docs/guides/' README.md && grep -q 'I-<n.m>:' README.md && grep -q 'Playwright' README.md` exits 0 on your file and exits 1 on the base copy taken with `git show HEAD:README.md > <scratchpad>/README.base.md` — **never `git stash`**: `refs/stash` is shared across worktrees (phase 1 measured the collision). `grep -c 'Managed (23 files)' README.md` prints 1 (unchanged).
 #### Status — item 3.1
 *(implementer keeps this current as it works: In progress → Done | Blocked)*
 

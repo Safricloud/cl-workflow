@@ -28,6 +28,7 @@
   "include": [
     "src",
     "template/.claude/hooks",
-    ".claude/hooks"
+    ".claude/hooks",
+    "test"
   ]
 }

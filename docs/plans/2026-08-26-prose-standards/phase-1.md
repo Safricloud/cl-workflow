@@ -60,8 +60,8 @@ The "Your final message…" sentences in both files stay; the prefix applies to 
   `template/.claude/agents/investigator.md` — new `## Voice` (W1 `Investigator-<topic>:`, W2)
   before **Rules**, a **Functions that already exist** bullet under **Rules** (W4's first half),
   and the copies row in the report shape's Facts table.
-- **Commits:** see the worktree branch `worktree-agent-ab0825153965e6556` (agent definitions +
-  this status block).
+- **Commits:** `632420f` on `worktree-agent-ab0825153965e6556` (both agent definitions + this
+  status block), plus a follow-up commit recording this sha.
 - **Deviation:** two, both small. (a) The item says the **Validation** first bullet "becomes" the
   tests obligation with **Verify the checker** following it; the existing "Run the **scoped**
   commands" bullet was not dropped — it moved to third, so the section now reads tests → verify

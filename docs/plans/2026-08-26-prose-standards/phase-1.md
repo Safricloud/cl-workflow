@@ -92,7 +92,7 @@ are in your base — leave them.
   gains the `git grep` for a second definition; §8 step 3 opens each inline brief with "You are
   `I-r<cycle>.<k>`"; Appendix C Investigate/Orchestrate lines gain copies-listed and
   duplicates-grepped; Appendix D gains the row from `plan.md`.
-- **Commits:** see below (one commit on `worktree-agent-a95b8ae8581dacb99`)
+- **Commits:** `37bdf2c` on `worktree-agent-a95b8ae8581dacb99` (this status update follows it)
 - **Deviation:** none. Two small re-wraps of pre-existing lines in §1 and §6 were needed to keep
   the ~95-column wrap after inserting text mid-paragraph; no wording of those sentences changed
   beyond the inserted clauses. PR #4's §11 and its two appendix rows are untouched.

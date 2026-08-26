@@ -51,7 +51,47 @@ The "Your final message…" sentences in both files stay; the prefix applies to 
 **Scoped validation:** `pnpm lint && pnpm typecheck`; `head -12 template/.claude/agents/investigator.md` unchanged from base (`git diff --stat` shows only body hunks)
 **Acceptance:** `grep -q '^## Voice' template/.claude/agents/implementer.md && grep -q '^## Code' template/.claude/agents/implementer.md && grep -q 'I-r<cycle>.<k>:' template/.claude/agents/implementer.md && grep -q '\*\*Tests:\*\*' template/.claude/agents/implementer.md && grep -q 'Investigator-<topic>:' template/.claude/agents/investigator.md && grep -q 'its copies' template/.claude/agents/investigator.md` exits 0; on stash exits 1. `git diff -U0 <base> -- template/.claude/agents/ | grep -c '^[-+]\(name\|model\|tools\|hooks\|isolation\):'` prints 0.
 #### Status — item 1.2
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26).
+- **Files touched:** `template/.claude/agents/implementer.md` — new `## Voice` (W1 with the
+  `I-r<cycle>.<k>:` inline-brief case, W2) after the opening block, new `## Code` (W3–W7 as five
+  bullets, W4's Blocked rule in the rule-zero bullet style) after **Scope**, the tests obligation
+  as the first **Validation** bullet with **Verify the checker** immediately after it, and
+  `- **Tests:** …` in the status-block template between **Validation** and **Blocked on**;
+  `template/.claude/agents/investigator.md` — new `## Voice` (W1 `Investigator-<topic>:`, W2)
+  before **Rules**, a **Functions that already exist** bullet under **Rules** (W4's first half),
+  and the copies row in the report shape's Facts table.
+- **Commits:** `632420f` on `worktree-agent-ab0825153965e6556` (both agent definitions + this
+  status block), plus a follow-up commit recording this sha.
+- **Deviation:** two, both small. (a) The item says the **Validation** first bullet "becomes" the
+  tests obligation with **Verify the checker** following it; the existing "Run the **scoped**
+  commands" bullet was not dropped — it moved to third, so the section now reads tests → verify
+  the checker → scoped commands → convenient results. (b) `investigator.md`'s `## Voice` sits
+  after *both* opening paragraphs (before `## Rules`) rather than after the first, which would
+  have orphaned the "The orchestrator's message gives you…" paragraph under the new heading.
+- **Verified against the installed package before writing:** n/a — prose only, no library
+  behaviour relied on. Frontmatter of both files verified untouched by diff (first `implementer.md`
+  hunk at line 19, first `investigator.md` hunk at line 23; `head -12` of each is base text).
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm lint` — clean, 0 problems (needed `pnpm install --frozen-lockfile` first; this worktree
+    had no `node_modules`)
+  - `pnpm typecheck` — clean, 0 errors (neither command reads `.md`; they prove nothing else broke)
+  - `git diff -U0 HEAD -- template/.claude/agents/ | grep -c '^[-+]\(name\|model\|tools\|hooks\|isolation\):'`
+    — prints `0`
+  - Acceptance grep chain (six greps) — exit 0
+  - **Checker verified:** `git stash push -- template/.claude/agents/`, the same chain exited **1**
+    (first failure `grep -q '^## Voice' implementer.md`); `git stash pop`, exit **0** again
+- **Tests:** none: no logic — this item is prose in two agent definitions. The acceptance grep
+  chain is the "fails when reverted" check, and it was seen failing on the stash.
+- **Blocked on:** nothing denied by the hook in the repo. Outside it, two attempts to put a helper
+  script in the session scratchpad were refused — `Write C:\Users\Keaton
+  Forrest\AppData\Local\Temp\claude\…\scratchpad\status12.py` (rule-zero.conf:49
+  `^path:outside-repo`) and a `cat > "$TMPDIR/../status12.py"` heredoc (worktree-isolation guard,
+  "too complex to verify"). Neither was needed; the edits were made in place.
+- **Orchestrator should verify:** the full check plus the generated-copy gate — this item changes
+  two **managed** payload files, so `.claude/cl-workflow.lock` and the root
+  `.claude/agents/*.md` are stale until phase 2 regenerates them; the wording against
+  `plan.md` → Canonical wording (I shortened W3–W7 for bullets but kept every fixed term); and
+  the two deviations above.
 
 ### Item 1.3 — the guide: the reasoning
 **Files:** `template/docs/guides/agent-workflow.md`

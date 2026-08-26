@@ -74,6 +74,9 @@ If it gives you neither, stop and say so.
 
 ## Validation
 
+- Format the files you own with the formatter named by the Format line in `CLAUDE.md`, if the
+  project has one, before each commit — the orchestrator's repo-wide run before the final commit
+  should find nothing of yours to change.
 - **Write the tests** for the logic you added — a test that fails when the change is reverted.
   An item with no logic in it (prose, configuration) has none: say so on the **Tests** line, with
   the reason.
@@ -107,6 +110,7 @@ to the PR.
 - **Verified against the installed package before writing:** <lib> <version>; <fact> at
   `node_modules/<lib>/<path>:<lines>`
 - **Validation (scoped; full check left to the orchestrator):**
+  - <formatter check over your files> — clean | "no formatter named in CLAUDE.md"
   - `<command>` — <n> pass, 0 fail
   - **Checker verified:** reverted <X>, tests failed (`<actual vs expected>`); restored, green
 - **Tests:** <files added or changed — or "none: no logic", with the reason>

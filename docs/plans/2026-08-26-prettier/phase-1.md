@@ -319,7 +319,59 @@ show HEAD:template/.claude/agents/implementer.md | head -9`; prettier `--check` 
 **Acceptance:** W3 in two places and W4 in two places, verbatim; front matter unchanged. Tests:
 none — prose.
 #### Status — item 1.5
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26).
+- **Files touched:** `template/.claude/agents/implementer.md` — W4 as the new first `## Validation`
+  bullet (`:77-79`) and as the new first status-block validation sub-line (`:113`);
+  `template/.claude/rules/process.md` — W3 in the Orchestrator role (`:82-84`), plus the formatter's
+  own `*Blocked on the owner*` → `_…_` at `:22`; `template/mem/outstanding.md` — W3 on the settled
+  line (`:32-35`) with the attribution, one reflow (see Deviation), plus the formatter's blank lines
+  after four headings.
+- **Commits:** `b4b4537` (the three files) on `worktree-agent-a6677e42912c115ce`, plus the
+  follow-up commit that records this sha.
+- **Deviation:** two, both measured, neither changes a word.
+  (a) **Prettier rewrites a settled ledger line.** `template/mem/outstanding.md` carried
+  `` labelled `blocked-on-owner` `` / `  + kind + area, created before the archive. (owner)` — a
+  continuation line starting with `+ `, which CommonMark (and Prettier) read as a **nested list
+  marker**; `--write` turned it into `  - kind + area, …`. I reflowed the line instead (moved
+  `` `blocked-on-owner` `` down so the `+` is no longer line-initial); Prettier then leaves it
+  alone. No word changed. The markdown investigation's bucket table reports "List markers `*` →
+  `-`: **0** — the corpus uses `-` throughout"; that is true of `*`, but the `+` continuation was
+  not surfaced (the mdast is unchanged, so the AST comparison could not see it).
+  **The root twin `mem/outstanding.md:197-198` still has it** and is not my file — the close-out
+  `pnpm format` (P7) will rewrite it to a `-` bullet unless the orchestrator reflows it the same way.
+  (b) W4 is applied **verbatim, without a bold lead-in**, so it does not match the `- **Write the
+  tests**` shape of its sibling bullets. Grounds: the plan fixes the wording and W2 carries its own
+  emphasis where it wants it, so I did not add bytes to W4.
+- **Fact to correct:** the item's scoped validation says `git grep -n "Format line" template/.claude/agents
+  template/.claude/rules template/mem` → "three files hit". It hits **one file, one line**
+  (`implementer.md:77`): W4 is the only canonical wording containing the phrase "Format line";
+  W3 says "the formatter run before the final Orchestrate commit". The three-file check is
+  `git grep -n "formatter" …` → 4 hits in 3 files, run below.
+- **Verified against the installed package before writing:** prettier 3.9.6 via `pnpm dlx`
+  (no `node_modules` in this worktree; `pnpm install --frozen-lockfile` not needed — no lint,
+  typecheck or test in this item's scoped validation).
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm dlx prettier@3.9.6 --print-width 100 --embedded-language-formatting off --check` over the
+    three files — **clean** (`All matched files use Prettier code style!`, exit 0)
+  - **Checker verified:** the same `--check` before the `--write` was **red** — exit 1, two files
+    listed (`process.md`, `outstanding.md`); `implementer.md` was already clean, i.e. W4 needed no
+    reformatting. After `--write`, green. (No unit test: no logic — prose.)
+  - `git grep -n "formatter" template/.claude/agents template/.claude/rules template/mem` — 4 hits
+    in **3 files** (`implementer.md:77,113`, `process.md:83`, `outstanding.md:33`)
+  - `git grep -n "Format line" …` — 1 hit, `implementer.md:77` (see Fact to correct)
+  - front matter: `head -9` of the file `cmp`-equal to `head -9` of
+    `git show HEAD:template/.claude/agents/implementer.md` — byte-identical, before and after the
+    format run
+  - `git grep -n "except on the small path"` over my three areas — no hit (no stale copy left)
+  - `git status --porcelain --untracked-files=all` — only my four files; no scratch files left
+- **Tests:** none — prose only (three managed/owned Markdown documents; no logic to test). The
+  formatter check above is the mechanical checker for this item, and it was seen failing.
+- **Blocked on:** nothing. One hook denial, on a *read-only* compound command: `git grep … && diff
+  <(git show HEAD:…) <(head -9 …)` was refused as "too complex to verify that it stays inside the
+  worktree"; re-run as separate plain commands, same result.
+- **Orchestrator should verify:** the root `mem/outstanding.md:197-198` `+ kind + area` line before
+  the close-out `pnpm format` (Deviation (a)); the regenerated root copies of `implementer.md` and
+  `process.md` after `node dist/cli.js update .`; the full check.
 
 ### Item 1.6 — `// prettier-ignore` on the two literal tables
 **Files:** `template/.claude/hooks/rule-zero-selftest.ts`, `template/.claude/hooks/docs-only.ts`

@@ -99,8 +99,13 @@ identical to the template copies — `pnpm lint` and `pnpm typecheck` still cove
     `mv -f docs/guides/agent-workflow.md.new docs/guides/agent-workflow.md` (the `.new` holds
     the template bytes exactly — no `git checkout`, no `git stash`); `update` then reported
     *0 refreshed, 24 already current, 0 … .new* and the gate printed nothing.
-- **Blocked on:** nothing. No rule-zero denial this item; `.claude/rule-zero.log` gained only
-  the 39 lines `pnpm selftest` writes.
+- **Blocked on:** nothing — the hook denied no command this item. A correction to something I
+  first wrote here and then checked: the selftest's "39 lines logged to rule-zero.log" do **not**
+  land in the repo. `rule-zero-selftest.ts:265,282` builds a throwaway project under
+  `os.tmpdir()` (`rule-zero-selftest-*`) and counts the log inside it. This worktree's
+  `.claude/` has no `rule-zero.log` at all, and the one in the main checkout was last written
+  at 10:31, before this item's run. So `.claude/rule-zero.log` is not evidence about my work
+  either way.
 - **Orchestrator should verify:** the full check on the merged branch, and the second over-long
   `SKILL.md` line described under **Deviation** — rewrap it in a later item or leave it as PR
   #4 wrote it. Both halves of the widened pathspec are measured above, so that one is closed.

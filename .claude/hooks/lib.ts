@@ -319,12 +319,11 @@ export function findGrant(grants: readonly string[], subject: string): string | 
  * Spend a grant: every line equal to the used one is removed, so a duplicated grant is
  * destroyed with its twin. That is the Python behaviour and it is the safe direction.
  */
-export function consumeGrant(
-  grantsPath: string,
-  grants: readonly string[],
-  used: string,
-): void {
-  writeGrants(grantsPath, grants.filter((grant) => grant !== used));
+export function consumeGrant(grantsPath: string, grants: readonly string[], used: string): void {
+  writeGrants(
+    grantsPath,
+    grants.filter((grant) => grant !== used),
+  );
 }
 
 /** `2026-08-25T16:01:01Z` — byte-identical to the Python `strftime` format. */

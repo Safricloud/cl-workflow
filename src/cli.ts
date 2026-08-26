@@ -236,7 +236,9 @@ function loadKit(): Kit {
 }
 
 function versionLabel(kitVersion: { version: string; sha: string | null }): string {
-  return kitVersion.sha === null ? kitVersion.version : kitVersion.version + "+" + kitVersion.sha.slice(0, 7);
+  return kitVersion.sha === null
+    ? kitVersion.version
+    : kitVersion.version + "+" + kitVersion.sha.slice(0, 7);
 }
 
 /* ----------------------------------------------------------------------- the lock file */
@@ -327,7 +329,11 @@ function clone(value: unknown): unknown {
  * foreign entry inside a shared matcher group survive byte-stable. A whole-file overwrite
  * would destroy project permissions; a whole-file skip would strand hook changes forever.
  */
-function mergeSettings(templateText: string, currentText: string | null, stems: Set<string>): string {
+function mergeSettings(
+  templateText: string,
+  currentText: string | null,
+  stems: Set<string>,
+): string {
   const template: unknown = JSON.parse(templateText);
   const parsedCurrent: unknown = currentText === null ? {} : JSON.parse(currentText);
   if (!isRecord(template)) die("template settings.json is not a JSON object");
@@ -352,8 +358,12 @@ function mergeSettings(templateText: string, currentText: string | null, stems: 
       const groups: unknown[] = Array.isArray(existingGroups) ? existingGroups.slice() : [];
       for (const templateGroup of templateGroups) {
         if (!isRecord(templateGroup)) continue;
-        const kitEntries = Array.isArray(templateGroup["hooks"]) ? (templateGroup["hooks"] as unknown[]) : [];
-        const at = groups.findIndex((g) => isRecord(g) && g["matcher"] === templateGroup["matcher"]);
+        const kitEntries = Array.isArray(templateGroup["hooks"])
+          ? (templateGroup["hooks"] as unknown[])
+          : [];
+        const at = groups.findIndex(
+          (g) => isRecord(g) && g["matcher"] === templateGroup["matcher"],
+        );
         if (at < 0) {
           groups.push(clone(templateGroup));
           continue;
@@ -439,7 +449,9 @@ function cmdInit(targetDir: string): number {
     // Never clobber. The lock deliberately does not record this path: the kit did not
     // install what is on disk, so `update` must keep treating it as the project's own.
     writeLf(dest + ".new", source);
-    say(`  warn   ${file.rel} exists and differs — wrote ${file.rel}.new beside it, yours untouched`);
+    say(
+      `  warn   ${file.rel} exists and differs — wrote ${file.rel}.new beside it, yours untouched`,
+    );
     beside++;
   }
 
@@ -598,11 +610,7 @@ function cmdDoctor(targetDir: string): number {
   // 2. The lock.
   const lock = loadLock(targetDir);
   if (lock === null) {
-    fail(
-      state,
-      `${LOCK_REL} missing or unparseable`,
-      "run `cl-workflow init` here first",
-    );
+    fail(state, `${LOCK_REL} missing or unparseable`, "run `cl-workflow init` here first");
   } else {
     pass(
       state,
@@ -620,7 +628,10 @@ function cmdDoctor(targetDir: string): number {
       settings = JSON.parse(readLf(settingsPath));
     } catch (e) {
       settings = null;
-      fail(state, `${MERGED} does not parse as JSON (${e instanceof Error ? e.message : String(e)})`);
+      fail(
+        state,
+        `${MERGED} does not parse as JSON (${e instanceof Error ? e.message : String(e)})`,
+      );
     }
     if (settings !== null) {
       const wired: string[] = [];
@@ -646,8 +657,10 @@ function cmdDoctor(targetDir: string): number {
           }
         }
       }
-      if (broken.length > 0) fail(state, `${MERGED} — hook script missing: ${broken.join(", ")}`, FAILS_OPEN);
-      else if (wired.length === 0) fail(state, `${MERGED} wires none of the kit's hooks`, FAILS_OPEN);
+      if (broken.length > 0)
+        fail(state, `${MERGED} — hook script missing: ${broken.join(", ")}`, FAILS_OPEN);
+      else if (wired.length === 0)
+        fail(state, `${MERGED} wires none of the kit's hooks`, FAILS_OPEN);
       else pass(state, `${MERGED} — ${wired.length} kit hook command(s), every script present`);
     }
   }
@@ -656,7 +669,11 @@ function cmdDoctor(targetDir: string): number {
   //    and a hook that cannot start fails open.
   const shim = abs(targetDir, ".claude/hooks/package.json");
   if (!fs.existsSync(shim)) {
-    fail(state, `.claude/hooks/package.json missing`, `without {"type":"module"} the hooks break in a "type":"commonjs" project. ` + FAILS_OPEN);
+    fail(
+      state,
+      `.claude/hooks/package.json missing`,
+      `without {"type":"module"} the hooks break in a "type":"commonjs" project. ` + FAILS_OPEN,
+    );
   } else {
     let type: unknown;
     try {
@@ -671,8 +688,11 @@ function cmdDoctor(targetDir: string): number {
 
   // 5. Every hook script the kit ships is actually on disk — four of them are invoked from
   //    the agent frontmatter and the skill, not from settings.json.
-  const missing = manifest.filter((name) => !fs.existsSync(abs(targetDir, ".claude/hooks/" + name)));
-  if (missing.length > 0) fail(state, `hook script(s) missing: ${missing.join(", ")}`, "run `cl-workflow update` here");
+  const missing = manifest.filter(
+    (name) => !fs.existsSync(abs(targetDir, ".claude/hooks/" + name)),
+  );
+  if (missing.length > 0)
+    fail(state, `hook script(s) missing: ${missing.join(", ")}`, "run `cl-workflow update` here");
   else pass(state, `${manifest.length} hook scripts present`);
 
   // 6. Managed files still byte-identical to what the kit installed. A warning, not a failure:
@@ -686,7 +706,8 @@ function cmdDoctor(targetDir: string): number {
       if (installed === undefined || !fs.existsSync(dest)) continue;
       if (hashText(readLf(dest)) !== installed) drifted.push(file.rel);
     }
-    if (drifted.length > 0) say(`  warn   ${drifted.length} managed file(s) locally edited: ${drifted.join(", ")}`);
+    if (drifted.length > 0)
+      say(`  warn   ${drifted.length} managed file(s) locally edited: ${drifted.join(", ")}`);
   }
 
   // 7. The only check that proves the gate actually fires.
@@ -698,9 +719,17 @@ function cmdDoctor(targetDir: string): number {
     const output = ((run.stdout ?? "") + (run.stderr ?? "")).trim();
     const counts = /(\d+)\/(\d+) cases passed/.exec(output);
     if (run.status !== 0 || counts === null) {
-      fail(state, `self-test failed (exit ${String(run.status)})`, output.split("\n")[0] ?? "no output");
+      fail(
+        state,
+        `self-test failed (exit ${String(run.status)})`,
+        output.split("\n")[0] ?? "no output",
+      );
     } else if (counts[1] !== counts[2]) {
-      fail(state, `self-test ${counts[1]}/${counts[2]} — the gate is not behaving`, output.split("\n")[0]);
+      fail(
+        state,
+        `self-test ${counts[1]}/${counts[2]} — the gate is not behaving`,
+        output.split("\n")[0],
+      );
     } else if (Number(counts[2]) !== EXPECTED_SELFTEST_CASES) {
       fail(
         state,

@@ -27,14 +27,14 @@ the small path (§11).
 there is one, goes inside the documents (review and plan headers, `Fixes #n` in the PR body), not in
 the id. Then:
 
-| Thing | Path |
-| --- | --- |
-| Branch | `feat/<id>` \| `fix/<id>` \| `chore/<id>` |
-| Review + investigations | `docs/reviews/<id>/review.md`, `docs/reviews/<id>/investigation-<topic>.md` |
-| Plan | `docs/plans/<id>/plan.md` (overview) + `phase-<n>.md` (items and their status blocks) |
-| Archive | `docs/history/<id>/` — `review.md`, `investigation-*.md`, `plan.md`, `phase-*.md` |
-| Changelog | `docs/history/index.md` — one line per entry, written at archive time |
-| Blocked on the owner | GitHub issues, labelled `blocked-on-owner` + kind + area |
+| Thing                   | Path                                                                                  |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| Branch                  | `feat/<id>` \| `fix/<id>` \| `chore/<id>`                                             |
+| Review + investigations | `docs/reviews/<id>/review.md`, `docs/reviews/<id>/investigation-<topic>.md`           |
+| Plan                    | `docs/plans/<id>/plan.md` (overview) + `phase-<n>.md` (items and their status blocks) |
+| Archive                 | `docs/history/<id>/` — `review.md`, `investigation-*.md`, `plan.md`, `phase-*.md`     |
+| Changelog               | `docs/history/index.md` — one line per entry, written at archive time                 |
+| Blocked on the owner    | GitHub issues, labelled `blocked-on-owner` + kind + area                              |
 
 **The archive commit is the last process-record commit.** Nothing under `docs/` or `mem/` is
 touched after `gh pr create`: review cycles are PR comments, merge and deploy are reported in
@@ -56,7 +56,7 @@ itself.
   compaction can happen at any time.
 - `git switch -c <branch> --no-track origin/main`, then
   `git config --get branch.<branch>.merge` must print nothing: a branch that tracks
-  `origin/main` is pushed *to* `main` by an IDE sync, and the loop's record commits must land
+  `origin/main` is pushed _to_ `main` by an IDE sync, and the loop's record commits must land
   with the PR, never before it (mid-loop decision in `plan.md`).
 
 ## 2. Investigate — two tiers
@@ -92,13 +92,14 @@ Include: the direction; scope; each decision from the review; every foreseeable 
 action; anything vague about what "done" looks like.
 
 When answered:
+
 - Append a dated **Decisions** section to the review (do not rewrite what is above it).
 - For each rule-zero yes:
   `node .claude/hooks/rule-zero.ts --grant '<regex matching the exact command>'` — written now,
   before any code that performs it.
-- Settled decisions → `mem/outstanding.md` → *Settled — do not re-open*.
+- Settled decisions → `mem/outstanding.md` → _Settled — do not re-open_.
 - Anything only the owner can do (accounts, content, filings) → `mem/outstanding.md` →
-  *Open — owner follow-ups*. That is the only thing that ever waits.
+  _Open — owner follow-ups_. That is the only thing that ever waits.
 - Commit.
 
 **After this phase you do not prompt the owner again.**
@@ -114,6 +115,7 @@ One directory, several files, so phases can be worked on concurrently:
   section; phase-mates share the file and their sections merge cleanly.
 
 Rules:
+
 - Every item: **Files** — including the shared module when the item generalizes a function;
   the investigation's copies list says which — **Approach** citing the facts, **Conventions
   that will fail your lint**, **Scoped validation**, **Acceptance including tests** (what must
@@ -143,12 +145,13 @@ deviations), commit to their `worktree-*` branch, never push, and return the wor
 conflict that is not mechanical, a Phase N.5 item on the merged base → `git worktree remove <wt>`
 then `git branch -d worktree-<slug>` (never `-D`).
 
-**Verify** on the merged branch, yourself: full check and build; read the diff of every
-load-bearing file; grep for the area's known conventions; `git grep` the names of functions the
-phase added for a second definition; `.claude/rule-zero.log` for any denial an implementer hit;
-the gates the package check does not cover; **verify the checker** (revert the fix, see red,
-restore); distrust convenient results; real rendered UI at each viewport, screenshots appraised
-by you; run the container if touched; re-read every sentence the change made true or false.
+**Verify** on the merged branch, yourself: full check — its first step is the formatter's check,
+when `CLAUDE.md` names one — and build; read the diff of every load-bearing file; grep for the
+area's known conventions; `git grep` the names of functions the phase added for a second
+definition; `.claude/rule-zero.log` for any denial an implementer hit; the gates the package
+check does not cover; **verify the checker** (revert the fix, see red, restore); distrust
+convenient results; real rendered UI at each viewport, screenshots appraised by you; run the
+container if touched; re-read every sentence the change made true or false.
 
 **Fix through sub-agents, always.** Every finding from verification becomes an item in
 `phase-<n>.5.md` with its own status block, implemented by a fresh implementer — you do not
@@ -168,13 +171,18 @@ licence. For each, before the archive:
 gh label list | grep -q blocked-on-owner || gh label create blocked-on-owner --color D93F0B --description "Needs an action only the owner can take"
 gh issue create --title "<short imperative>" --label blocked-on-owner --label <kind> --label <area> --body-file <templates/blocked-issue.md, filled>
 ```
+
 Kind labels: `rule-zero`, `credentials`, `account`, `content`, `licensing`, `decision` (create
 missing ones the same way). Area labels: the repo's own. Record the issue number in
-`plan.md` → *Blocked on the owner* and in `mem/outstanding.md`. Ship everything that does not
+`plan.md` → _Blocked on the owner_ and in `mem/outstanding.md`. Ship everything that does not
 depend on it, and say in the issue how the shipped code behaves meanwhile.
 
-When every item is Done and the final verification is green, commit: what, why, the decision
-it rests on, the validation run, any lockfile diff explained.
+When every item is Done and the final verification is green, **format, then commit**: run the
+formatter named by the Format line in `CLAUDE.md`, if the project has one, over the repo; then
+the build and any generated-copy regeneration `CLAUDE.md` names; then the full check once more.
+This is the one code change the orchestrator makes outside the small path — a deterministic tool
+run, not an edit. Commit: what, why, the decision it rests on, the validation run, any lockfile
+diff explained.
 
 ## 7. PR
 
@@ -186,6 +194,7 @@ mkdir -p docs/history/<id>
 git mv docs/reviews/<id>/* docs/history/<id>/   && rmdir docs/reviews/<id>
 git mv docs/plans/<id>/*   docs/history/<id>/   && rmdir docs/plans/<id>
 ```
+
 Add one line to `docs/history/index.md`
 (`<date> · <id> · <one-line outcome> · blocked: #n, #m | none`), update `mem/` and `CLAUDE.md`
 to reflect the code as it lands, commit ("Archive <id>; <what the ledger now says>"), push.
@@ -205,6 +214,7 @@ The reviewer is GitHub Copilot. Its output is a claim, verified before acted on.
 ```
 node .claude/hooks/pr-watch.ts --pr <n> --reset      # first cycle; polls every minute
 ```
+
 It returns as soon as something new appears (inline comments and review bodies, with any
 collapsed low-confidence section extracted), or with `"new": []` after **5 quiet minutes** —
 and the quiet window restarts whenever the PR head changes, so a push always gets its five
@@ -226,6 +236,7 @@ status blocks — that is the cycle record; nothing in the repo is updated. Run
 ```
 node .claude/hooks/docs-only.ts --base origin/<default> --pr <n> --branch <branch> --grant
 ```
+
 - **Exit 0 (docs-only):** the standing rule applies — go to §9 and merge now, without asking.
 - **Exit 3 (code changed):** report — PR, head SHA, CI, cycles, blocked-on-owner issues —
   comment on each issue with `templates/issue-comment.md`, and **stop. Do not ask whether to
@@ -247,6 +258,7 @@ git switch <default> && git pull
 git branch -D <branch>                                                    # -d refuses after a squash merge
 node .claude/hooks/rule-zero.ts --clear
 ```
+
 Report in the conversation: which way in (the owner's words, quoted — or "docs-only standing
 rule, `docs-only.ts` at `<head>`"), method, SHA. Nothing in the repo records the merge. If the
 PR was merged before a cycle ran, the owed cycle is worked post-merge through the whole loop
@@ -279,13 +291,14 @@ Rule zero and the three habits apply unchanged; what shrinks is the ceremony.
    second copy of the file, a string the change makes false elsewhere (`git grep`). No
    investigators, no review document, no plan directory.
 3. **Change it yourself.** You edit directly — no worktree, no implementer. In a kit repo, edit
-   `template/` and regenerate the root copy with the CLI; never the root copy.
-4. **Verify** with the full check from `CLAUDE.md`, and verify the checker where a test
-   exists: revert, see red, restore.
+   `template/` and regenerate the root copy with the CLI; never the root copy. Format the files
+   you changed with the formatter named in `CLAUDE.md`, if there is one.
+4. **Verify** with the full check from `CLAUDE.md` — its first step is the formatter's check,
+   when it names one — and verify the checker where a test exists: revert, see red, restore.
 5. **Record** one entry in `docs/history/index.md` —
    `<date> · <id> · small: <what> · blocked: none`, wrapped like its neighbours — committed
    with the change. No review document and no plan directory; `mem/` only if a decision was
-   settled. If an investigator *was* run (step 2 needed a measurement you could not make
+   settled. If an investigator _was_ run (step 2 needed a measurement you could not make
    yourself), its report is part of the record: `git mv` it from `docs/reviews/<id>/` to
    `docs/history/<id>/` and commit it with the change. Investigation reports are never deleted.
 6. **PR** with a short body: the ask and its source, why it is small and who declared it, what

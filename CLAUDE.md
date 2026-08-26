@@ -10,6 +10,7 @@ Node >= 24, pnpm; default branch `main`. This repo runs the kit on itself and it
 the root copy.
 
 ## Commands
+
 - Install: `pnpm install`
 - Full check (format check + lint + typecheck + unit): `pnpm format:check && pnpm lint && pnpm typecheck && pnpm build && git diff --exit-code dist/ && pnpm selftest && pnpm test`,
   then the generated-copy gate: `node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/ docs/guides/`
@@ -40,6 +41,7 @@ the root copy.
 - Container: none
 
 ## Conventions that will fail your lint
+
 - `erasableSyntaxOnly` — no enums, no runtime `namespace`, no parameter properties, no
   decorators, in `src/` or in `template/.claude/hooks/`. Node strips these types, it does not
   compile them; sibling imports carry the explicit `.ts` extension.
@@ -66,12 +68,15 @@ the root copy.
   — `tsc` carries source line breaks into `dist/cli.js`.
 
 ## Deploy
+
 Mode: `none yet`
+
 - Nothing is deployed and nothing runs after a merge: `.github/workflows/ci.yml` triggers on
   `pull_request` into `main` and on nothing else. A release is a git tag, which is what makes
   `npx github:Safricloud/cl-workflow#vX.Y.Z` resolvable — there is no publish step.
 
 ## Process
+
 Every contribution runs `/contribute` (`.claude/skills/contribute/SKILL.md`); a change of a
 few lines the owner declares small runs its small path (`/contribute --small`, SKILL §11).
 Rule zero, the two owner gates and the three habits are in `.claude/rules/process.md`; the reasoning is in

@@ -3,12 +3,8 @@
     "module": "nodenext",
     "moduleResolution": "nodenext",
     "target": "esnext",
-    "lib": [
-      "esnext"
-    ],
-    "types": [
-      "node"
-    ],
+    "lib": ["esnext"],
+    "types": ["node"],
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -25,10 +21,5 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": [
-    "src",
-    "template/.claude/hooks",
-    ".claude/hooks",
-    "test"
-  ]
+  "include": ["src", "template/.claude/hooks", ".claude/hooks", "test"]
 }

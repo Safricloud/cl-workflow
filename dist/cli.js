@@ -195,7 +195,9 @@ function loadKit() {
     };
 }
 function versionLabel(kitVersion) {
-    return kitVersion.sha === null ? kitVersion.version : kitVersion.version + "+" + kitVersion.sha.slice(0, 7);
+    return kitVersion.sha === null
+        ? kitVersion.version
+        : kitVersion.version + "+" + kitVersion.sha.slice(0, 7);
 }
 /* ----------------------------------------------------------------------- the lock file */
 function loadLock(targetDir) {
@@ -312,7 +314,9 @@ function mergeSettings(templateText, currentText, stems) {
             for (const templateGroup of templateGroups) {
                 if (!isRecord(templateGroup))
                     continue;
-                const kitEntries = Array.isArray(templateGroup["hooks"]) ? templateGroup["hooks"] : [];
+                const kitEntries = Array.isArray(templateGroup["hooks"])
+                    ? templateGroup["hooks"]
+                    : [];
                 const at = groups.findIndex((g) => isRecord(g) && g["matcher"] === templateGroup["matcher"]);
                 if (at < 0) {
                     groups.push(clone(templateGroup));

@@ -1,17 +1,20 @@
 # Outstanding — the live ledger
 
 ## Open — owner follow-ups
+
 <!-- dated; content/product decisions, not engineering; nothing in code blocked on these -->
 
 ## Blocked on the owner
+
 <!-- one line per GitHub issue: #n — what the owner has to do — which contribution waits -->
 <!-- #1 resolved 2026-08-25: owner delegated, MIT chosen; lands with 2026-08-25-npx-ts-kit -->
 
 ## Open — engineering follow-ups
-- 2026-08-25 — `rule-zero.ts` spends a single-use grant while *judging*, segment by segment, so
+
+- 2026-08-25 — `rule-zero.ts` spends a single-use grant while _judging_, segment by segment, so
   when a later segment of the same Bash command is denied the whole command does not run but
   the earlier grant is already consumed (measured at the merge of PR #3: log shows `grant-used
-  gh pr merge 3 …` then the deny of `git branch -D … 2>&1`, PR still OPEN; re-bundled to
+gh pr merge 3 …` then the deny of `git branch -D … 2>&1`, PR still OPEN; re-bundled to
   proceed). Fix: consume grants only after every segment is allowed. Until then, write merge
   sequences as exact segments — no trailing `2>&1`, no variables.
 - 2026-08-26 — **Kit conformance** (one future contribution; owner chose these three at the
@@ -34,7 +37,7 @@
   the orchestrator and for `agent:implementer`, each of which stopped the command; (b)
   `worktree.baseRef: "head"` is honoured — **measured 2026-08-26**: six implementer worktrees
   dispatched from `feat/2026-08-26-prose-standards` each had `git merge-base <worktree-branch>
-  HEAD` = the feature branch head `05c8ae7`, not `main`; (c) `claude --version` ≥ 2.1.218 —
+HEAD` = the feature branch head `05c8ae7`, not `main`; (c) `claude --version` ≥ 2.1.218 —
   **measured 2026-08-26: 2.1.246** (the `version` field stamped on this session's transcript
   records; the `claude` binary is not on this machine's PATH — the VS Code extension runs it).
   All three hold; record them in `docs/guides/agent-workflow.md` §5 on the next edit of that
@@ -42,7 +45,7 @@
 - 2026-08-25 — Measure Copilot's latency, trigger and suppressed-section location on the first
   PR; fill in §10 "Know your reviewer".
 - 2026-08-25 — Watch npm upstream: 11.12.0's git-install regression (breaks every `npx
-  github:` consumer on that version) and npm 12's `allow-git=none` default. Revisit the README
+github:` consumer on that version) and npm 12's `allow-git=none` default. Revisit the README
   install caveats when either moves; `pnpm dlx` is the measured always-works path today.
 - 2026-08-25 — `pr-watch.ts` has run only against a fake `gh` (news/quiet/head-change all
   measured); real-PR pagination remains unmeasured until the first PR review cycle.
@@ -57,13 +60,13 @@
   `pyRealpath`'s no-ancestor fallback. Add a case if that fallback ever bites.
 - 2026-08-25 — Kit ergonomics seen this loop, not fixed: (a) `git worktree remove` fails with
   "Directory not empty" when the implementer ran `pnpm install` in its worktree — delete the
-  worktree's `node_modules` first, then remove; (b) the gate judges every *line* of a Bash
+  worktree's `node_modules` first, then remove; (b) the gate judges every _line_ of a Bash
   command as a segment, so a heredoc or `git commit -m` whose text quotes a guarded shape
   (`path:outside-repo …`, a hard-reset command) is denied — write such text through the file
   tools or from a variable; (c) an `allow` line like `^git branch -d worktree-` needs the
   literal name — `git branch -d "$BR"` is judged on the variable and denied; (d) Claude Code's
   own worktree-isolation check for sub-agents (not the kit's hook) refuses `git -C <path
-  outside the worktree>`, `cd <absolute path>` before `git`, and any Bash text containing a
+outside the worktree>`, `cd <absolute path>` before `git`, and any Bash text containing a
   bare `<` (a heredoc with `i < n` is read as a redirect) — implementers needing a scratch
   clone make it inside their worktree and delete it; the kit cannot change this.
 - 2026-08-26 — Narration is half-adopted under prose alone. First implementer under the new
@@ -95,6 +98,7 @@
   `node_modules` — every item that runs lint/typecheck pays a `pnpm install --frozen-lockfile`.
 
 ## Settled — do not re-open, do not "fix"
+
 - 2026-08-26 — Prettier (`^3.9.6`, devDependency of the kit repo only) formats code, the payload
   and the root owned documents at `printWidth: 100`, `proseWrap: preserve`,
   `embeddedLanguageFormatting: off`; `pnpm format` writes, `pnpm format:check` is the first step
@@ -154,7 +158,7 @@
   `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noPropertyAccessFromIndexSignature`)
   and includes the generated root `.claude/hooks`; CI gates root-copy drift by re-running
   `node dist/cli.js update .` and requiring an empty `git status --porcelain
-  --untracked-files=all -- .claude/`. (owner, 2026-08-25-static-analysis, decisions 5–6)
+--untracked-files=all -- .claude/`. (owner, 2026-08-25-static-analysis, decisions 5–6)
 - 2026-08-25 — `@typescript-eslint/no-unnecessary-condition` stays off if the strict presets are
   ever adopted: it calls the hooks' `(r.stdout ?? "")` after `spawnSync` dead, but Node returns
   `null` there when the spawn itself fails. Deleting that guard makes the gate fail open.

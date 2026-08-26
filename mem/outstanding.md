@@ -65,6 +65,15 @@
   outside the worktree>`, `cd <absolute path>` before `git`, and any Bash text containing a
   bare `<` (a heredoc with `i < n` is read as a redirect) — implementers needing a scratch
   clone make it inside their worktree and delete it; the kit cannot change this.
+- 2026-08-26 — Narration is half-adopted under prose alone. First implementer under the new
+  `implementer.md` (item 3.1 of `2026-08-26-prose-standards`, transcript measured by grouping
+  blocks on `message.id`): 22/23 text blocks prefixed `I-3.1:` (96%), but only 22/45
+  tool-calling turns had a line before the first tool call (49%) — tool calls that follow a
+  tool call in the same turn get no line. The name rule took; the narration rule did not fully.
+  If that matters, the candidates are the mechanism the review's direction B described
+  (`SubagentStop` reading `last_assistant_message`, which cannot see mid-turn narration) or a
+  stronger sentence in the definitions; the owner chose prose (decision 1). Re-measure on the
+  next loop before changing anything.
 - 2026-08-26 — `.claude/cl-workflow.lock` in this repo has 32 entries and omits
   `mem/outstanding.md` although `OWNED` lists it (`src/cli.ts:31-41`): `cmdUpdate` skips owned
   files with `continue` before `recorded[file.rel]` is set (`src/cli.ts:483-485`) and seeds

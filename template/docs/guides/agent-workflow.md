@@ -448,10 +448,12 @@ settled; the deploy step.
 worktrees, the archive directory — and, usually, investigators. If the one measurement that
 decides whether the change is small needs an investigator, run one; its report is then part of
 the record and is archived under `docs/history/<id>/` with the change, exactly as in the full
-loop. Investigation reports are never deleted (owner, 2026-08-26). The orchestrator makes the change itself — the one
-place the "documents only" rule is lifted — and in a kit repo edits `template/` and
-regenerates the root copy with the CLI. The PR body is short: ask and source, why small and
-who declared it, what changed, validation with counts and what was seen to fail.
+loop. Investigation reports are never deleted (owner, 2026-08-26).
+
+The orchestrator makes the change itself — the one place the "documents only" rule is lifted —
+and in a kit repo edits `template/` and regenerates the root copy with the CLI. The PR body is
+short: ask and source, why small and who declared it, what changed, validation with counts and
+what was seen to fail.
 
 **How it merges.** Under a standing approval, the second after docs-only: once the review loop
 is silent and `ci-ok` is green on the head, the orchestrator writes the bundle grant and

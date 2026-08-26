@@ -8,10 +8,6 @@
 <!-- #1 resolved 2026-08-25: owner delegated, MIT chosen; lands with 2026-08-25-npx-ts-kit -->
 
 ## Open — engineering follow-ups
-- 2026-08-26 — `template/docs/history/index.md` seeds new installs with an entry format that
-  carries `PR #<n>`, while this repo's `docs/history/index.md` header says the PR number is
-  never written into the repo (`gh pr list --search <id>` finds it). Pick one; the root
-  convention is the one the loop follows.
 - 2026-08-25 — `rule-zero.ts` spends a single-use grant while *judging*, segment by segment, so
   when a later segment of the same Bash command is denied the whole command does not run but
   the earlier grant is already consumed (measured at the merge of PR #3: log shows `grant-used

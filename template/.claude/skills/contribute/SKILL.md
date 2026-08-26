@@ -217,7 +217,8 @@ archived and is not reopened); each returns its status block in its message. Eac
 opens with "You are `I-r<cycle>.<k>`" — review cycle, brief number — and the implementer signs
 its text with that name. Verify, commit the fix, push. Reply to each comment with the verdict.
 Post one **cycle comment** on the PR — head SHA, items returned, verdicts, the implementers'
-status blocks — that is the cycle record; nothing in the repo is updated. Run `pr-watch.ts --pr <n>` again (no `--reset`).
+status blocks — that is the cycle record; nothing in the repo is updated. Run
+`pr-watch.ts --pr <n>` again (no `--reset`).
 
 **Silence — `"new": []` after a cycle with nothing new — closes the loop.** Then:
 

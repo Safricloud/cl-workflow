@@ -195,8 +195,8 @@
   phases can be worked concurrently. (owner)
 - 2026-08-25 — No record commits after `gh pr create`: review cycles are PR comments; merge and
   deploy are reported in the conversation. Otherwise the loop triggers its own reviews. (owner)
-- 2026-08-25 — Anything blocked on the owner becomes a GitHub issue labelled `blocked-on-owner`
-  + kind + area, created before the archive. (owner)
+- 2026-08-25 — Anything blocked on the owner becomes a GitHub issue labelled
+  `blocked-on-owner` + kind + area, created before the archive. (owner)
 - 2026-08-25 — Standing merge approval: a docs/comments-only PR (measured by `docs-only.ts`)
   is merged by the orchestrator after the review loop is silent, CI cancelled. (owner)
 - 2026-08-26 — Second standing merge approval: a small-path PR is merged by the orchestrator

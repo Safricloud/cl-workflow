@@ -480,9 +480,9 @@ contribution — ask, investigate, review, questions, plan — not as a quiet fi
 `CLAUDE.md` declares the mode under a *Deploy* heading:
 
 - **production-ci** — a merge to the default branch triggers the deploy Action. The
-  orchestrator watches that run to completion (`gh run list --workflow <name> --branch
-  <default> -L1`, `gh run watch <id>`) and records its final status. "It fired" is a claim; the
-  run's result is the evidence.
+  orchestrator watches that run to completion
+  (`gh run list --workflow <name> --branch <default> -L1`, `gh run watch <id>`) and records its
+  final status. "It fired" is a claim; the run's result is the evidence.
 - **local-containers** — the app lives in containers on the dev machine. The orchestrator
   rebuilds them with the merged code using the command in `CLAUDE.md`, runs the container checks
   from §6 (user id, migrations applied, server bound, nothing in stderr), and records the result.

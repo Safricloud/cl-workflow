@@ -105,6 +105,9 @@
   is merged by the orchestrator after the review loop is silent, CI cancelled. (owner)
 - 2026-08-26 — Second standing merge approval: a small-path PR is merged by the orchestrator
   after the review loop is silent and `ci-ok` is green on the head. (owner)
+- 2026-08-26 — Investigator reports are retained and archived under `docs/history/<id>/`,
+  never removed from the repo — on the small path as much as in the full loop. (owner:
+  "Investigator reports should be retained and archived, not removed from the repo")
 - 2026-08-25 — `gh pr merge --admin` is always used; branch protection is not the gate. (owner)
 - 2026-08-25 — PR review quiet window is 5 minutes, restarting on every push. (owner)
 - 2026-08-25 — An ask may name several GitHub issues; one PR or split is decided at Questions. (owner)

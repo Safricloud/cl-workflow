@@ -190,7 +190,7 @@ amended cell; `git diff` read in full — only those hunks plus formatting. Test
   the §6 "Commit" paragraph into "**Format, then commit**" (`:374-382`) with the guide-voice
   sentence on why the run is the orchestrator's; W8 on the Appendix C Orchestrate (`:583-584`)
   and Small path (`:598-600`) lines and as a new last Appendix D row.
-- **Commits:** see below (one commit on `worktree-*`; sha recorded in the commit log).
+- **Commits:** `d0059a6` on `worktree-agent-a932da3fa4bab722f` (plus this sha-recording commit).
 - **Deviation:** none of substance. Two readings worth naming: (a) the item says the Appendix D
   row "gains the same exception in its right-hand cell" — the exception belongs in the *This
   edition* cell (the right-hand cell is *Why* = "Owner's rule"), so that is where it went and

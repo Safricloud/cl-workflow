@@ -1,0 +1,16 @@
+# tsc output — CI rebuilds it and diffs (dist/ drift gate)
+dist/
+# pnpm's own serialization
+pnpm-lock.yaml
+# Generated root copies of template/ — format template/, then `node dist/cli.js update .`.
+# Also covers .claude/settings.json (serialized by the CLI), worktrees/ and pr-watch/ (live
+# state Prettier would otherwise reach: it reads only the root .gitignore).
+/.claude/
+/docs/guides/agent-workflow.md
+# Serialized by mergeSettings (src/cli.ts) in JSON.stringify shape; stays byte-identical
+template/.claude/settings.json
+# Process records stay as written (owner, 2026-08-26-prettier, decision 3)
+/docs/history/
+/docs/reviews/
+/docs/plans/
+/docs/reports/

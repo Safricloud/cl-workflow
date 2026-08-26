@@ -85,7 +85,8 @@ none — configuration; say so.
   on `node-version`); `README.md` (Development block gains two command lines, the CI paragraph
   gains "the format check" and "the `node:test` suite" — plus table re-padding and one `*merge*`
   → `_merge_` from formatting).
-- **Commits:** `cfa73d5` on `worktree-agent-ab6f2692213830880` (one commit, all seven files).
+- **Commits:** `527e5dc` on `worktree-agent-ab6f2692213830880` (the whole change, seven files),
+  plus one follow-up commit on this file recording that sha.
 - **Deviation:** the item's scoped validation says the red list includes
   `template/.claude/hooks/rule-zero.ts`. **It does not, and the expectation is wrong:** measured,
   `rule-zero.ts` is already Prettier-clean at `printWidth: 100` (`prettier --check` exit 0, and

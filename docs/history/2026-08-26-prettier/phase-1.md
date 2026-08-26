@@ -492,7 +492,42 @@ comments; say so.
   `git grep -n "prettier-ignore" template/` is exactly two hits.
 
 ## Merge-back record (orchestrator)
-<!-- per item: worktree branch, commits merged, conflicts and how resolved, worktree removed -->
+
+All six merged by `git merge --no-edit` onto `chore/2026-08-26-prettier`, each worktree clean
+before the merge, each merge automatic (the only shared file, this one, merged its six status
+blocks without conflict). Order: 1.3 (`b4753d4`, `9a37e2d`, `ec3a41e` → `8bb9519`), 1.2
+(`299d2f6`, `59d9e6e` → `3653e1b`), 1.4 (`d0059a6`, `07a6049` → `7e10ade`), 1.5 (`b4b4537`,
+`3e11ff3` → `904a04d`), 1.6 (`12a2d00`, `97133a6` → `ec63bb7`), 1.1 (`527e5dc`, `f56b945` →
+`6878885`). Worktrees removed and branches deleted; two removals (1.2, 1.6) needed the
+worktree's `node_modules` deleted first (ledger ergonomics (a)), and one of my own cleanup
+commands was denied because it named the branch through a shell variable rather than literally
+(ledger ergonomics (c)); re-issued with literal names. No implementer hit a rule-zero denial
+(`.claude/rule-zero.log`, 2026-08-26 entries read).
 
 ## Verification (orchestrator, after this phase merged)
-<!-- what was run, counts, checkers verified, findings → phase 1.5 items -->
+
+- Close-out (owner decision 2, plan P7) at `b33c371`: `pnpm install --frozen-lockfile` →
+  `pnpm format:check` **red on 14 files** (`CLAUDE.md`, `mem/outstanding.md`, `src/cli.ts`,
+  `investigator.md`, `lib.ts`, hooks `package.json`, `path-fence.ts`, `pr-watch.ts`, four
+  templates, both tsconfigs) and on none of `dist/`, `.claude/`, `docs/history/`,
+  `pnpm-lock.yaml`, `template/.claude/settings.json` — the checker seen failing → `pnpm format`
+  (14 files, 130+/62−; a second run changed nothing) → `pnpm build` (`dist/cli.js` +6/−2, a
+  second build byte-stable) → `node dist/cli.js update .` (18 refreshed, 0 `.new`).
+- Full check green: `pnpm format:check` "All matched files use Prettier code style";
+  `pnpm lint` clean; `pnpm typecheck` clean; `git diff --exit-code dist/` clean after the
+  rebuild; `pnpm selftest` 62/62; `pnpm test` 3 pass / 0 fail; generated-copy gate
+  (`update` → `git status --porcelain --untracked-files=all -- .claude/ docs/guides/`) empty;
+  `node dist/cli.js doctor .` 6 passed.
+- Checkers verified: `:93` reverted alone (the `_(implement` clause removed) → "counts both
+  placeholder forms as pending" fails, 2/3; `:67` reverted alone (`"Source review"` back) →
+  "echoes the plan's Review…" fails, 2/3; restored from `HEAD`, 3/3.
+- Code diff read in full (`src/cli.ts`, `lib.ts`, `path-fence.ts`, `pr-watch.ts`, tsconfigs,
+  hooks `package.json`, `dist/cli.js`): every hunk a re-wrap; no quote, semicolon, indent or
+  import-form change; `"./lib.ts"` specifiers intact. Prose diffs of 1.3/1.4/1.5 read: W1–W8
+  present; the `*x*` → `_x_` swaps are bytes only.
+- `git grep`: "full check and build" 0; "CI gates them separately" only in W6's form; "Source
+  review" only in the hook's own comment; "same 17 files" 0; `prettier-ignore` exactly two in
+  `template/`.
+- CLI smoke into the scratchpad: `init` 33 written, `doctor` 6 passed, the landed
+  `reload-plan.ts` carries both fixes.
+- Findings → none; no `phase-1.5.md`.

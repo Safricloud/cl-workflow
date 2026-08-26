@@ -125,7 +125,26 @@ full check → commit) · `phase-1.5.md` added if verification finds anything
 
 ## Decisions made mid-loop — implemented; veto in the PR
 
-<!-- appended as the loop runs, dated -->
+- **M1 (2026-08-26)** — The root `mem/outstanding.md` had a continuation line beginning `+ kind
+  + area`, which Prettier reads as a list marker (found by item 1.5 in the payload twin; the
+  markdown investigation's AST comparison could not see it). Reflowed by the orchestrator — a
+  document edit — so `blocked-on-owner` leads the continuation; no word changed (`bbd0029`).
+- **M2 (2026-08-26)** — Three scoped-validation expectations in the phase file were wrong, the
+  work was right: 1.3's and 1.5's `git grep "Format line"` counted files the canonical wording
+  never puts that phrase in (only W2 and W4 carry it); 1.1's red list named
+  `template/.claude/hooks/rule-zero.ts`, which is already clean at width 100 (four of the ten
+  code files are: `rule-zero.ts`, `reload-plan.ts`, `status-block.ts`, `eslint.config.mjs`).
+  Recorded, nothing changed.
+- **M3 (2026-08-26)** — `.prettierrc` is read by Prettier's YAML parser (extensionless rc); the
+  P1 JSON text is valid YAML and both options are honoured (measured by 1.1: `rule-zero.ts` is
+  clean only at width 100). Left as is; `CLAUDE.md` documents the two options.
+- **M4 (2026-08-26)** — Item 1.6 put each `// prettier-ignore` *below* its reason comment (the
+  item's two instructions could not both hold); measured to work in either order.
+- **M5 (2026-08-26)** — P3 worked as intended: the orchestrator's close-out formatted 14 files
+  (130+/62−) rather than the ~800 lines the review forecast, because every implementer
+  formatted its own files first.
+- **M6 (2026-08-26)** — `pnpm test` exits 0 with zero tests (measured by 1.1); the
+  minimum-count assertion stays with the kit-conformance ledger entry, not this contribution.
 
 ## Phasing
 

@@ -42,14 +42,19 @@ function phaseText(): string {
   ].join("\n");
 }
 
-/** A plan file carrying the keys the hook echoes back, in the shape `templates/plan.md` writes. */
+/**
+ * A plan file carrying the keys the hook echoes back, each value in the exact shape
+ * `templates/plan.md` and every archived plan write it: a backticked path with an em-dash clause
+ * after it, the branch with its base and its sha. The hook echoes the raw remainder of the line,
+ * so a simplified value would not prove that a real one survives the round trip intact.
+ */
 function planText(): string {
   return [
     "# Plan — fixture",
     "",
-    "**Review:** docs/reviews/x/review.md",
-    "**Branch:** `feat/x`",
-    '**Owner go-ahead:** 2026-01-01 — "yes"',
+    "**Review:** `docs/reviews/x/review.md` — direction **A**, decisions 1–12",
+    "**Branch:** `feat/x` off `main` (`abc1234`)",
+    '**Owner go-ahead:** 2026-01-01 at the Questions phase — "yes"',
     "",
     "## Owner decisions this plan rests on",
     "",
@@ -98,10 +103,18 @@ void test("echoes the plan's Review, Branch, Owner go-ahead and owner decisions"
   const { status, stdout, stderr } = runHook(fixture(true));
   assert.equal(status, 0, `hook exited non-zero; stderr: ${stderr}`);
   assert.ok(stdout.includes("Plan — fixture"), `no plan title in:\n${stdout}`);
-  assert.ok(stdout.includes("Review: docs/reviews/x/review.md"), `no Review line in:\n${stdout}`);
-  assert.ok(stdout.includes("Branch: `feat/x`"), `no Branch line in:\n${stdout}`);
+  // The whole value, backticks and em-dash clause included: the hook prints the raw remainder of
+  // the line, and stripping any of it here would let a lossy echo pass.
   assert.ok(
-    stdout.includes('Owner go-ahead: 2026-01-01 — "yes"'),
+    stdout.includes("Review: `docs/reviews/x/review.md` — direction **A**, decisions 1–12"),
+    `no Review line in:\n${stdout}`,
+  );
+  assert.ok(
+    stdout.includes("Branch: `feat/x` off `main` (`abc1234`)"),
+    `no Branch line in:\n${stdout}`,
+  );
+  assert.ok(
+    stdout.includes('Owner go-ahead: 2026-01-01 at the Questions phase — "yes"'),
     `no go-ahead line in:\n${stdout}`,
   );
   assert.ok(stdout.includes("1. The fixture decision."), `no owner decisions in:\n${stdout}`);

@@ -114,7 +114,53 @@ and in the Status placeholder line nothing (the block shape lives in `implemente
 **Scoped validation:** `pnpm lint && pnpm typecheck`; `git diff --stat <base>` shows exactly these three files
 **Acceptance:** `grep -q 'its copies' template/.claude/skills/contribute/templates/investigation.md && grep -q 'shared module' template/.claude/skills/contribute/templates/phase.md && grep -q 'Playwright' template/CLAUDE.md` exits 0; on stash exits 1; `grep -c Playwright template/CLAUDE.md` prints 1.
 #### Status — item 1.5
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26).
+- **Files touched:**
+  `template/.claude/skills/contribute/templates/investigation.md` — one Facts row added after the
+  live-count row, for the functions a change needs and their existing copies (W4's first half);
+  `template/.claude/skills/contribute/templates/phase.md` — the **Files** placeholder now says
+  "including the shared module when this item generalizes a function"; the Status placeholder is
+  untouched (the block shape lives in `implementer.md`);
+  `template/CLAUDE.md` — the E2E line is now W8 verbatim, naming Playwright for browser-based
+  visual tests. Nothing else in the skeleton.
+- **Commits:** `014dd3d` on `worktree-agent-adad9a662e3bc94ee` (amended once to carry this sha)
+- **Deviation:** two wrap deviations, both deliberate. (a) The new E2E line is 103 columns, past
+  the ~95 wrap — W8 is fixed one-line wording and breaking it would split the `<cmd>` placeholder
+  out of the parenthetical. (b) In `phase.md` the **Files** placeholder wraps onto a second line
+  (`…generalizes a` / `function>`) to stay inside ~95, the way the real phase files wrap their
+  own **Files** lines; "shared module" stays whole on the first line so the acceptance grep sees
+  it.
+- **Tests:** none: no logic — prose only. The acceptance greps below are the "what must fail if
+  reverted" for this item.
+- **Verified against the installed package before writing:** not applicable — prose only, no
+  library behaviour relied on. Confirmed the scoped checks really ran against the installed
+  toolchain: eslint 10.9.1 and typescript 6.0.3 from `pnpm install --frozen-lockfile` in this
+  worktree (`node_modules` was absent until then, so the commands would otherwise have failed
+  loudly, not silently passed).
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm lint` — clean, `eslint --max-warnings 0 .`, 0 problems
+  - `pnpm typecheck` — clean, `tsc --noEmit`, 0 errors
+  - `git diff --stat` — exactly the three files this item owns (1 +, 3 ++-, 2 +-), plus this
+    phase file in the same commit
+  - `grep -c Playwright template/CLAUDE.md` — prints `1`
+  - **Checker verified:** with the change, the item's acceptance chain exits 0 and `grep -c
+    Playwright` prints 1; after `git stash push -- template/` the same chain exits **1** and
+    `grep -c Playwright` prints **0**; `git stash pop` restored all three files and the chain
+    exits 0 again with the count back to 1.
+  - Line endings: `file` reports all three as UTF-8 text with no CRLF terminators; `git diff`
+    shows no `^M` on any added line.
+- **Blocked on:** nothing. Two Bash commands were refused by the worktree-isolation check for
+  being too complex to verify (a `sed -e '15r …' > tmp && cp` pipeline writing through the
+  scratchpad, and `grep -c $'\r' <three files>`); both were replaced with in-worktree
+  equivalents (the edit tool, and `file`). No rule-zero denial — `.claude/rule-zero.log` was not
+  written to by this item.
+- **Orchestrator should verify:** the full check and the phase-2 regeneration — this item changes
+  three managed payload files, so the lock and the generated root copies of
+  `templates/investigation.md` and `templates/phase.md` move with it (`template/CLAUDE.md` is
+  **owned**: new installs only, so no root-copy drift from that one). Also worth a look: whether
+  the 103-column E2E line is acceptable house style before it ships to every new install. I ran
+  `pnpm install --frozen-lockfile` in this worktree, so `node_modules/` exists here — delete it
+  before `git worktree remove` (ledger, 2026-08-25 ergonomics (a)).
 
 ### Item 1.6 — the drift gate sees the guide
 **Files:** `.github/workflows/ci.yml`, `CLAUDE.md` (repo root)

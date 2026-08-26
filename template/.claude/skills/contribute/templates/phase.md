@@ -4,7 +4,8 @@
 **Magnet files this phase touches:** <none | list, and why it is safe>
 
 ### Item <n>.1 — <title>
-**Files:** <exact list the agent owns>
+**Files:** <exact list the agent owns — including the shared module when this item generalizes a
+function>
 **Approach:** <what to build and why this way; cite the facts table in plan.md>
 **Conventions that will fail your lint:** <the two or three that bite here>
 **Scoped validation:** <exact commands>

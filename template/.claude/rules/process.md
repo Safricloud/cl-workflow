@@ -44,17 +44,47 @@ grant, not branch protection, is the gate.
 2. **Measure, don't assume.** Record the measurement and where it was taken.
 3. **Say what you did not do.**
 
+## Voice
+
+Every text block you write begins with your name: the orchestrator writes `Orchestrator:`, an
+implementer `I-<n.m>:` (its plan item), an implementer on an inline brief in the PR-review
+loop `I-r<cycle>.<k>:` (the brief names it), an investigator `Investigator-<topic>:` (the stem
+of its report file). Before each tool call, one prefixed line saying what you are about to do
+and why — "Orchestrator: reading the drift gate in `ci.yml` to see which paths it inspects."
+Not what you did; the result says that.
+
+## Code
+
+- **Modular.** Small functions with one job each, composed; the piece you need next week should
+  be liftable without the piece beside it.
+- **No duplicate functions.** Never implement a function that already exists. If you meet a
+  duplicate the plan did not foresee and its file is not yours, report **Blocked** naming the
+  function; do not copy it and do not edit outside your files.
+- **Short files.** Keep to one concern per file; a file you cannot summarize in one sentence
+  is two files.
+- **Pure functions.** Inputs to outputs, no hidden state, no I/O inside; keep I/O at the edges,
+  so the logic can be tested by calling it.
+- **Tests with the logic.** Every implementation pairs with tests for its logic — a test that
+  fails when the change is reverted. Browser-based visual tests use the suite named by the E2E
+  line in `CLAUDE.md`.
+
+Duplicates are found at investigation — an investigator lists the functions a change will need
+and their existing copies — and the plan locks in the generalization: the shared module is in
+the **Files** of the item that generalizes it.
+
 ## Roles
 
 - **Owner** answers the questions, reserves the merge, may delegate it.
-- **Orchestrator** (this session) orients, briefs investigators, writes the review and the plan,
-  asks the questions, dispatches implementers, merges their worktree branches, verifies,
-  decides mid-loop, archives, opens the PR, runs the review loop, merges on the owner's word,
+- **Orchestrator** (this session) orients, briefs investigators — for the functions a change
+  will need and their copies among the rest — writes the review and the plan, asks the
+  questions, dispatches implementers, merges their worktree branches, verifies, decides
+  mid-loop, archives, opens the PR, runs the review loop, merges on the owner's word,
   deploys per `CLAUDE.md`. Edits documents only — never code — except on the small path
   (SKILL §11), where it makes the change itself.
 - **Sub-agents** (Opus): `investigator` writes reports under `docs/reviews/<id>/` and nothing
-  else; `implementer` works in its own worktree, commits to its branch, never pushes, never
-  takes a rule-zero action, keeps its status block in the plan current.
+  else; `implementer` works in its own worktree, commits to its branch, writes tests for the
+  logic it adds, never pushes, never takes a rule-zero action, keeps its status block in the
+  plan current.
 
 ## Naming
 

@@ -155,7 +155,52 @@ prettier@3.9.6 --print-width 100 --embedded-language-formatting off --check <you
 changes except what formatting moved; the naming table and the §9 merge block in SKILL are intact
 (`git diff` read). Tests: none — prose; say so.
 #### Status — item 1.3
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26). Anchors re-measured in this worktree and all four found where
+`investigation-process.md` §1 said: `SKILL.md:146`, `:176-177`, `:282`, `:283-284`;
+`templates/plan.md:33-35`; `templates/pr-body.md:12-14`; `template/CLAUDE.md:5-10`.
+- **Files touched:** `SKILL.md` — W5 in the §6 Verify sentence and in §11 step 4, W2 replacing the
+  §6 close-out paragraph, the format sentence appended to §11 step 3; `templates/plan.md` — W7
+  first in the Orchestrator-validation placeholder; `templates/pr-body.md` — W7 first in the
+  Validation bullet; `template/CLAUDE.md` — W1: `Full check` re-labelled `(format check + lint +
+  typecheck + unit)` and a `Format:` line directly after it.
+- **Commits:** `b4753d4` (wording only, so the anchor diff reads clean), `9a37e2d` (Prettier pass),
+  plus this status commit — branch `worktree-agent-aee0fca89dcfef62a`.
+- **Deviation:**
+  - §11 step 4 reads "the full check from `CLAUDE.md` — its first step is the formatter's check,
+    when **it** names one — and verify the checker…": the sentence already names `CLAUDE.md`, so
+    W5's clause takes a pronoun rather than repeating it. Item 1.4's guide §11 "What stays" should
+    match if it sits beside the same phrase.
+  - `templates/plan.md` W7 is capitalized (`<Formatter run and its check clean, full check, …>`)
+    because every placeholder in that template opens with a capital; the words are W7's.
+  - `template/CLAUDE.md`'s `Format:` bullet is wrapped over two lines (≤ 100 columns per this
+    item's conventions); its neighbour, the E2E line, is a 118-column single line and untouched.
+  - Two commits instead of formatting before each (P3): wording first, format second, so the
+    orchestrator can read the four anchors without formatting churn. End state is formatted and
+    `--check` clean, which is what P3 is for.
+  - The item's second scoped command expects `git grep -n "Format line" template/` to hit all four
+    of my files; measured, it hits **one** (`SKILL.md:181`) — W1, W7 and the §11 sentences as
+    fixed by P6 do not contain the literal phrase (`CLAUDE.md` carries the `- Format:` line
+    itself; the templates say "formatter"). Nothing to fix in the files; the expectation was wrong.
+- **Verified against the installed package before writing:** Prettier 3.9.6 via `pnpm dlx
+  prettier@3.9.6` (nothing installed in this worktree; no `node_modules` and no `pnpm install`
+  needed for a prose item).
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm dlx prettier@3.9.6 --print-width 100 --embedded-language-formatting off --check` on the
+    four files — "All matched files use Prettier code style!" (before the pass it warned on all 4)
+  - `git grep -n "full check and build" template/` — no hit (exit 1); `git grep -n "Format line"
+    template/` — 1 hit, `SKILL.md:181`
+  - `<placeholder>` tokens across the four files: 134 before the format pass, 134 after
+  - **Checker verified:** the two greps run against `HEAD~2` (pre-change) flip both ways —
+    "full check and build" hits `SKILL.md:146` (exit 0) and "Format line" has no hit (exit 1);
+    after the change, exactly the reverse. `prettier --check` seen red on all four files before
+    the write, green after.
+- **Tests:** none — prose only; this item adds no logic. The greps above are its checker.
+- **Blocked on:** nothing. No hook denial; `git diff` of both commits read in full — the §11 code
+  fences, the naming table's cells and the §9 merge block are unchanged apart from Prettier's
+  padding, `*x*` → `_x_` and blank lines after headings/fences.
+- **Orchestrator should verify:** the full check and the generated-copy regeneration (`update`)
+  for the root copies of these three payload files — I did not touch `.claude/`; and that item
+  1.4's guide wording for W5 §11 matches the pronoun form above.
 
 ### Item 1.4 — The guide: roles, Verify, the CI sentence, commit, small path, appendices
 **Files:** `template/docs/guides/agent-workflow.md`

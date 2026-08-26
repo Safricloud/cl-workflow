@@ -73,7 +73,7 @@
   briefs ask for the functions a change will need and their existing copies; the review and
   the plan carry any generalization as items whose **Files** include the shared module. The
   ownership fence stands; an implementer that still meets a duplicate outside its files
-  reports **Blocked** naming the function. (owner: "Duplicate code needs to come from the
+  reports **Blocked** naming the function. (owner: "Duplicate code detection needs to come from the
   investigation - the plan needs the direction already locked in.", decision 6)
 - 2026-08-26 — Implementer code standards are prose, threshold-free: modular and reusable, one
   concern per file, pure functions where possible, every implementation paired with tests for

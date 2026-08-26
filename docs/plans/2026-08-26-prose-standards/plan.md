@@ -8,7 +8,7 @@ plus the one-line CI fix (decision 11), decisions 1–15
 after PR #4 merges, before phase 1 is dispatched** (decision 13) — the post-rebase base SHA is
 recorded under *Orchestrator work* below when it happens
 **Owner go-ahead:** 2026-08-26 at the Questions phase — "A — prose only"; "I-<n.m>:"; "Yes,
-I-r<cycle>.<k>:"; "Yes, Investigator-<topic>:"; "Duplicate code needs to come from the
+I-r<cycle>.<k>:"; "Yes, Investigator-<topic>:"; "Duplicate code detection needs to come from the
 investigation - the plan needs the direction already locked in."; "template/CLAUDE.md only";
 "No — leave rule zero prose as is"; "Include the one-line fix after all"; "Merge #4 first; I
 rebase before dispatch"; "Merge when silent — squash, --admin"

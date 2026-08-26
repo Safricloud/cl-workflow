@@ -238,3 +238,28 @@ C each add reach into target projects that the kit's zero-dependency stance rule
 
 ---
 <!-- Appended at the Questions phase; the review is not rewritten above this line. -->
+## Decisions (recorded 2026-08-26)
+1. Direction → **A — Prettier for the kit repo only**; payload prose stays tool-agnostic.
+2. Who runs the formatter → **(iii) the orchestrator runs `pnpm format` itself before the final
+   Orchestrate commit** — the owner amends the settled "edits documents only — never code" rule:
+   running the formatter named by `CLAUDE.md` over the repo is a deterministic tool run, not an
+   edit. Implementers still format the files they own so that run is a no-op on their code (plan
+   decision). On the small path the orchestrator formats directly, as it edits directly.
+3. Markdown scope → **(c) code, the payload and the root owned documents**; every process record
+   (`docs/history/`, `docs/reviews/`, `docs/plans/`, `docs/reports/`) is ignored.
+4. Print width → **100**.
+5. The two dense literal tables → **`// prettier-ignore` on both**.
+6. Version pin → **caret `^3.9.6`**, consistent with the other devDependencies (the owner declined
+   the exact pin; the lockfile pins it until someone updates it).
+7. Enforcement → **full check + CI step**; the guide's "CI gates formatting separately" sentence
+   is re-worded.
+8. Naming in the payload → **`Format:` line in the owned `template/CLAUDE.md` skeleton naming
+   Prettier as the default, managed prose says "the formatter named by the Format line in
+   `CLAUDE.md`, if the project has one"** (the Playwright pattern).
+9. `reload-plan.ts` → **fix `:93` (accept `_(implement`) and `:67` (`Source review` → `Review`) in
+   one item**, each with a test.
+10. Tests → **a new `test/` directory, `pnpm test` = `node --test test/`, in CI and the full
+    check**; pre-decides the location for the kit-conformance suite.
+11. `.git-blame-ignore-revs` → **skip it**.
+12. Merge method → **squash**, on the owner's word at §9.
+**Rule-zero grants written:** none — no rule-zero action before the merge.

@@ -94,6 +94,28 @@
   `node_modules` — every item that runs lint/typecheck pays a `pnpm install --frozen-lockfile`.
 
 ## Settled — do not re-open, do not "fix"
+- 2026-08-26 — Prettier (`^3.9.6`, devDependency of the kit repo only) formats code, the payload
+  and the root owned documents at `printWidth: 100`, `proseWrap: preserve`,
+  `embeddedLanguageFormatting: off`; `pnpm format` writes, `pnpm format:check` is the first step
+  of the full check and of CI. Ignored (`.prettierignore`): `dist/`, `pnpm-lock.yaml`, the
+  generated root `.claude/` and `docs/guides/agent-workflow.md`, `template/.claude/settings.json`
+  (the CLI serializes it), and every process record (`docs/history/`, `docs/reviews/`,
+  `docs/plans/`, `docs/reports/`) — records stay as written. The two dense literal tables
+  (`CASES` in `rule-zero-selftest.ts`, the extension `Set`s in `docs-only.ts`) carry
+  `// prettier-ignore`. No `eslint-config-prettier` (measured unnecessary). Nothing ships to
+  target projects; the payload names the tool only in the owned `template/CLAUDE.md` `Format:`
+  line (the Playwright pattern). (owner, 2026-08-26-prettier, decisions 1, 3–8)
+- 2026-08-26 — **The orchestrator runs the formatter.** The "edits documents only — never code"
+  rule gains one exception beside the small path: before the final Orchestrate commit the
+  orchestrator runs the formatter named by the Format line in `CLAUDE.md` over the repo (then the
+  build and the generated-copy regeneration where `CLAUDE.md` names them) and commits — a
+  deterministic tool run, not an edit. Implementers still format the files they own. (owner,
+  2026-08-26-prettier, decision 2 — chose (iii) over implementers-only)
+- 2026-08-26 — Hook tests live in `test/` (`*.test.ts`, `node:test`, `pnpm test` =
+  `node --test test/`, in CI and the full check) — outside the payload and outside `dist/`. The
+  kit-conformance suite goes there too. (owner, 2026-08-26-prettier, decision 10)
+- 2026-08-26 — No `.git-blame-ignore-revs` for the one-off reformat. (owner, 2026-08-26-prettier,
+  decision 11)
 - 2026-08-26 — Every agent names itself at the start of each text block and says in one line
   what it is about to do before a tool call: the orchestrator as `Orchestrator:`, an
   implementer as `I-<n.m>:` (its plan item — the kit's noun is "item", never "task"), an

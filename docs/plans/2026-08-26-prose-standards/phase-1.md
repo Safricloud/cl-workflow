@@ -35,7 +35,8 @@ session; if a sentence can go, it goes.
   gains "briefs investigators — for the functions a change will need and their copies among
   the rest" and the sub-agents bullet "writes tests for the logic it adds". +35/−5 lines; the
   file grows 62 → 92 lines.
-- **Commits:** see the worktree branch `worktree-agent-ade9f5e0e4ce4cce7` (one commit)
+- **Commits:** `88504a2` on `worktree-agent-ade9f5e0e4ce4cce7`, plus one follow-up commit
+  recording that sha here
 - **Deviation:** the canonical W5 sentence is spelled "Keep to one concern per file; a file you
   cannot summarize in one sentence is two files" rather than opening with "One concern per
   file." — the acceptance grep is case-sensitive and the sentence-initial capital made it exit

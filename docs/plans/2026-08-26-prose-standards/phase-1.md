@@ -217,7 +217,59 @@ payload's scaffolding here.
 then the gate itself: `node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/ docs/guides/` prints nothing in your worktree — it holds only your own change and `template/` is untouched there, so the root copy still matches; if anything prints, read it and report it rather than fixing it. **Verify the checker:** append a line to the root `docs/guides/agent-workflow.md`, run `update`, confirm `git status --porcelain --untracked-files=all -- docs/guides/` lists a `.new` (or the modified file) and `-- .claude/` alone lists nothing; then `git checkout -- docs/guides/agent-workflow.md` and delete the `.new`. Record both outputs.
 **Acceptance:** `grep -q -- '-- .claude/ docs/guides/' .github/workflows/ci.yml && grep -q 'docs/guides/' CLAUDE.md` exits 0; on stash exits 1. `git status --porcelain` clean at the end apart from your commits.
 #### Status — item 1.6
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26).
+- **Files touched:** `.github/workflows/ci.yml` — the drift-gate pathspec becomes
+  `-- .claude/ docs/guides/`, the step is renamed "Generated copy drift gate", and its comment
+  says why (`docs/guides/agent-workflow.md` is a managed payload file `update` rewrites at the
+  root; the rest of `docs/` stays out because `docs/history/` and `docs/plans/` are this repo's
+  own records); `CLAUDE.md` (root) — the **Commands** generated-copy-gate sentence quotes the new
+  pathspec and carries the same one-clause reason.
+- **Commits:** on `worktree-agent-a777a40ce3eec879c`; shas in the merge-back record.
+- **Deviation:** none in the change itself. During the checker verification the restore command
+  the item prescribes (`git checkout` with a `--` pathspec) was denied by rule zero — see
+  **Blocked on**. The guide was restored instead by deleting the bytes I had appended;
+  `git diff -- docs/guides/` is empty, so the file is byte-identical to `HEAD`.
+- **Tests:** none: no logic — the change is a CI pathspec and a sentence of prose. The gate is
+  its own checker, and it was made to fail and then pass (below).
+- **Verified against the installed package before writing:** no npm package is load-bearing here;
+  verified against the repo instead — `docs/guides/agent-workflow.md` is absent from the CLI's
+  `OWNED` list (`src/cli.ts:31-41`), so it is managed and rewritten at the root by `update`, which
+  is the premise of the widened pathspec. Confirmed live: `update` over a hand-edited root guide
+  printed `warn docs/guides/agent-workflow.md has local edits — wrote
+  docs/guides/agent-workflow.md.new beside it, yours untouched`.
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm lint` — exit 0, no problems (`pnpm install --frozen-lockfile` was needed first: the
+    worktree had no `node_modules`)
+  - `pnpm typecheck` — exit 0
+  - `pnpm build && git diff --exit-code dist/` — exit 0, `dist/` unmoved
+  - The gate in this worktree: `node dist/cli.js update .` → `0 refreshed, 24 already current,
+    0 left beside as .new, 0 removed, 9 owned files untouched`; then
+    `git status --porcelain --untracked-files=all -- .claude/ docs/guides/` → **no output**
+    (0 bytes, exit 0), as the item predicted.
+  - `.github/workflows/ci.yml` parses (PyYAML): the step's `run` is exactly the three expected
+    lines — `node dist/cli.js update .`, the `status=` line carrying the new pathspec, the `if`
+    guard — with `shell: bash` and the name `Generated copy drift gate`.
+  - **Checker verified:** appended a line to the root `docs/guides/agent-workflow.md` and ran
+    `update`. Under the new pathspec, `git status --porcelain --untracked-files=all --
+    .claude/ docs/guides/` printed two lines — ` M docs/guides/agent-workflow.md` and
+    `?? docs/guides/agent-workflow.md.new` — while `-- .claude/` alone printed **nothing**: the
+    old pathspec is blind to exactly this drift. The step body run verbatim under bash exited
+    **1** on that state. After the guide was restored and the `.new` deleted, the same step body
+    exited **0** with no output, and `git status --porcelain` showed only my three modified files.
+  - **Acceptance:** `grep -q -- '-- .claude/ docs/guides/' .github/workflows/ci.yml && grep -q
+    'docs/guides/' CLAUDE.md` → exit **0**; the same pair run against the base copies extracted
+    with `git show HEAD:<file>` (used in place of `git stash`, to leave the worktree state alone)
+    → exit **1**.
+- **Blocked on:** nothing left unfinished, but one command was denied and the orchestrator should
+  see it: the item's restore step — `git checkout` with a `--` pathspec on
+  `docs/guides/agent-workflow.md` — is guarded at `rule-zero.conf:36`
+  (`guard git checkout (-- |\.( |$))`), so a sub-agent cannot run it, grant or no grant. Worth
+  noting because the item text instructs the implementer to run exactly that; the restore was
+  completed another way and verified with `git diff`.
+- **Orchestrator should verify:** the full check including `pnpm selftest` (62/62) and the CLI
+  smoke, neither of which this item ran; and that the widened gate still prints nothing after
+  phase 2 regenerates the root copy — in this worktree `template/` is untouched, so the root copy
+  matched trivially.
 
 ## Merge-back record (orchestrator)
 <Per item: worktree branch, commits merged, conflicts and how resolved, worktree removed.>

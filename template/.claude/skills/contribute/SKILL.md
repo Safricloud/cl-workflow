@@ -54,10 +54,10 @@ itself.
 - Mint the id, create the branch with no upstream, `mkdir docs/reviews/<id>`. Everything from
   here is committed on the branch as it is written; the plan is the state of record and
   compaction can happen at any time.
-- `git switch -c <branch> --no-track origin/main`, then `git config --get
-  branch.<branch>.merge` must print nothing: a branch that tracks `origin/main` is pushed *to*
-  `main` by an IDE sync, and the loop's record commits must land with the PR, never before it
-  (mid-loop decision in `plan.md`).
+- `git switch -c <branch> --no-track origin/main`, then
+  `git config --get branch.<branch>.merge` must print nothing: a branch that tracks
+  `origin/main` is pushed *to* `main` by an IDE sync, and the loop's record commits must land
+  with the PR, never before it (mid-loop decision in `plan.md`).
 
 ## 2. Investigate — two tiers
 
@@ -93,8 +93,9 @@ action; anything vague about what "done" looks like.
 
 When answered:
 - Append a dated **Decisions** section to the review (do not rewrite what is above it).
-- For each rule-zero yes: `node .claude/hooks/rule-zero.ts --grant '<regex matching the
-  exact command>'` — written now, before any code that performs it.
+- For each rule-zero yes:
+  `node .claude/hooks/rule-zero.ts --grant '<regex matching the exact command>'` — written now,
+  before any code that performs it.
 - Settled decisions → `mem/outstanding.md` → *Settled — do not re-open*.
 - Anything only the owner can do (accounts, content, filings) → `mem/outstanding.md` →
   *Open — owner follow-ups*. That is the only thing that ever waits.
@@ -139,8 +140,8 @@ deviations), commit to their `worktree-*` branch, never push, and return the wor
 
 **Merge a phase back** (measured sequence): `git -C <wt> status --short` is clean → read
 `git -C <wt> log --oneline <branch>..HEAD` → `git merge --no-edit worktree-<slug>` → on a
-conflict that is not mechanical, a Phase N.5 item on the merged base → `git worktree remove
-<wt>` then `git branch -d worktree-<slug>` (never `-D`).
+conflict that is not mechanical, a Phase N.5 item on the merged base → `git worktree remove <wt>`
+then `git branch -d worktree-<slug>` (never `-D`).
 
 **Verify** on the merged branch, yourself: full check and build; read the diff of every
 load-bearing file; grep for the area's known conventions; `git grep` the names of functions the
@@ -185,17 +186,17 @@ mkdir -p docs/history/<id>
 git mv docs/reviews/<id>/* docs/history/<id>/   && rmdir docs/reviews/<id>
 git mv docs/plans/<id>/*   docs/history/<id>/   && rmdir docs/plans/<id>
 ```
-Add one line to `docs/history/index.md` (`<date> · <id> · <one-line outcome> · blocked: #n, #m
-| none`), update `mem/` and `CLAUDE.md` to reflect the code as it lands, commit
-("Archive <id>; <what the ledger now says>"), push. `docs/plans/` and `docs/reviews/` now read
-as empty.
+Add one line to `docs/history/index.md`
+(`<date> · <id> · <one-line outcome> · blocked: #n, #m | none`), update `mem/` and `CLAUDE.md`
+to reflect the code as it lands, commit ("Archive <id>; <what the ledger now says>"), push.
+`docs/plans/` and `docs/reviews/` now read as empty.
 
 `gh pr create` with `templates/pr-body.md`: the ask and source, what changed (user-visible
 first), **Decisions to veto** (Questions-phase decisions by reference; plan decisions;
 mid-loop decisions), validation with counts and what was seen to fail, records, blocked-on-owner
 issues, `Fixes #<n>`. Comment on each blocked-on-owner issue with the PR link. One issue per
-branch, one branch per PR. The PR number is not written into the repo — `gh pr list --search
-<id>` finds it.
+branch, one branch per PR. The PR number is not written into the repo —
+`gh pr list --search <id>` finds it.
 
 ## 8. PR reviews — to silence
 
@@ -253,9 +254,9 @@ as a new contribution.
 
 ## 10. Deploy — per `CLAUDE.md` → Deploy
 
-- **production-ci**: the merge triggered the deploy Action. Watch it: `gh run list --workflow
-  <name> --branch <default> -L1` → `gh run watch <run-id>`. "It fired" is a claim; the run's
-  final status is the evidence.
+- **production-ci**: the merge triggered the deploy Action. Watch it:
+  `gh run list --workflow <name> --branch <default> -L1` → `gh run watch <run-id>`. "It fired"
+  is a claim; the run's final status is the evidence.
 - **local-containers**: rebuild with the merged code (`<command from CLAUDE.md>`), then the
   container checks from Verify — user id, migrations applied, server bound, nothing in stderr.
 - **none yet**: say so.
@@ -281,12 +282,12 @@ Rule zero and the three habits apply unchanged; what shrinks is the ceremony.
    `template/` and regenerate the root copy with the CLI; never the root copy.
 4. **Verify** with the full check from `CLAUDE.md`, and verify the checker where a test
    exists: revert, see red, restore.
-5. **Record** one entry in `docs/history/index.md` — `<date> · <id> · small: <what> · blocked:
-   none`, wrapped like its neighbours — committed with the change. No review document and
-   no plan directory; `mem/` only if a decision was settled. If an investigator *was* run
-   (step 2 needed a measurement you could not make yourself), its report is part of the
-   record: `git mv` it from `docs/reviews/<id>/` to `docs/history/<id>/` and commit it with
-   the change. Investigation reports are never deleted.
+5. **Record** one entry in `docs/history/index.md` —
+   `<date> · <id> · small: <what> · blocked: none`, wrapped like its neighbours — committed
+   with the change. No review document and no plan directory; `mem/` only if a decision was
+   settled. If an investigator *was* run (step 2 needed a measurement you could not make
+   yourself), its report is part of the record: `git mv` it from `docs/reviews/<id>/` to
+   `docs/history/<id>/` and commit it with the change. Investigation reports are never deleted.
 6. **PR** with a short body: the ask and its source, why it is small and who declared it, what
    changed, validation with counts and what was seen to fail. Push; `gh pr create`.
 7. **PR reviews** as §8 — `pr-watch.ts` to silence; each item verified; fixes made by you

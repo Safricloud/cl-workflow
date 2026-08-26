@@ -113,7 +113,8 @@ shipped conf contains.
 
 The `allow` lines are the process's own recorded "yes": commits, plain pushes, `gh pr create`,
 PR and issue comments, `gh api` reads, and any HTTP call to a local host. Add to them freely;
-that is cheaper than a question.
+that is cheaper than a question. Two standing *merge* approvals sit beside them: a docs-only
+PR, and a small-path PR (below) — both merge once the review loop is silent.
 
 ## The ten phases, and the one place you are prompted
 
@@ -127,6 +128,13 @@ your word — or unasked when `docs-only.ts` says the diff is docs/comments only
 always; one bundle grant covers merge + remote + local delete) → deploy (per `CLAUDE.md`: watch
 the Action, or rebuild the containers and check them). The archive commit before the PR is the
 last record commit; anything blocked on you becomes a labelled GitHub issue.
+
+**The small path** (`/contribute --small <ask>`, SKILL §11) is for a change of a few lines —
+a conf line, a doc fix, a version pin, a one-line bug. You declare it, or the orchestrator
+proposes it and you accept. It keeps rule zero, the three habits, the full check and the
+review loop, and drops the rest: the orchestrator edits directly, records one line in
+`docs/history/index.md`, opens a short PR, and merges it once the loop is silent and CI is
+green. If the change turns out to be more than a few lines, it escalates to the full loop.
 
 One id per contribution — `<yyyy-mm-dd>-<descriptive-slug>` — names the branch,
 the review directory, the plan directory (`plan.md` + one `phase-<n>.md` per phase) and the

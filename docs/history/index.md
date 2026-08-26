@@ -11,3 +11,7 @@ One line per contribution, newest last: `<date> · <id> · <one-line outcome> ·
   strictness flags, all 17 .ts files compiled (generated root copy included), CI lint step +
   generated-.claude/ drift gate, Windows path-spelling fix in the gate (self-test 60 → 62) ·
   blocked: none
+- 2026-08-26 · 2026-08-26-small-path · the small path (SKILL §11): a few-line change declared
+  small by the owner (or proposed and accepted) — orchestrator edits directly, full check, PR +
+  this index line, merged when the review loop is silent and CI is green; escalates when it is
+  more than the change · blocked: none

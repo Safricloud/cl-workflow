@@ -84,7 +84,14 @@
   elsewhere. Mid-loop the orchestrator decides, sub-agents implement everything, decisions are
   recorded for veto. Nothing is deferred except what the owner must personally do. (owner)
 - 2026-08-25 — The orchestrator edits documents only; every code change goes through an
-  implementer. (owner)
+  implementer — except on the small path, below. (owner)
+- 2026-08-26 — The small path (SKILL §11): a change of a few lines, no new dependency, no gate
+  or hook logic, declared small by the owner or proposed by the orchestrator and accepted. The
+  orchestrator edits directly; the full check is the gate; the record is the PR plus one
+  `docs/history/index.md` line; it merges under a standing approval once the review loop is
+  silent and CI is green; anything more escalates to the full loop. Four decisions asked and
+  answered in conversation, 2026-08-26. (owner: "One liners should not need to go through the
+  full contribute loop. We need a lighter loop for that kind of thing.")
 - 2026-08-25 — Naming: one id `<yyyy-mm-dd>-<descriptive-slug>` for branch, review dir, plan
   file, history dir. Issue number and PR number are recorded inside the documents, never in
   the id. (owner)
@@ -94,8 +101,10 @@
   deploy are reported in the conversation. Otherwise the loop triggers its own reviews. (owner)
 - 2026-08-25 — Anything blocked on the owner becomes a GitHub issue labelled `blocked-on-owner`
   + kind + area, created before the archive. (owner)
-- 2026-08-25 — Standing merge approval: a docs/comments-only PR (measured by `docs-only.py`)
+- 2026-08-25 — Standing merge approval: a docs/comments-only PR (measured by `docs-only.ts`)
   is merged by the orchestrator after the review loop is silent, CI cancelled. (owner)
+  2026-08-26 — a second: a small-path PR, merged after the review loop is silent and CI is
+  green. (owner)
 - 2026-08-25 — `gh pr merge --admin` is always used; branch protection is not the gate. (owner)
 - 2026-08-25 — PR review quiet window is 5 minutes, restarting on every push. (owner)
 - 2026-08-25 — An ask may name several GitHub issues; one PR or split is decided at Questions. (owner)

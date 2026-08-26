@@ -3,8 +3,12 @@
 Every contribution — feature, bug, one or more issues, owner feedback, post-merge reviewer
 comment — runs the
 `/contribute` loop: ask → investigate → review → questions → plan → orchestrate → PR →
-PR reviews → merge → deploy. There is no small-change path; small changes produce short
-documents. The loop: `.claude/skills/contribute/SKILL.md`. The why: `docs/guides/agent-workflow.md`.
+PR reviews → merge → deploy. A change of a few lines that the owner declares small — or that
+the orchestrator proposes as small and the owner accepts — runs the **small path** instead
+(SKILL §11): the orchestrator edits directly, the full check is the gate, the record is the PR
+plus one `docs/history/index.md` line, and it merges under a standing approval once the review
+loop is silent and CI is green. Anything more escalates to the full loop. The loop:
+`.claude/skills/contribute/SKILL.md`. The why: `docs/guides/agent-workflow.md`.
 
 ## Rule zero
 
@@ -27,9 +31,10 @@ orchestrator makes after Questions is implemented and listed for veto in the pla
 Nothing is deferred except what the owner must personally do — and that becomes a GitHub
 issue labelled `blocked-on-owner`. The archive commit before the PR is the last record commit;
 after `gh pr create` nothing under `docs/` or `mem/` changes. At the end, report and stop; the
-owner initiates the merge — with one standing exception: a PR whose diff is documentation or
+owner initiates the merge — with two standing exceptions: a PR whose diff is documentation or
 comments only (`docs-only.ts` says so) is merged by the orchestrator once the review loop is
-silent, CI cancelled, `--admin` bypass. The admin bypass is used for every merge; the rule-zero
+silent, CI cancelled, `--admin` bypass; and a small-path PR (SKILL §11) is merged once the
+review loop is silent and CI is green. The admin bypass is used for every merge; the rule-zero
 grant, not branch protection, is the gate.
 
 ## Three habits
@@ -45,7 +50,8 @@ grant, not branch protection, is the gate.
 - **Orchestrator** (this session) orients, briefs investigators, writes the review and the plan,
   asks the questions, dispatches implementers, merges their worktree branches, verifies,
   decides mid-loop, archives, opens the PR, runs the review loop, merges on the owner's word,
-  deploys per `CLAUDE.md`. Edits documents only — never code.
+  deploys per `CLAUDE.md`. Edits documents only — never code — except on the small path
+  (SKILL §11), where it makes the change itself.
 - **Sub-agents** (Opus): `investigator` writes reports under `docs/reviews/<id>/` and nothing
   else; `implementer` works in its own worktree, commits to its branch, never pushes, never
   takes a rule-zero action, keeps its status block in the plan current.

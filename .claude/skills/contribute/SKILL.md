@@ -1,17 +1,18 @@
 ---
 name: contribute
-description: Run one contribution through the loop — ask → investigate (two tiers) → review → questions (the last prompt) → plan → orchestrate → PR → PR reviews → merge → deploy. Invoke for any feature request, bug report, one or more GitHub issues, owner feedback, or post-merge reviewer comment. Use /contribute <issue number(s) | one-line ask>.
+description: Run one contribution through the loop — ask → investigate (two tiers) → review → questions (the last prompt) → plan → orchestrate → PR → PR reviews → merge → deploy. Invoke for any feature request, bug report, one or more GitHub issues, owner feedback, or post-merge reviewer comment. Use /contribute <issue number(s) | one-line ask>, or /contribute --small <ask> for a change of a few lines (the small path, §11).
 ---
 
 # /contribute — $ARGUMENTS
 
-You are the orchestrator. Ten phases, in order; a small change produces short documents, not a
-shorter loop. Templates: `.claude/skills/contribute/templates/`. The reasoning behind each
-phase: `docs/guides/agent-workflow.md`.
+You are the orchestrator. Ten phases, in order — or, for a change of a few lines that the owner
+has declared small, the **small path** in §11. Templates: `.claude/skills/contribute/templates/`.
+The reasoning behind each phase: `docs/guides/agent-workflow.md`.
 
 **The owner is prompted in exactly one phase — Questions.** Before it, you are orienting. After
 it, you decide, sub-agents implement, and every decision you make is recorded for veto. At the
-end you report and stop; the owner initiates the merge — unless the PR is docs-only (§9).
+end you report and stop; the owner initiates the merge — unless the PR is docs-only (§9) or on
+the small path (§11).
 
 ## Naming — one id for everything
 
@@ -243,3 +244,37 @@ as a new contribution.
 
 Report in one paragraph in the conversation: merge method and SHA, deploy result, open
 blocked-on-owner issues, each issue closed by the merge. No commit. The loop is over.
+
+## 11. The small path — `/contribute --small <ask>`
+
+For a change of a few lines in a few files that adds no dependency and touches no gate or hook
+logic: a conf line, a doc fix, a version pin, a one-line bug. The owner declares it (`--small`,
+or "small" in the ask), or you propose it in your restatement of the ask and the owner accepts.
+Rule zero and the three habits apply unchanged; what shrinks is the ceremony.
+
+1. **Ask.** Restate it in one sentence with its source, and say in one more why it is small.
+   Mint the id and the branch as usual (`chore/<id>` unless it is a fix).
+2. **Orient, don't investigate.** Read the area yourself — the file, its tests, `CLAUDE.md`'s
+   conventions, `mem/outstanding.md` for a settled decision the change would cross — and
+   measure the one thing that could make it not small: a test that pins the old behaviour, a
+   second copy of the file, a string the change makes false elsewhere (`git grep`). No
+   investigators, no review document, no plan directory.
+3. **Change it yourself.** You edit directly — no worktree, no implementer. In a kit repo, edit
+   `template/` and regenerate the root copy with the CLI; never the root copy.
+4. **Verify** with the full check from `CLAUDE.md`, and verify the checker where a test
+   exists: revert, see red, restore.
+5. **Record** one line in `docs/history/index.md` — `<date> · <id> · small: <what> · blocked:
+   none` — committed with the change. Nothing under `docs/reviews/` or `docs/plans/`; `mem/`
+   only if a decision was settled.
+6. **PR** with a short body: the ask and its source, why it is small and who declared it, what
+   changed, validation with counts and what was seen to fail. Push; `gh pr create`.
+7. **PR reviews** as §8 — `pr-watch.ts` to silence; each item verified; fixes made by you
+   directly; one cycle comment per cycle.
+8. **Merge under the small-path standing approval:** once the loop is silent and `ci-ok` is
+   green on the head, write the bundle grant and merge as §9 (squash, `--admin`) — no word
+   needed. Report which way in: "small path, declared by the owner" or "small path, proposed
+   and accepted". Deploy per §10.
+
+**Escalation.** The moment orientation or verification shows more than the change — a failing
+test, a second file family, a hook or gate touched, a decision the owner would want to make —
+stop, say so, and run the full loop from §1. The small path never widens silently.

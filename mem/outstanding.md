@@ -103,8 +103,8 @@
   + kind + area, created before the archive. (owner)
 - 2026-08-25 — Standing merge approval: a docs/comments-only PR (measured by `docs-only.ts`)
   is merged by the orchestrator after the review loop is silent, CI cancelled. (owner)
-  2026-08-26 — a second: a small-path PR, merged after the review loop is silent and CI is
-  green. (owner)
+- 2026-08-26 — Second standing merge approval: a small-path PR is merged by the orchestrator
+  after the review loop is silent and `ci-ok` is green on the head. (owner)
 - 2026-08-25 — `gh pr merge --admin` is always used; branch protection is not the gate. (owner)
 - 2026-08-25 — PR review quiet window is 5 minutes, restarting on every push. (owner)
 - 2026-08-25 — An ask may name several GitHub issues; one PR or split is decided at Questions. (owner)

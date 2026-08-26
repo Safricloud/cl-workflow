@@ -114,7 +114,8 @@ shipped conf contains.
 The `allow` lines are the process's own recorded "yes": commits, plain pushes, `gh pr create`,
 PR and issue comments, `gh api` reads, and any HTTP call to a local host. Add to them freely;
 that is cheaper than a question. Two standing *merge* approvals sit beside them: a docs-only
-PR, and a small-path PR (below) — both merge once the review loop is silent.
+PR merges once the review loop is silent, with its CI cancelled because it proves nothing; a
+small-path PR (below) merges once the review loop is silent **and** `ci-ok` is green.
 
 ## The ten phases, and the one place you are prompted
 

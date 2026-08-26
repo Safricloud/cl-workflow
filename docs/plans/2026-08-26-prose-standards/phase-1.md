@@ -80,7 +80,37 @@ are in your base — leave them.
 **Scoped validation:** `pnpm lint && pnpm typecheck`; `grep -n '^## \|^### ' template/docs/guides/agent-workflow.md` shows §0.5 between §0.4 and §1
 **Acceptance:** `grep -q '^### 0.5 How agents write' template/docs/guides/agent-workflow.md && grep -q 'I-r<cycle>.<k>' template/docs/guides/agent-workflow.md && grep -q 'last_assistant_message' template/docs/guides/agent-workflow.md && grep -q 'second definition' template/docs/guides/agent-workflow.md && grep -c '^| ' template/docs/guides/agent-workflow.md` exits 0 and the Appendix D row count is base + 1; on stash exits 1.
 #### Status — item 1.3
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**Done** (implementer, 2026-08-26).
+- **Files touched:** `template/docs/guides/agent-workflow.md` — all nine edits (a)–(i): §0.2
+  gains a naming clause on the orchestrator and on the sub-agents bullet; new **§0.5 How agents
+  write, and what implementers are held to** between §0.4 and §1 (identity, narration, the
+  "prose by the owner's choice" paragraph naming `last_assistant_message` in the `SubagentStop`
+  payload as the mechanism that is *not* built, then W3–W7 with the why and W4's three cases
+  citing `parseOptions` / `git` / `isRecord`); §1 branch creation is `--no-track` with the
+  `branch.<branch>.merge` check and the IDE-sync grounds; §2 tier two asks for the functions a
+  change needs and their existing copies; §5 **Files** gains the shared module; §6 **Verify**
+  gains the `git grep` for a second definition; §8 step 3 opens each inline brief with "You are
+  `I-r<cycle>.<k>`"; Appendix C Investigate/Orchestrate lines gain copies-listed and
+  duplicates-grepped; Appendix D gains the row from `plan.md`.
+- **Commits:** see below (one commit on `worktree-agent-a95b8ae8581dacb99`)
+- **Deviation:** none. Two small re-wraps of pre-existing lines in §1 and §6 were needed to keep
+  the ~95-column wrap after inserting text mid-paragraph; no wording of those sentences changed
+  beyond the inserted clauses. PR #4's §11 and its two appendix rows are untouched.
+- **Tests:** none: no logic — prose only; the acceptance grep is the checker.
+- **Validation (scoped; full check left to the orchestrator):**
+  - `pnpm lint` — clean, 0 problems (`node_modules` was absent in the worktree; `pnpm install
+    --frozen-lockfile` first, lockfile unchanged)
+  - `pnpm typecheck` — clean, exit 0
+  - `grep -n '^## \|^### '` — `### 0.5 …` at line 111, between `### 0.4` (102) and `## 1. The
+    ask` (165)
+  - Appendix D rows 21 → 22 (base + 1); whole-file `grep -c '^| '` 38 → 39
+  - **Checker verified:** the item's acceptance grep exits 0 with the change; with
+    `git stash push -- template/docs/guides/agent-workflow.md` it exits 1; after `git stash pop`
+    it exits 0 again
+- **Blocked on:** nothing
+- **Orchestrator should verify:** the full check and the generated-copy gate — the root
+  `docs/guides/agent-workflow.md` is deliberately untouched here (phase 2 regenerates it), so
+  `template/` and the root copy differ on this branch until then.
 
 ### Item 1.4 — `SKILL.md`: the orchestrator's own rules and duties
 **Files:** `template/.claude/skills/contribute/SKILL.md`

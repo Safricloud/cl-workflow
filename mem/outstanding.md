@@ -8,6 +8,10 @@
 <!-- #1 resolved 2026-08-25: owner delegated, MIT chosen; lands with 2026-08-25-npx-ts-kit -->
 
 ## Open — engineering follow-ups
+- 2026-08-26 — `template/docs/history/index.md` seeds new installs with an entry format that
+  carries `PR #<n>`, while this repo's `docs/history/index.md` header says the PR number is
+  never written into the repo (`gh pr list --search <id>` finds it). Pick one; the root
+  convention is the one the loop follows.
 - 2026-08-25 — `rule-zero.ts` spends a single-use grant while *judging*, segment by segment, so
   when a later segment of the same Bash command is denied the whole command does not run but
   the earlier grant is already consumed (measured at the merge of PR #3: log shows `grant-used
@@ -88,8 +92,8 @@
 - 2026-08-26 — The small path (SKILL §11): a change of a few lines, no new dependency, no gate
   or hook logic, declared small by the owner or proposed by the orchestrator and accepted. The
   orchestrator edits directly; the full check is the gate; the record is the PR plus one
-  `docs/history/index.md` line; it merges under a standing approval once the review loop is
-  silent and CI is green; anything more escalates to the full loop. Four decisions asked and
+  `docs/history/index.md` entry; it merges under a standing approval once the review loop is
+  silent and `ci-ok` is green on the head; anything more escalates to the full loop. Four decisions asked and
   answered in conversation, 2026-08-26. (owner: "One liners should not need to go through the
   full contribute loop. We need a lighter loop for that kind of thing.")
 - 2026-08-25 — Naming: one id `<yyyy-mm-dd>-<descriptive-slug>` for branch, review dir, plan

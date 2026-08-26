@@ -1,4 +1,4 @@
 # History
 
-One line per contribution, newest last: `<date> · <id> · PR #<n> · <one-line outcome>`
+One entry per contribution (one logical line, wrapped like the rest), newest last: `<date> · <id> · PR #<n> · <one-line outcome>`
 

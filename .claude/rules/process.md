@@ -6,8 +6,8 @@ comment — runs the
 PR reviews → merge → deploy. A change of a few lines that the owner declares small — or that
 the orchestrator proposes as small and the owner accepts — runs the **small path** instead
 (SKILL §11): the orchestrator edits directly, the full check is the gate, the record is the PR
-plus one `docs/history/index.md` line, and it merges under a standing approval once the review
-loop is silent and CI is green. Anything more escalates to the full loop. The loop:
+plus one `docs/history/index.md` entry, and it merges under a standing approval once the review
+loop is silent and `ci-ok` is green on the head. Anything more escalates to the full loop. The loop:
 `.claude/skills/contribute/SKILL.md`. The why: `docs/guides/agent-workflow.md`.
 
 ## Rule zero
@@ -34,7 +34,7 @@ after `gh pr create` nothing under `docs/` or `mem/` changes. At the end, report
 owner initiates the merge — with two standing exceptions: a PR whose diff is documentation or
 comments only (`docs-only.ts` says so) is merged by the orchestrator once the review loop is
 silent, CI cancelled, `--admin` bypass; and a small-path PR (SKILL §11) is merged once the
-review loop is silent and CI is green. The admin bypass is used for every merge; the rule-zero
+review loop is silent and `ci-ok` is green on the head. The admin bypass is used for every merge; the rule-zero
 grant, not branch protection, is the gate.
 
 ## Three habits

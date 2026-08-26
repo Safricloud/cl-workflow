@@ -30,9 +30,9 @@
 - 2026-08-26 — The small path (SKILL §11): a change of a few lines, no new dependency, no gate
   or hook logic, declared small by the owner or proposed by the orchestrator and accepted. The
   orchestrator edits directly; the full check is the gate; the record is the PR plus one
-  `docs/history/index.md` line; it merges under a standing approval once the review loop is
-  silent and CI is green; anything more escalates to the full loop. (owner: "One liners should
-  not need to go through the full contribute loop.")
+  `docs/history/index.md` entry; it merges under a standing approval once the review loop is
+  silent and `ci-ok` is green on the head; anything more escalates to the full loop. (owner:
+  "One liners should not need to go through the full contribute loop.")
 - 2026-08-25 — Naming: one id `<yyyy-mm-dd>-<descriptive-slug>` for branch, review dir, plan
   file, history dir. Issue number and PR number are recorded inside the documents, never in
   the id. (owner)

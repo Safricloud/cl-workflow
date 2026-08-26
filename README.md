@@ -133,9 +133,9 @@ last record commit; anything blocked on you becomes a labelled GitHub issue.
 **The small path** (`/contribute --small <ask>`, SKILL §11) is for a change of a few lines —
 a conf line, a doc fix, a version pin, a one-line bug. You declare it, or the orchestrator
 proposes it and you accept. It keeps rule zero, the three habits, the full check and the
-review loop, and drops the rest: the orchestrator edits directly, records one line in
-`docs/history/index.md`, opens a short PR, and merges it once the loop is silent and CI is
-green. If the change turns out to be more than a few lines, it escalates to the full loop.
+review loop, and drops the rest: the orchestrator edits directly, records one entry in
+`docs/history/index.md`, opens a short PR, and merges it once the loop is silent and `ci-ok`
+is green. If the change turns out to be more than a few lines, it escalates to the full loop.
 
 One id per contribution — `<yyyy-mm-dd>-<descriptive-slug>` — names the branch,
 the review directory, the plan directory (`plan.md` + one `phase-<n>.md` per phase) and the

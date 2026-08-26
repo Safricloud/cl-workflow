@@ -263,8 +263,8 @@ Rule zero and the three habits apply unchanged; what shrinks is the ceremony.
    `template/` and regenerate the root copy with the CLI; never the root copy.
 4. **Verify** with the full check from `CLAUDE.md`, and verify the checker where a test
    exists: revert, see red, restore.
-5. **Record** one line in `docs/history/index.md` — `<date> · <id> · small: <what> · blocked:
-   none` — committed with the change. No review document and no plan directory; `mem/` only
+5. **Record** one entry in `docs/history/index.md` — `<date> · <id> · small: <what> · blocked:
+   none`, wrapped like its neighbours — committed with the change. No review document and no plan directory; `mem/` only
    if a decision was settled. If an investigator *was* run (step 2 needed a measurement you
    could not make yourself), its report is part of the record: `git mv` it from
    `docs/reviews/<id>/` to `docs/history/<id>/` and commit it with the change. Investigation

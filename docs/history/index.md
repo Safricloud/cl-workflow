@@ -1,6 +1,6 @@
 # History
 
-One line per contribution, newest last: `<date> · <id> · <one-line outcome> · blocked: #n | none`
+One entry per contribution (one logical line, wrapped like the rest), newest last: `<date> · <id> · <one-line outcome> · blocked: #n | none`
 (the PR number is never written into the repo — `gh pr list --search <id>` finds it)
 
 - 2026-08-25 · 2026-08-25-npx-ts-kit · Python kit → npm package installed from GitHub: seven

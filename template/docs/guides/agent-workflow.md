@@ -441,7 +441,7 @@ proposes it when restating the ask and the owner accepts. Nobody else decides.
 **What stays.** Rule zero and its hook; the three habits; the full check from `CLAUDE.md` as
 the gate, with the checker verified where a test exists; the review loop (`pr-watch.ts` to
 silence, every item verified before it is acted on, a cycle comment per cycle); the record —
-one line in `docs/history/index.md`, committed with the change; `mem/` if a decision was
+one entry in `docs/history/index.md`, committed with the change; `mem/` if a decision was
 settled; the deploy step.
 
 **What goes.** The review document, the Questions phase, the plan directory, implementers and
@@ -542,4 +542,4 @@ An entry moves between sections; it is deleted only when it is no longer true.
 | Merge only on the owner's explicit ask | + the **docs-only standing rule**: `docs-only.ts` measures the diff and writes the grant itself; CI cancelled; `--admin` always | One standing approval, made mechanical and conservative |
 | One issue per branch | An ask may name several issues; one PR or split is a Questions-phase decision | The owner's asks come in batches |
 | Loop ends at "report and stop" | + **Merge** on the owner's word (bundle grant) + **Deploy** per `CLAUDE.md` | The loop closes on the running system |
-| No small-change path; small changes produce short documents | The **small path** (§11): declared or accepted, orchestrator edits directly, full check, PR + one index line, merged when silent and CI green, escalates when it is more than the change | Owner, 2026-08-26: one-liners should not need the full loop |
+| No small-change path; small changes produce short documents | The **small path** (§11): declared or accepted, orchestrator edits directly, full check, PR + one index entry, merged when silent and `ci-ok` green, escalates when it is more than the change | Owner, 2026-08-26: one-liners should not need the full loop |

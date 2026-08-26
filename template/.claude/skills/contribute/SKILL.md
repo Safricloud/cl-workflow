@@ -143,12 +143,13 @@ deviations), commit to their `worktree-*` branch, never push, and return the wor
 conflict that is not mechanical, a Phase N.5 item on the merged base → `git worktree remove <wt>`
 then `git branch -d worktree-<slug>` (never `-D`).
 
-**Verify** on the merged branch, yourself: full check and build; read the diff of every
-load-bearing file; grep for the area's known conventions; `git grep` the names of functions the
-phase added for a second definition; `.claude/rule-zero.log` for any denial an implementer hit;
-the gates the package check does not cover; **verify the checker** (revert the fix, see red,
-restore); distrust convenient results; real rendered UI at each viewport, screenshots appraised
-by you; run the container if touched; re-read every sentence the change made true or false.
+**Verify** on the merged branch, yourself: full check — its first step is the formatter's check,
+when `CLAUDE.md` names one — and build; read the diff of every load-bearing file; grep for the
+area's known conventions; `git grep` the names of functions the phase added for a second
+definition; `.claude/rule-zero.log` for any denial an implementer hit; the gates the package
+check does not cover; **verify the checker** (revert the fix, see red, restore); distrust
+convenient results; real rendered UI at each viewport, screenshots appraised by you; run the
+container if touched; re-read every sentence the change made true or false.
 
 **Fix through sub-agents, always.** Every finding from verification becomes an item in
 `phase-<n>.5.md` with its own status block, implemented by a fresh implementer — you do not
@@ -173,8 +174,12 @@ missing ones the same way). Area labels: the repo's own. Record the issue number
 `plan.md` → *Blocked on the owner* and in `mem/outstanding.md`. Ship everything that does not
 depend on it, and say in the issue how the shipped code behaves meanwhile.
 
-When every item is Done and the final verification is green, commit: what, why, the decision
-it rests on, the validation run, any lockfile diff explained.
+When every item is Done and the final verification is green, **format, then commit**: run the
+formatter named by the Format line in `CLAUDE.md`, if the project has one, over the repo; then
+the build and any generated-copy regeneration `CLAUDE.md` names; then the full check once more.
+This is the one code change the orchestrator makes outside the small path — a deterministic tool
+run, not an edit. Commit: what, why, the decision it rests on, the validation run, any lockfile
+diff explained.
 
 ## 7. PR
 
@@ -279,9 +284,10 @@ Rule zero and the three habits apply unchanged; what shrinks is the ceremony.
    second copy of the file, a string the change makes false elsewhere (`git grep`). No
    investigators, no review document, no plan directory.
 3. **Change it yourself.** You edit directly — no worktree, no implementer. In a kit repo, edit
-   `template/` and regenerate the root copy with the CLI; never the root copy.
-4. **Verify** with the full check from `CLAUDE.md`, and verify the checker where a test
-   exists: revert, see red, restore.
+   `template/` and regenerate the root copy with the CLI; never the root copy. Format the files
+   you changed with the formatter named in `CLAUDE.md`, if there is one.
+4. **Verify** with the full check from `CLAUDE.md` — its first step is the formatter's check,
+   when it names one — and verify the checker where a test exists: revert, see red, restore.
 5. **Record** one entry in `docs/history/index.md` —
    `<date> · <id> · small: <what> · blocked: none`, wrapped like its neighbours — committed
    with the change. No review document and no plan directory; `mem/` only if a decision was

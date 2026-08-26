@@ -4,7 +4,9 @@
 
 ## Commands
 - Install: `<cmd>`
-- Full check (lint + typecheck + unit): `<cmd>`
+- Full check (format check + lint + typecheck + unit): `<cmd>`
+- Format: `<write cmd>` / `<check cmd>` (the check is the first step of the full check; default
+  for new installs: Prettier — `prettier --write .` / `prettier --check .`)
 - Build: `<cmd>`
 - E2E: `<cmd>` (`<which suites cover which surfaces>`; browser-based visual tests: Playwright — `<playwright cmd>`)
 - Container: `<cmd>`

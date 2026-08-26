@@ -31,8 +31,8 @@ verified result of phase N.>
 <Seeds committed before a phase; plan, ledger, CLAUDE.md, blocked-on-owner issues, archive, PR.>
 
 ## Orchestrator validation (after each phase merge, and at the end)
-<Full check, build, E2E for the touched surfaces, screenshots at which viewports, container
-run if touched, checker-verified for each new test.>
+<Formatter run and its check clean, full check, build, E2E for the touched surfaces, screenshots
+at which viewports, container run if touched, checker-verified for each new test.>
 
 ## Blocked on the owner
 <The only kind of deferral. Each becomes a GitHub issue before the archive — record the number

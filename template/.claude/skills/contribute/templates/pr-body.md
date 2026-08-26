@@ -10,8 +10,9 @@ outcome.>
 - **Made mid-loop:** <each, one line, with grounds — implemented already>
 
 ## Validation
-- <full check with counts>; <E2E suites and results>; <new tests seen to fail against a
-  pre-change build>; <screenshots appraised at which viewports>; <container run if touched>
+- <formatter check clean>; <full check with counts>; <E2E suites and results>; <new tests seen
+  to fail against a pre-change build>; <screenshots appraised at which viewports>; <container
+  run if touched>
 - Known flake / not run: <say it>
 
 ## Records

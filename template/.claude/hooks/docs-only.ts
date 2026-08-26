@@ -49,6 +49,9 @@ const DOC_DIRS = ["docs/", "mem/"] as const;
 const PAYLOAD_PREFIX = "template/";
 
 /** Whole-line comment markers by file extension. Every set is disjoint. */
+// A lookup, and it is read as a table: one marker per line with its extensions beside it.
+// Prettier would give each extension a line of its own (owner decision 5).
+// prettier-ignore
 const COMMENT: ReadonlyArray<readonly [string, ReadonlySet<string>]> = [
   ["#", new Set([".py", ".sh", ".bash", ".zsh", ".rb", ".yml", ".yaml", ".toml", ".ini", ".cfg", ".conf", ".pl", ".r", ".ps1", ".dockerfile", ".gitignore", ".env"])],
   ["//", new Set([".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs", ".go", ".rs", ".java", ".c", ".h", ".cpp", ".hpp", ".cc", ".cs", ".swift", ".kt", ".kts", ".scala", ".php", ".dart", ".groovy", ".proto"])],

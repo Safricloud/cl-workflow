@@ -23,7 +23,15 @@ identical to the template copies — `pnpm lint` and `pnpm typecheck` still cove
 **Scoped validation:** `pnpm lint && pnpm typecheck && pnpm build && git diff --exit-code dist/ && pnpm selftest` (62/62); the gate: `node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/ docs/guides/` prints nothing after your commit. **Verify the checker:** after committing, add a line to `template/.claude/rules/process.md`, run the gate, and see the root `.claude/rules/process.md` appear in `git status` (template ahead of the copy); then `git checkout -- template/.claude/rules/process.md .claude/rules/process.md` and run the gate again to see it print nothing. Record both outputs.
 **Acceptance:** all 25 `diff -q` pairs identical; `git diff --stat <base> -- .claude/cl-workflow.lock` shows the lock changed; `git diff <base> -- .claude/cl-workflow.lock | grep -c '^[-+]    "'` equals 2 × the number of managed `.md` files phase 1 changed; the gate prints nothing; no `*.new` anywhere (`git status --porcelain --untracked-files=all` clean after the commit).
 #### Status — item 2.1
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**In progress** (implementer, 2026-08-26).
+- **Files touched so far:** `template/.claude/skills/contribute/SKILL.md` — the §8 paragraph
+  ending "Run `pr-watch.ts --pr <n>` again (no `--reset`)." rewrapped; the 124-column line is
+  now 77 + 44, words unchanged, the inline code span kept whole on one line.
+- **Commits:** pending
+- **Deviation:** pending — one finding to report (a second over-long line, from PR #4, outside
+  this item's one authorised rewrap).
+- **Validation:** pending — regeneration, gate and full check not yet run.
+- **Blocked on:** nothing so far
 
 ## Merge-back record (orchestrator)
 <worktree branch, commits merged, conflicts, worktree removed.>

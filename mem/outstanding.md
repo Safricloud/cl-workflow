@@ -28,11 +28,16 @@
   `lib.ts`. Not in scope: `isRecord` (deliberate build boundary between `dist/` and the payload)
   and the two `git` helpers (different contracts). Measurements in
   `docs/history/2026-08-26-prose-standards/investigation-{mechanisms,tests}.md`.
-- 2026-08-25 — Measure on this install: (a) a hook `deny` holds under `bypassPermissions`;
-  (b) `worktree.baseRef: "head"` is honoured by subagent worktrees (spawn one implementer from
-  a feature branch and check `git -C .claude/worktrees/<slug> merge-base HEAD <branch>`);
-  (c) `claude --version` ≥ 2.1.218. Reopen if any fails; record the results in
-  `docs/guides/agent-workflow.md` §5.
+- 2026-08-25 — Measure on this install: (a) a hook `deny` holds under `bypassPermissions` —
+  **measured 2026-08-26**: `.claude/rule-zero.log` carries `deny … bypassPermissions` rows for
+  the orchestrator and for `agent:implementer`, each of which stopped the command; (b)
+  `worktree.baseRef: "head"` is honoured — **measured 2026-08-26**: six implementer worktrees
+  dispatched from `feat/2026-08-26-prose-standards` each had `git merge-base <worktree-branch>
+  HEAD` = the feature branch head `05c8ae7`, not `main`; (c) `claude --version` ≥ 2.1.218 —
+  **measured 2026-08-26: 2.1.246** (the `version` field stamped on this session's transcript
+  records; the `claude` binary is not on this machine's PATH — the VS Code extension runs it).
+  All three hold; record them in `docs/guides/agent-workflow.md` §5 on the next edit of that
+  file, then delete this entry.
 - 2026-08-25 — Measure Copilot's latency, trigger and suppressed-section location on the first
   PR; fill in §10 "Know your reviewer".
 - 2026-08-25 — Watch npm upstream: 11.12.0's git-install regression (breaks every `npx
@@ -60,6 +65,17 @@
   outside the worktree>`, `cd <absolute path>` before `git`, and any Bash text containing a
   bare `<` (a heredoc with `i < n` is read as a redirect) — implementers needing a scratch
   clone make it inside their worktree and delete it; the kit cannot change this.
+- 2026-08-26 — Kit ergonomics seen in `2026-08-26-prose-standards`, not fixed: (e) **`git stash`
+  is shared across worktrees** — `refs/stash` lives in the common git dir, so two implementers
+  stashing at the same moment swap entries (measured: items 1.1 and 1.4 popped each other's
+  WIP; nothing lost, both rebuilt); never write "git stash" into an item's validation — the
+  safe revert check is `git show HEAD:<path> > <scratchpad>/base` and grep both copies;
+  (f) a sub-agent writing to the session scratchpad (`%LOCALAPPDATA%\Temp\claude\…`) is
+  denied `path:outside-repo` — implementers keep scratch files inside their worktree;
+  (g) `git checkout -- <path>` is a guarded shape (`rule-zero.conf:36`) for sub-agents too — an
+  item that tells an implementer to "restore" a file must say how (delete the appended bytes,
+  or copy back from `git show HEAD:<path>`); (h) an implementer worktree inherits no
+  `node_modules` — every item that runs lint/typecheck pays a `pnpm install --frozen-lockfile`.
 
 ## Settled — do not re-open, do not "fix"
 - 2026-08-26 — Every agent names itself at the start of each text block and says in one line

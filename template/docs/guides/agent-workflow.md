@@ -5,7 +5,7 @@ in conversation, a post-merge reviewer comment — goes through the same loop, w
 exception: a change of a few lines that the owner declares small — or that the orchestrator
 proposes as small and the owner accepts — takes the **small path** (§11), which keeps the rules
 and the verification and drops the ceremony. Project-specific values are `<placeholders>`;
-`.claude/rule-zero.conf` and the *Deploy* section of `CLAUDE.md` are the dials each project turns.
+`.claude/rule-zero.conf` and the _Deploy_ section of `CLAUDE.md` are the dials each project turns.
 
 The pattern, in one line:
 
@@ -29,23 +29,23 @@ the review directory, the plan file, and the archive directory. Sorting any of t
 by name gives chronology; grepping the id finds everything about the contribution in the repo,
 in git, and on GitHub.
 
-| Thing | Where it lives | Notes |
-| --- | --- | --- |
-| Branch | `feat/<id>` \| `fix/<id>` \| `chore/<id>` | Created at the ask, off the default branch's remote head |
-| Review + investigations | `docs/reviews/<id>/review.md`, `investigation-<topic>.md` | Live until archived |
-| Plan | `docs/plans/<id>/plan.md` + `phase-<n>.md` | One file per phase so phases can be worked concurrently. **`docs/plans/` is empty when nothing is pending** |
-| Archive | `docs/history/<id>/` — `review.md`, `investigation-*.md`, `plan.md`, `phase-*.md` | Moved, unchanged, before the PR is opened; lands with the PR. **The last record commit** |
-| Changelog | `docs/history/index.md` | One line per contribution, written at archive time: date · id · outcome · blocked issues |
-| Blocked on the owner | GitHub issues, `blocked-on-owner` + kind + area | Created before the archive; the only kind of deferral |
-| Reports to third parties | `docs/reports/` | Drafted here, sent (or not) by the owner, never by an agent |
-| Process guide | `docs/guides/agent-workflow.md` | This document. Wins over `CLAUDE.md` on conflict |
-| The loop, as a checklist | `.claude/skills/contribute/SKILL.md` + `templates/` | `/contribute` |
-| Always-on rules | `.claude/rules/process.md` | Short: rule zero, the one prompt phase, habits, roles, naming |
-| Instructions file | `CLAUDE.md` | Repo facts, commands, conventions, **Deploy** section — not a ledger, not the process |
-| Enforcement | `.claude/settings.json`, `.claude/hooks/`, `.claude/rule-zero.conf` | §0.3 |
-| Agent definitions | `.claude/agents/investigator.md`, `.claude/agents/implementer.md` | The invariant half of every sub-agent prompt |
-| Durable project facts | `mem/<topic>.md`, indexed by `mem/index.md` | Read the relevant one before touching that area |
-| The ledger | `mem/outstanding.md` | Owner follow-ups, blocked-on-owner issue numbers, settled decisions |
+| Thing                    | Where it lives                                                                    | Notes                                                                                                       |
+| ------------------------ | --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Branch                   | `feat/<id>` \| `fix/<id>` \| `chore/<id>`                                         | Created at the ask, off the default branch's remote head                                                    |
+| Review + investigations  | `docs/reviews/<id>/review.md`, `investigation-<topic>.md`                         | Live until archived                                                                                         |
+| Plan                     | `docs/plans/<id>/plan.md` + `phase-<n>.md`                                        | One file per phase so phases can be worked concurrently. **`docs/plans/` is empty when nothing is pending** |
+| Archive                  | `docs/history/<id>/` — `review.md`, `investigation-*.md`, `plan.md`, `phase-*.md` | Moved, unchanged, before the PR is opened; lands with the PR. **The last record commit**                    |
+| Changelog                | `docs/history/index.md`                                                           | One line per contribution, written at archive time: date · id · outcome · blocked issues                    |
+| Blocked on the owner     | GitHub issues, `blocked-on-owner` + kind + area                                   | Created before the archive; the only kind of deferral                                                       |
+| Reports to third parties | `docs/reports/`                                                                   | Drafted here, sent (or not) by the owner, never by an agent                                                 |
+| Process guide            | `docs/guides/agent-workflow.md`                                                   | This document. Wins over `CLAUDE.md` on conflict                                                            |
+| The loop, as a checklist | `.claude/skills/contribute/SKILL.md` + `templates/`                               | `/contribute`                                                                                               |
+| Always-on rules          | `.claude/rules/process.md`                                                        | Short: rule zero, the one prompt phase, habits, roles, naming                                               |
+| Instructions file        | `CLAUDE.md`                                                                       | Repo facts, commands, conventions, **Deploy** section — not a ledger, not the process                       |
+| Enforcement              | `.claude/settings.json`, `.claude/hooks/`, `.claude/rule-zero.conf`               | §0.3                                                                                                        |
+| Agent definitions        | `.claude/agents/investigator.md`, `.claude/agents/implementer.md`                 | The invariant half of every sub-agent prompt                                                                |
+| Durable project facts    | `mem/<topic>.md`, indexed by `mem/index.md`                                       | Read the relevant one before touching that area                                                             |
+| The ledger               | `mem/outstanding.md`                                                              | Owner follow-ups, blocked-on-owner issue numbers, settled decisions                                         |
 
 ### 0.2 Three roles, and no step vouches for itself
 
@@ -56,14 +56,15 @@ in git, and on GitHub.
   review and the plan, asks the questions, dispatches implementers, merges their worktree
   branches, verifies everything itself, decides mid-loop and records it, opens a GitHub issue for
   anything blocked on the owner, archives, opens the PR, runs the review loop, merges on the
-  owner's word, deploys per `CLAUDE.md`. **Edits documents only — never code.** Every code
-  change goes through an implementer — except on the small path (§11), where the orchestrator
-  makes the few-line change itself and the full check is the gate. Every text block it writes
-  begins `Orchestrator:` (§0.5).
+  owner's word, deploys per `CLAUDE.md`. **Edits documents only — never code** — with two
+  exceptions: the small path (§11), where the orchestrator makes the few-line change itself and
+  the full check is the gate, and the formatter run before the final Orchestrate commit (§6), a
+  tool run over the repo, not an edit. Every other code change goes through an implementer.
+  Every text block it writes begins `Orchestrator:` (§0.5).
 - **Sub-agents** — **Opus**, whatever the orchestrator runs on. `investigator`: one brief, one
   report under `docs/reviews/<id>/`, nothing else writable. `implementer`: one plan item, its own
   worktree, commits to its own branch, never pushes, never takes a rule-zero action, keeps its
-  status block in the plan current from *In progress* to *Done* or *Blocked*. Each names itself
+  status block in the plan current from _In progress_ to _Done_ or _Blocked_. Each names itself
   in every text block it writes (`I-<n.m>:`, `Investigator-<topic>:` — §0.5).
 
 ### 0.3 Rule zero (overrides everything below)
@@ -176,7 +177,7 @@ split when they do not. Then: confirm the checkout
 (`git fetch && git status` — default branch, remote head, clean; record the SHA), mint the id,
 create the branch with no upstream (`git switch -c <branch> --no-track origin/main`; then
 `git config --get branch.<branch>.merge` must print nothing — a branch that tracks `origin/main`
-is pushed *to* `main` by an IDE "Sync Changes", and the loop's record commits must land with the
+is pushed _to_ `main` by an IDE "Sync Changes", and the loop's record commits must land with the
 PR, never before it), create `docs/reviews/<id>/`. From here everything is committed on the
 branch as it is written: the documents are the state of record, and compaction can happen at any
 time.
@@ -201,14 +202,14 @@ the owner has asked for live reads. When the brief concerns code that will be wr
 wanted include the functions the change will need and their existing copies, with `file:line` —
 that list is what lets the plan lock the generalization in (§0.5). Each investigator writes
 `docs/reviews/<id>/investigation-<topic>.md` — a hook in its definition fences every write to
-`docs/reviews/` — and returns only its *Answer* paragraph. The orchestrator reads the files it
+`docs/reviews/` — and returns only its _Answer_ paragraph. The orchestrator reads the files it
 needs. Investigation reports are part of the record and archive with the review.
 
 **Method rules:**
 
 - Investigation is read-only on the code. Live reads happen only if the owner asked, are
   GET-equivalent, and are **labelled where they appear** with the system's actual response.
-- A fact carries *where measured* (file:line, command, installed package version). A fact
+- A fact carries _where measured_ (file:line, command, installed package version). A fact
   without a source is an assumption wearing a costume.
 - For UI: the real rendered app at each relevant viewport, screenshots, appraised by the
   orchestrator itself. Code-reading cannot validate layout.
@@ -255,9 +256,9 @@ When answered, the orchestrator:
 - appends a dated **Decisions** section to the review — quoted, not paraphrased; the review above
   that line is not rewritten;
 - writes a grant for each rule-zero yes, **before** any code that performs it;
-- records settled decisions in `mem/outstanding.md` → *Settled — do not re-open*;
+- records settled decisions in `mem/outstanding.md` → _Settled — do not re-open_;
 - records anything only the owner can do (accounts, content, licensing, third-party filings) in
-  `mem/outstanding.md` → *Open — owner follow-ups* — the only kind of thing that ever waits;
+  `mem/outstanding.md` → _Open — owner follow-ups_ — the only kind of thing that ever waits;
 - commits.
 
 **This is the one phase in which the owner is prompted.** After it the orchestrator decides.
@@ -314,10 +315,10 @@ definition carries the invariants — read the guide and the area memory, inheri
 only your files, scoped validation, verify the checker, rule zero, no push, the status block.
 
 **What the implementer does.** Works in `.claude/worktrees/<slug>` on `worktree-<slug>`; writes an
-*In progress* status block under its item in the phase file as soon as it has read it and keeps it current —
+_In progress_ status block under its item in the phase file as soon as it has read it and keeps it current —
 deviations the moment they are decided, a blocked command the moment the hook denies it;
 commits as it goes (commits are the transport; uncommitted work may be lost); finishes the block
-as *Done* or *Blocked*; commits the phase file; returns a short summary and its worktree path. A
+as _Done_ or _Blocked_; commits the phase file; returns a short summary and its worktree path. A
 `SubagentStop` hook refuses to let it finish while nothing under `docs/plans/` has changed.
 
 **Merging a phase back — the measured sequence:**
@@ -334,15 +335,16 @@ as *Done* or *Blocked*; commits the phase file; returns a short summary and its 
    `worktree-*` and treats `-D` as rule zero everywhere.
 
 **Verify — after each phase merge and again at the end, on the merged branch, yourself.** Believe
-nothing until you have seen it. Full check and build. The diff of every load-bearing file, not
+nothing until you have seen it. Full check — its first step is the formatter's check, when
+`CLAUDE.md` names one — and build. The diff of every load-bearing file, not
 the agent's summary of it. Grep for the conventions the area breaks. `git grep` the names of the
 functions the phase added, looking for a second definition — parallel implementers cannot see
 each other's worktrees, so a duplicate the plan did not foresee first exists here.
 `.claude/rule-zero.log` for any denial an implementer hit. The gates the package check does
-**not** cover — root config, scripts, formatting, the container build — CI gates them
-separately, so find out here. **Verify the checker**: a new test is evidence only once seen to
-fail — revert the fix, watch it go red, restore. **Distrust convenient results**: zero tests
-run, an empty grep, an unchanged lockfile.
+**not** cover — root config, scripts, the container build — CI gates them separately, so find
+out here; formatting is inside the full check now, first. **Verify the checker**: a new test is
+evidence only once seen to fail — revert the fix, watch it go red, restore.
+**Distrust convenient results**: zero tests run, an empty grep, an unchanged lockfile.
 UI at each viewport, screenshots before and after, appraised by you. Containers: run it — user
 id, migrations applied, server bound, nothing in stderr; a green build is not validation. Docs:
 re-read every sentence the change made true or false; nothing mechanical checks prose, and that
@@ -366,14 +368,20 @@ owner must personally do — a rule-zero action nobody granted, a credential, an
 content, a licence. For each, before the archive, the orchestrator opens an issue
 (`templates/blocked-issue.md`) labelled `blocked-on-owner`, a kind (`rule-zero`,
 `credentials`, `account`, `content`, `licensing`, `decision`) and the repo's area label,
-creating labels that are missing; records the number under *Blocked on the owner* in `plan.md`
+creating labels that are missing; records the number under _Blocked on the owner_ in `plan.md`
 and in `mem/outstanding.md`; ships everything that does not depend on it; and says in the issue
 how the shipped code behaves meanwhile. A well-labelled issue is findable by kind when the
 owner sits down to clear them.
 
-**Commit** when every item is Done and the final verification is green: what and why, the
-decision it rests on, the validation run, any lockfile diff explained. Committing needs no
-approval — history is additive; the owner reviews after the fact.
+**Format, then commit** when every item is Done and the final verification is green: run the
+formatter named by the Format line in `CLAUDE.md`, if the project has one, over the repo; then
+the build and any generated-copy regeneration `CLAUDE.md` names; then the full check once more.
+This is the one code change the orchestrator makes outside the small path — a deterministic tool
+run, not an edit; it is the orchestrator's rather than an implementer's because the same input
+gives the same output, no judgement enters it, and the formatter's check — in the full check and
+again in CI — is the evidence that it ran. Commit: what and why, the decision it rests on, the
+validation run, any lockfile diff explained. Committing needs no approval — history is additive;
+the owner reviews after the fact.
 
 ---
 
@@ -419,8 +427,8 @@ posted nothing" and "Copilot never arrived" are distinguishable states, and both
 **One cycle:**
 
 1. Run the watcher (`--reset` on the first cycle only).
-2. Verify each returned item against the code. Verdict per item: *correct → fixed*; *correct in
-   part → what was adopted and on which argument*; *not a finding → the verified reason*.
+2. Verify each returned item against the code. Verdict per item: _correct → fixed_; _correct in
+   part → what was adopted and on which argument_; _not a finding → the verified reason_.
 3. Legitimate ones go to implementers as **inline briefs** — files, approach, scoped
    validation, acceptance, in the message — because the plan is archived and is not reopened.
    Each brief opens with "You are `I-r<cycle>.<k>`" (the review cycle, then the brief's number
@@ -477,7 +485,7 @@ contribution — ask, investigate, review, questions, plan — not as a quiet fi
 
 **Purpose:** close the loop on the running system, not on the merge.
 
-`CLAUDE.md` declares the mode under a *Deploy* heading:
+`CLAUDE.md` declares the mode under a _Deploy_ heading:
 
 - **production-ci** — a merge to the default branch triggers the deploy Action. The
   orchestrator watches that run to completion
@@ -506,7 +514,8 @@ owner declares it (`/contribute --small <ask>`, or "small" in the ask), or the o
 proposes it when restating the ask and the owner accepts. Nobody else decides.
 
 **What stays.** Rule zero and its hook; the three habits; the full check from `CLAUDE.md` as
-the gate, with the checker verified where a test exists; the review loop (`pr-watch.ts` to
+the gate — its first step is the formatter's check, when `CLAUDE.md` names one — with the
+checker verified where a test exists; the review loop (`pr-watch.ts` to
 silence, every item verified before it is acted on, a cycle comment per cycle); the record —
 one entry in `docs/history/index.md`, committed with the change; `mem/` if a decision was
 settled; the deploy step.
@@ -573,7 +582,8 @@ An entry moves between sections; it is deleted only when it is no longer true.
       merge → worktree remove → branch -d); verified by the orchestrator on the merged branch;
       the phase's new function names grepped for a second definition; findings fixed by
       implementers via `phase-<n>.5.md`; mid-loop decisions recorded;
-      blocked-on-owner issues created and labelled; final commit
+      blocked-on-owner issues created and labelled; formatter run before the final commit;
+      final commit
 - [ ] **PR**: archived into `docs/history/<id>/` with an index line; `mem/` and `CLAUDE.md`
       reflect the code; pushed — **last record commit**; `gh pr create` with decisions-to-veto,
       validation, blocked issues, `Fixes #n`
@@ -587,31 +597,32 @@ An entry moves between sections; it is deleted only when it is no longer true.
       one-paragraph report; no commit
 - [ ] **Small path** (§11), when declared or accepted: ask restated with why it is small; area
       read, the one thing that could make it not small measured; change made by the
-      orchestrator; full check + checker verified; one `docs/history/index.md` line committed
-      with the change; short PR; pr-watch to silence; merged when silent and `ci-ok` green;
-      escalated to the full loop the moment it is more than the change
+      orchestrator, formatted; full check + checker verified; one `docs/history/index.md` line
+      committed with the change; short PR; pr-watch to silence; merged when silent and `ci-ok`
+      green; escalated to the full loop the moment it is more than the change
 
 ## Appendix D — what changed from the portable baseline, and why
 
-| Baseline | This edition | Why |
-| --- | --- | --- |
-| Ten unnamed stages | Ten named phases: ask, investigate, review, questions, plan, orchestrate, PR, PR reviews, merge, deploy | The owner's description of the loop |
-| Rule zero backed by "a mechanism" in the abstract | `PreToolUse` hook + `rule-zero.conf` + single-use grants + log + self-test; no prompts | Runs inside sub-agents too and holds under bypassed prompts; the grant is the recorded yes |
-| Questions "together, once" | **One prompt phase.** Rule-zero yeses collected there; mid-loop the orchestrator decides and records for veto | The owner accepts prompts in exactly one place and prefers more questions there, none elsewhere |
-| Investigation by the orchestrator, read-only | Two tiers: orchestrator orients; investigators (Opus) write reports under `docs/reviews/<id>/`, fenced by a hook | Keeps the orchestrator's context for orchestrating; reports become part of the record |
-| Review = findings + ranked recommendations | Review = plain-English document for the owner, with **directions** and **decisions we need** | The review's job is to make the questions answerable |
-| "Strongest model available" | **Opus** for all sub-agents | Owner correction |
-| Sub-agents never commit | Implementers commit to their own `worktree-*` branch; never push | Worktrees make commits the transport |
-| Status block appended at the end | Kept current from *In progress*; `SubagentStop` hook enforces presence | Feedback lands in the plan as the work happens |
-| Trivial fixes applied by the orchestrator | Every code change through an implementer; orchestrator edits documents only | Owner's rule |
-| Deferred findings to the ledger | **Nothing deferred** except what the owner must personally do; mid-loop decisions implemented and listed for veto | Owner's rule |
-| Phasing by file contention | Phasing by expected merge cleanliness; magnet files seeded or serialised | Each implementer has its own checkout |
-| Archive after commit, before push | Archive **before the PR is opened**, into `docs/history/<id>/` with an index line; **no record commits after the PR opens** | Records land with the PR; a loop that records its own cycles in the repo triggers its own reviews |
-| Review/plan named by date(+time) and slug, flat history | One id per contribution; plan split into `plan.md` + `phase-<n>.md`; directory per contribution in history; `index.md` changelog | The name is the same everywhere it appears; phases can be worked concurrently |
-| Deferred findings in the ledger | Anything blocked on the owner is a **GitHub issue**, labelled `blocked-on-owner` + kind + area, created before the archive | Findable and clearable by kind; the ledger holds the number |
-| "Wait for the reviewer's latency" | `pr-watch.ts`: one-minute polling, returns on news or after five quiet minutes, window restarts on push, extracts collapsed sections | Waiting is a script, not an agent counting minutes |
-| Merge only on the owner's explicit ask | + the **docs-only standing rule**: `docs-only.ts` measures the diff and writes the grant itself; CI cancelled; `--admin` always | One standing approval, made mechanical and conservative |
-| One issue per branch | An ask may name several issues; one PR or split is a Questions-phase decision | The owner's asks come in batches |
-| Loop ends at "report and stop" | + **Merge** on the owner's word (bundle grant) + **Deploy** per `CLAUDE.md` | The loop closes on the running system |
-| No small-change path; small changes produce short documents | The **small path** (§11): declared or accepted, orchestrator edits directly, full check, PR + one index entry, merged when silent and `ci-ok` green, escalates when it is more than the change | Owner, 2026-08-26: one-liners should not need the full loop |
-| Agents unnamed; no code-structure rules | Every agent prefixes its text with its name and narrates before tool calls; implementer code standards and tests-with-logic in the definition; duplicates found at investigation | Owner's standard, 2026-08-26; prose by the owner's choice (direction A) |
+| Baseline                                                    | This edition                                                                                                                                                                                   | Why                                                                                               |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Ten unnamed stages                                          | Ten named phases: ask, investigate, review, questions, plan, orchestrate, PR, PR reviews, merge, deploy                                                                                        | The owner's description of the loop                                                               |
+| Rule zero backed by "a mechanism" in the abstract           | `PreToolUse` hook + `rule-zero.conf` + single-use grants + log + self-test; no prompts                                                                                                         | Runs inside sub-agents too and holds under bypassed prompts; the grant is the recorded yes        |
+| Questions "together, once"                                  | **One prompt phase.** Rule-zero yeses collected there; mid-loop the orchestrator decides and records for veto                                                                                  | The owner accepts prompts in exactly one place and prefers more questions there, none elsewhere   |
+| Investigation by the orchestrator, read-only                | Two tiers: orchestrator orients; investigators (Opus) write reports under `docs/reviews/<id>/`, fenced by a hook                                                                               | Keeps the orchestrator's context for orchestrating; reports become part of the record             |
+| Review = findings + ranked recommendations                  | Review = plain-English document for the owner, with **directions** and **decisions we need**                                                                                                   | The review's job is to make the questions answerable                                              |
+| "Strongest model available"                                 | **Opus** for all sub-agents                                                                                                                                                                    | Owner correction                                                                                  |
+| Sub-agents never commit                                     | Implementers commit to their own `worktree-*` branch; never push                                                                                                                               | Worktrees make commits the transport                                                              |
+| Status block appended at the end                            | Kept current from _In progress_; `SubagentStop` hook enforces presence                                                                                                                         | Feedback lands in the plan as the work happens                                                    |
+| Trivial fixes applied by the orchestrator                   | Every code change through an implementer; orchestrator edits documents only — with two exceptions: the small path (§11) and the formatter run before the final Orchestrate commit (§6)         | Owner's rule                                                                                      |
+| Deferred findings to the ledger                             | **Nothing deferred** except what the owner must personally do; mid-loop decisions implemented and listed for veto                                                                              | Owner's rule                                                                                      |
+| Phasing by file contention                                  | Phasing by expected merge cleanliness; magnet files seeded or serialised                                                                                                                       | Each implementer has its own checkout                                                             |
+| Archive after commit, before push                           | Archive **before the PR is opened**, into `docs/history/<id>/` with an index line; **no record commits after the PR opens**                                                                    | Records land with the PR; a loop that records its own cycles in the repo triggers its own reviews |
+| Review/plan named by date(+time) and slug, flat history     | One id per contribution; plan split into `plan.md` + `phase-<n>.md`; directory per contribution in history; `index.md` changelog                                                               | The name is the same everywhere it appears; phases can be worked concurrently                     |
+| Deferred findings in the ledger                             | Anything blocked on the owner is a **GitHub issue**, labelled `blocked-on-owner` + kind + area, created before the archive                                                                     | Findable and clearable by kind; the ledger holds the number                                       |
+| "Wait for the reviewer's latency"                           | `pr-watch.ts`: one-minute polling, returns on news or after five quiet minutes, window restarts on push, extracts collapsed sections                                                           | Waiting is a script, not an agent counting minutes                                                |
+| Merge only on the owner's explicit ask                      | + the **docs-only standing rule**: `docs-only.ts` measures the diff and writes the grant itself; CI cancelled; `--admin` always                                                                | One standing approval, made mechanical and conservative                                           |
+| One issue per branch                                        | An ask may name several issues; one PR or split is a Questions-phase decision                                                                                                                  | The owner's asks come in batches                                                                  |
+| Loop ends at "report and stop"                              | + **Merge** on the owner's word (bundle grant) + **Deploy** per `CLAUDE.md`                                                                                                                    | The loop closes on the running system                                                             |
+| No small-change path; small changes produce short documents | The **small path** (§11): declared or accepted, orchestrator edits directly, full check, PR + one index entry, merged when silent and `ci-ok` green, escalates when it is more than the change | Owner, 2026-08-26: one-liners should not need the full loop                                       |
+| Agents unnamed; no code-structure rules                     | Every agent prefixes its text with its name and narrates before tool calls; implementer code standards and tests-with-logic in the definition; duplicates found at investigation               | Owner's standard, 2026-08-26; prose by the owner's choice (direction A)                           |
+| No formatter in the loop                                    | The formatter named by `CLAUDE.md`'s Format line, run by the orchestrator before the final Orchestrate commit; its check first in the full check and in CI                                     | owner, 2026-08-26                                                                                 |

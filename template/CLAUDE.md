@@ -6,7 +6,7 @@
 - Install: `<cmd>`
 - Full check (lint + typecheck + unit): `<cmd>`
 - Build: `<cmd>`
-- E2E: `<cmd>` (`<which suites cover which surfaces>`)
+- E2E: `<cmd>` (`<which suites cover which surfaces>`; browser-based visual tests: Playwright — `<playwright cmd>`)
 - Container: `<cmd>`
 
 ## Conventions that will fail your lint

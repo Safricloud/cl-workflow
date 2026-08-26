@@ -12,9 +12,11 @@ the root copy.
 ## Commands
 - Install: `pnpm install`
 - Full check (lint + typecheck + unit): `pnpm lint && pnpm typecheck && pnpm build && git diff --exit-code dist/ && pnpm selftest`,
-  then the generated-copy gate: `node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/`
+  then the generated-copy gate: `node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/ docs/guides/`
   must print nothing (a tracked change means `template/` moved ahead; a `*.new` means someone
-  hand-edited the generated root copy)
+  hand-edited the generated root copy). `docs/guides/` is in the pathspec because
+  `docs/guides/agent-workflow.md` is a managed payload file `update` rewrites at the root; the
+  rest of `docs/` is not — `docs/history/` and `docs/plans/` are this repo's own records
 - Lint: `pnpm lint` — `eslint --max-warnings 0 .` from `eslint.config.mjs`: `@eslint/js`
   recommended everywhere, typescript-eslint `recommendedTypeChecked` + `eslint-plugin-n` on
   every `.ts` (`src/`, `template/.claude/hooks/`, and the generated `.claude/hooks/` copy);

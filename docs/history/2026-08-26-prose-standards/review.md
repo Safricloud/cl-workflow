@@ -249,7 +249,7 @@ owner's own words where they typed them.
 5. Prefix mechanism in `status-block.ts` → **not in this PR** (follows from A; not asked
    separately)
 6. Who generalizes a duplicate → **the investigation finds it, the plan locks it in** — owner's
-   words: "Duplicate code needs to come from the investigation - the plan needs the direction
+   words: "Duplicate code detection needs to come from the investigation - the plan needs the direction
    already locked in." Read as: investigator briefs ask for the functions the change will need
    and any existing copies; the review and plan carry the generalization as items with the
    shared module in **Files**; the ownership fence is unchanged; an implementer that still

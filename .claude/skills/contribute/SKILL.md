@@ -10,6 +10,12 @@ has declared small (or that you propose as small and the owner accepts), the **s
 §11. Templates: `.claude/skills/contribute/templates/`.
 The reasoning behind each phase: `docs/guides/agent-workflow.md`.
 
+**Every text block you write begins `Orchestrator:`** — a transcript with several agents in it
+is unreadable without names, and the same rule binds every sub-agent you dispatch. Before each
+tool call, one line, prefixed the same way, saying what you are about to do and why:
+"Orchestrator: reading the drift gate in `ci.yml` to see which paths it inspects." Not what you
+did; the result says that.
+
 **The owner is prompted in exactly one phase — Questions.** Before it, you are orienting. After
 it, you decide, sub-agents implement, and every decision you make is recorded for veto. At the
 end you report and stop; the owner initiates the merge — unless the PR is docs-only (§9) or on
@@ -45,9 +51,13 @@ itself.
   question at the Questions phase; the review recommends. Default: one PR when they touch the
   same area, split when they do not.
 - `git fetch && git status` — default branch, remote head, clean. Record the SHA.
-- Mint the id, create the branch, `mkdir docs/reviews/<id>`. Everything from here is committed
-  on the branch as it is written; the plan is the state of record and compaction can happen
-  at any time.
+- Mint the id, create the branch with no upstream, `mkdir docs/reviews/<id>`. Everything from
+  here is committed on the branch as it is written; the plan is the state of record and
+  compaction can happen at any time.
+- `git switch -c <branch> --no-track origin/main`, then
+  `git config --get branch.<branch>.merge` must print nothing: a branch that tracks
+  `origin/main` is pushed *to* `main` by an IDE sync, and the loop's record commits must land
+  with the PR, never before it (mid-loop decision in `plan.md`).
 
 ## 2. Investigate — two tiers
 
@@ -58,7 +68,10 @@ the code. Stop when you can write investigator briefs — not when you have a vi
 
 **Tier two, investigators, thorough, parallel.** One brief per `investigator`: the id, one
 question, the paths in scope, the facts wanted and where to measure them, whether the owner
-has asked for live reads. Each writes `docs/reviews/<id>/investigation-<topic>.md` (a hook
+has asked for live reads. When the brief concerns code to be written, it also asks for the
+functions the change will need and their existing copies, with `file:line` — nobody
+re-implements a function that already exists, and the plan cannot lock in a generalization the
+investigation did not find. Each writes `docs/reviews/<id>/investigation-<topic>.md` (a hook
 fences them to `docs/reviews/`) and returns its Answer paragraph. Read the files you need.
 Investigation is read-only; no code changes.
 
@@ -80,8 +93,9 @@ action; anything vague about what "done" looks like.
 
 When answered:
 - Append a dated **Decisions** section to the review (do not rewrite what is above it).
-- For each rule-zero yes: `node .claude/hooks/rule-zero.ts --grant '<regex matching the
-  exact command>'` — written now, before any code that performs it.
+- For each rule-zero yes:
+  `node .claude/hooks/rule-zero.ts --grant '<regex matching the exact command>'` — written now,
+  before any code that performs it.
 - Settled decisions → `mem/outstanding.md` → *Settled — do not re-open*.
 - Anything only the owner can do (accounts, content, filings) → `mem/outstanding.md` →
   *Open — owner follow-ups*. That is the only thing that ever waits.
@@ -100,8 +114,10 @@ One directory, several files, so phases can be worked on concurrently:
   section; phase-mates share the file and their sections merge cleanly.
 
 Rules:
-- Every item: **Files**, **Approach** citing the facts, **Conventions that will fail your
-  lint**, **Scoped validation**, **Acceptance including tests** (what must FAIL if reverted).
+- Every item: **Files** — including the shared module when the item generalizes a function;
+  the investigation's copies list says which — **Approach** citing the facts, **Conventions
+  that will fail your lint**, **Scoped validation**, **Acceptance including tests** (what must
+  FAIL if reverted).
 - **Phase by expected merge cleanliness.** Implementers work in their own worktrees branched
   from your HEAD. Two items that touch the same magnet file (lockfile, root manifest,
   `CLAUDE.md`, a shared client, the same region of a module) go in different phases, or you
@@ -124,15 +140,15 @@ deviations), commit to their `worktree-*` branch, never push, and return the wor
 
 **Merge a phase back** (measured sequence): `git -C <wt> status --short` is clean → read
 `git -C <wt> log --oneline <branch>..HEAD` → `git merge --no-edit worktree-<slug>` → on a
-conflict that is not mechanical, a Phase N.5 item on the merged base → `git worktree remove
-<wt>` then `git branch -d worktree-<slug>` (never `-D`).
+conflict that is not mechanical, a Phase N.5 item on the merged base → `git worktree remove <wt>`
+then `git branch -d worktree-<slug>` (never `-D`).
 
 **Verify** on the merged branch, yourself: full check and build; read the diff of every
-load-bearing file; grep for the area's known conventions; `.claude/rule-zero.log` for any
-denial an implementer hit; the gates the package check does not cover; **verify the checker**
-(revert the fix, see red, restore); distrust convenient results; real rendered UI at each
-viewport, screenshots appraised by you; run the container if touched; re-read every sentence
-the change made true or false.
+load-bearing file; grep for the area's known conventions; `git grep` the names of functions the
+phase added for a second definition; `.claude/rule-zero.log` for any denial an implementer hit;
+the gates the package check does not cover; **verify the checker** (revert the fix, see red,
+restore); distrust convenient results; real rendered UI at each viewport, screenshots appraised
+by you; run the container if touched; re-read every sentence the change made true or false.
 
 **Fix through sub-agents, always.** Every finding from verification becomes an item in
 `phase-<n>.5.md` with its own status block, implemented by a fresh implementer — you do not
@@ -170,17 +186,17 @@ mkdir -p docs/history/<id>
 git mv docs/reviews/<id>/* docs/history/<id>/   && rmdir docs/reviews/<id>
 git mv docs/plans/<id>/*   docs/history/<id>/   && rmdir docs/plans/<id>
 ```
-Add one line to `docs/history/index.md` (`<date> · <id> · <one-line outcome> · blocked: #n, #m
-| none`), update `mem/` and `CLAUDE.md` to reflect the code as it lands, commit
-("Archive <id>; <what the ledger now says>"), push. `docs/plans/` and `docs/reviews/` now read
-as empty.
+Add one line to `docs/history/index.md`
+(`<date> · <id> · <one-line outcome> · blocked: #n, #m | none`), update `mem/` and `CLAUDE.md`
+to reflect the code as it lands, commit ("Archive <id>; <what the ledger now says>"), push.
+`docs/plans/` and `docs/reviews/` now read as empty.
 
 `gh pr create` with `templates/pr-body.md`: the ask and source, what changed (user-visible
 first), **Decisions to veto** (Questions-phase decisions by reference; plan decisions;
 mid-loop decisions), validation with counts and what was seen to fail, records, blocked-on-owner
 issues, `Fixes #<n>`. Comment on each blocked-on-owner issue with the PR link. One issue per
-branch, one branch per PR. The PR number is not written into the repo — `gh pr list --search
-<id>` finds it.
+branch, one branch per PR. The PR number is not written into the repo —
+`gh pr list --search <id>` finds it.
 
 ## 8. PR reviews — to silence
 
@@ -198,10 +214,12 @@ result.
 Per item returned: verify against the code → verdict (correct → fix; correct in part → what
 was adopted and on which argument; not a finding → the verified reason). Legitimate ones go to
 implementers as **inline briefs** (files, approach, scoped validation, acceptance — the plan is
-archived and is not reopened); each returns its status block in its message. Verify, commit
-the fix, push. Reply to each comment with the verdict. Post one **cycle comment** on the PR —
-head SHA, items returned, verdicts, the implementers' status blocks — that is the cycle record;
-nothing in the repo is updated. Run `pr-watch.ts --pr <n>` again (no `--reset`).
+archived and is not reopened); each returns its status block in its message. Each inline brief
+opens with "You are `I-r<cycle>.<k>`" — review cycle, brief number — and the implementer signs
+its text with that name. Verify, commit the fix, push. Reply to each comment with the verdict.
+Post one **cycle comment** on the PR — head SHA, items returned, verdicts, the implementers'
+status blocks — that is the cycle record; nothing in the repo is updated. Run
+`pr-watch.ts --pr <n>` again (no `--reset`).
 
 **Silence — `"new": []` after a cycle with nothing new — closes the loop.** Then:
 
@@ -236,9 +254,9 @@ as a new contribution.
 
 ## 10. Deploy — per `CLAUDE.md` → Deploy
 
-- **production-ci**: the merge triggered the deploy Action. Watch it: `gh run list --workflow
-  <name> --branch <default> -L1` → `gh run watch <run-id>`. "It fired" is a claim; the run's
-  final status is the evidence.
+- **production-ci**: the merge triggered the deploy Action. Watch it:
+  `gh run list --workflow <name> --branch <default> -L1` → `gh run watch <run-id>`. "It fired"
+  is a claim; the run's final status is the evidence.
 - **local-containers**: rebuild with the merged code (`<command from CLAUDE.md>`), then the
   container checks from Verify — user id, migrations applied, server bound, nothing in stderr.
 - **none yet**: say so.
@@ -264,12 +282,12 @@ Rule zero and the three habits apply unchanged; what shrinks is the ceremony.
    `template/` and regenerate the root copy with the CLI; never the root copy.
 4. **Verify** with the full check from `CLAUDE.md`, and verify the checker where a test
    exists: revert, see red, restore.
-5. **Record** one entry in `docs/history/index.md` — `<date> · <id> · small: <what> · blocked:
-   none`, wrapped like its neighbours — committed with the change. No review document and no plan directory; `mem/` only
-   if a decision was settled. If an investigator *was* run (step 2 needed a measurement you
-   could not make yourself), its report is part of the record: `git mv` it from
-   `docs/reviews/<id>/` to `docs/history/<id>/` and commit it with the change. Investigation
-   reports are never deleted.
+5. **Record** one entry in `docs/history/index.md` —
+   `<date> · <id> · small: <what> · blocked: none`, wrapped like its neighbours — committed
+   with the change. No review document and no plan directory; `mem/` only if a decision was
+   settled. If an investigator *was* run (step 2 needed a measurement you could not make
+   yourself), its report is part of the record: `git mv` it from `docs/reviews/<id>/` to
+   `docs/history/<id>/` and commit it with the change. Investigation reports are never deleted.
 6. **PR** with a short body: the ask and its source, why it is small and who declared it, what
    changed, validation with counts and what was seen to fail. Push; `gh pr create`.
 7. **PR reviews** as §8 — `pr-watch.ts` to silence; each item verified; fixes made by you

@@ -8,7 +8,7 @@ plus the one-line CI fix (decision 11), decisions 1–15
 after PR #4 merges, before phase 1 is dispatched** (decision 13) — the post-rebase base SHA is
 recorded under *Orchestrator work* below when it happens
 **Owner go-ahead:** 2026-08-26 at the Questions phase — "A — prose only"; "I-<n.m>:"; "Yes,
-I-r<cycle>.<k>:"; "Yes, Investigator-<topic>:"; "Duplicate code needs to come from the
+I-r<cycle>.<k>:"; "Yes, Investigator-<topic>:"; "Duplicate code detection needs to come from the
 investigation - the plan needs the direction already locked in."; "template/CLAUDE.md only";
 "No — leave rule zero prose as is"; "Include the one-line fix after all"; "Merge #4 first; I
 rebase before dispatch"; "Merge when silent — squash, --admin"
@@ -123,6 +123,36 @@ gives, but the terms (`Orchestrator:`, `I-<n.m>:`, `I-r<cycle>.<k>:`, `Investiga
 
 ## Decisions made mid-loop — implemented; veto in the PR
 <!-- appended as the loop runs, dated -->
+- **2026-08-26 — Branches are created with no upstream.** This branch was minted with
+  `git switch -c <branch> origin/main`, which set its upstream to `refs/heads/main`; at 10:19:32
+  +0200 a push from this machine that this session did not run (an IDE "Sync Changes" is the
+  only path that fits — the reflog says "update by push", no `git push` in this session's
+  history) moved `origin/main` to this branch's plan commit `bd193f1`. The seven record commits
+  of this contribution (review, investigations, plan, ledger — documents only) are therefore
+  already on `main` without a PR; they are not reverted (a force-push or a direct push to
+  `main`, both outside the loop), and this PR will carry only phases 1–3 plus the archive move.
+  Implemented: SKILL §1 and guide §1 say `git switch -c <branch> --no-track origin/main`, and
+  the orchestrator checks `git config --get branch.<branch>.merge` prints nothing (items 1.3 and
+  1.4). Grounds: the loop's record commits are meant to land with the PR, never before it.
+- **2026-08-26 — PR #4 was merged by this session on the owner's word** ("You may merge"),
+  after a merge commit of `main` into its branch (not a rebase — a rebase push is a
+  force-push, rule zero) resolved the one ledger conflict; the first `gh pr merge` attempt was
+  refused by GitHub ("merge conflicts") after the gate had already spent the single-use grant —
+  the failure mode the ledger's own 2026-08-25 entry describes. A replacement grant was written
+  and the merge succeeded at `8e29e80`. A local branch `small-path-rebased-unused` (the
+  discarded rebase attempt, content-equivalent to what merged) is left for the owner to
+  delete: `-d` refuses it and `-D` is rule zero.
+- **2026-08-26 — Both unwrapped lines in `SKILL.md` are rewrapped, PR #4's included.** Phase 1
+  left one line at 124 columns (§8; fixed in item 2.1); phase-2 verification found a second at
+  122 columns in §11, blamed to `8e29e80` (PR #4). The plan said items touching `SKILL.md` add
+  nothing to §11; a rewrap changes no words, and the guide's rule is to fix the pattern
+  everywhere, not the flagged line — so item 3.1 rewraps it and regenerates the root copy and
+  the lock. Grounds: two fixes of one pattern in one PR read as one thing.
+- **2026-08-26 — The lock's missing owned entry is a ledger follow-up, not this PR.** Item 2.1
+  found `.claude/cl-workflow.lock` holds 32 entries and omits `mem/outstanding.md` although
+  `OWNED` lists it: `cmdUpdate` skips owned files before recording them and seeds the record
+  from the previous lock, so an owned path absent at `init` never reappears. Pre-existing, CLI
+  code, outside a prose contribution; recorded under *Open — engineering follow-ups*.
 
 ## Phasing
 Phase 1 — six items in parallel, one file family each, no magnet file shared: `process.md` /
@@ -136,8 +166,9 @@ Phase 3 — one item, serial, after phase 2 has regenerated `implementer.md`: RE
 ## Orchestrator work (documents only)
 - After PR #4 merges: `git fetch`, `git rebase origin/main`, resolve any overlap in documents
   (the review directory and ledger only — nothing under `template/` has been touched yet),
-  record the new base SHA here: **base after rebase: `<sha>`** — then commit the plan and
-  dispatch phase 1.
+  record the new base SHA here: **base after rebase: `8e29e80`** (PR #4 squash-merged
+  2026-08-26; the feature branch fast-forwarded to it — zero commits ahead, see the mid-loop
+  decision above) — then commit the plan and dispatch phase 1.
 - Plan directory committed before dispatch; ledger already updated at Questions.
 - Per phase: merge-back sequence, verification record in the phase file, `phase-<n>.5.md` for
   findings.

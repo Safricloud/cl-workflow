@@ -15,3 +15,10 @@ One entry per contribution (one logical line, wrapped like the rest), newest las
   small by the owner (or proposed and accepted) — orchestrator edits directly, full check, PR +
   this index entry, merged when the review loop is silent and `ci-ok` is green; escalates when it is
   more than the change · blocked: none
+
+- 2026-08-26 · 2026-08-26-prose-standards · Every agent names itself (`Orchestrator:`, `I-<n.m>:`,
+  `I-r<cycle>.<k>:`, `Investigator-<topic>:`) and narrates before tool calls; implementer code
+  standards (modular, no duplicates — found at investigation, one concern per file, pure, tests
+  with the logic) in `process.md`, both agent definitions, SKILL and the guide §0.5; Playwright
+  named in the owned CLAUDE.md skeleton; branches created `--no-track`; CI drift gate widened
+  to `docs/guides/`; live measurement 96% prefixed / 49% narrated · blocked: none

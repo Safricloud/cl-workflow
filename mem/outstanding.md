@@ -2,9 +2,6 @@
 
 ## Open — owner follow-ups
 <!-- dated; content/product decisions, not engineering; nothing in code blocked on these -->
-- 2026-08-26 — Merge PR #4 (the small path). `2026-08-26-prose-standards` waits at its plan
-  until `origin/main` carries it, then rebases and dispatches (owner: "Merge #4 first; I rebase
-  before dispatch"). Remove this line when #4 is on `main`.
 
 ## Blocked on the owner
 <!-- one line per GitHub issue: #n — what the owner has to do — which contribution waits -->
@@ -31,11 +28,16 @@
   `lib.ts`. Not in scope: `isRecord` (deliberate build boundary between `dist/` and the payload)
   and the two `git` helpers (different contracts). Measurements in
   `docs/history/2026-08-26-prose-standards/investigation-{mechanisms,tests}.md`.
-- 2026-08-25 — Measure on this install: (a) a hook `deny` holds under `bypassPermissions`;
-  (b) `worktree.baseRef: "head"` is honoured by subagent worktrees (spawn one implementer from
-  a feature branch and check `git -C .claude/worktrees/<slug> merge-base HEAD <branch>`);
-  (c) `claude --version` ≥ 2.1.218. Reopen if any fails; record the results in
-  `docs/guides/agent-workflow.md` §5.
+- 2026-08-25 — Measure on this install: (a) a hook `deny` holds under `bypassPermissions` —
+  **measured 2026-08-26**: `.claude/rule-zero.log` carries `deny … bypassPermissions` rows for
+  the orchestrator and for `agent:implementer`, each of which stopped the command; (b)
+  `worktree.baseRef: "head"` is honoured — **measured 2026-08-26**: six implementer worktrees
+  dispatched from `feat/2026-08-26-prose-standards` each had `git merge-base <worktree-branch>
+  HEAD` = the feature branch head `05c8ae7`, not `main`; (c) `claude --version` ≥ 2.1.218 —
+  **measured 2026-08-26: 2.1.246** (the `version` field stamped on this session's transcript
+  records; the `claude` binary is not on this machine's PATH — the VS Code extension runs it).
+  All three hold; record them in `docs/guides/agent-workflow.md` §5 on the next edit of that
+  file, then delete this entry.
 - 2026-08-25 — Measure Copilot's latency, trigger and suppressed-section location on the first
   PR; fill in §10 "Know your reviewer".
 - 2026-08-25 — Watch npm upstream: 11.12.0's git-install regression (breaks every `npx
@@ -63,6 +65,33 @@
   outside the worktree>`, `cd <absolute path>` before `git`, and any Bash text containing a
   bare `<` (a heredoc with `i < n` is read as a redirect) — implementers needing a scratch
   clone make it inside their worktree and delete it; the kit cannot change this.
+- 2026-08-26 — Narration is half-adopted under prose alone. First implementer under the new
+  `implementer.md` (item 3.1 of `2026-08-26-prose-standards`, transcript measured by grouping
+  blocks on `message.id`): 22/23 text blocks prefixed `I-3.1:` (96%), but only 22/45
+  tool-calling turns had a line before the first tool call (49%) — tool calls that follow a
+  tool call in the same turn get no line. The name rule took; the narration rule did not fully.
+  If that matters, the candidates are the mechanism the review's direction B described
+  (`SubagentStop` reading `last_assistant_message`, which cannot see mid-turn narration) or a
+  stronger sentence in the definitions; the owner chose prose (decision 1). Re-measure on the
+  next loop before changing anything.
+- 2026-08-26 — `.claude/cl-workflow.lock` in this repo has 32 entries and omits
+  `mem/outstanding.md` although `OWNED` lists it (`src/cli.ts:31-41`): `cmdUpdate` skips owned
+  files with `continue` before `recorded[file.rel]` is set (`src/cli.ts:483-485`) and seeds
+  `recorded` from the previous lock (`:466`), so an owned path absent at `init` can never
+  reappear on `update`. Harmless today (`update` never touches owned files); `doctor`'s
+  disk-vs-lock check simply does not see that file. Fix with the kit-conformance work or on
+  its own; measured by item 2.1 of `2026-08-26-prose-standards`.
+- 2026-08-26 — Kit ergonomics seen in `2026-08-26-prose-standards`, not fixed: (e) **`git stash`
+  is shared across worktrees** — `refs/stash` lives in the common git dir, so two implementers
+  stashing at the same moment swap entries (measured: items 1.1 and 1.4 popped each other's
+  WIP; nothing lost, both rebuilt); never write "git stash" into an item's validation — the
+  safe revert check is `git show HEAD:<path> > <scratchpad>/base` and grep both copies;
+  (f) a sub-agent writing to the session scratchpad (`%LOCALAPPDATA%\Temp\claude\…`) is
+  denied `path:outside-repo` — implementers keep scratch files inside their worktree;
+  (g) `git checkout -- <path>` is a guarded shape (`rule-zero.conf:36`) for sub-agents too — an
+  item that tells an implementer to "restore" a file must say how (delete the appended bytes,
+  or copy back from `git show HEAD:<path>`); (h) an implementer worktree inherits no
+  `node_modules` — every item that runs lint/typecheck pays a `pnpm install --frozen-lockfile`.
 
 ## Settled — do not re-open, do not "fix"
 - 2026-08-26 — Every agent names itself at the start of each text block and says in one line
@@ -76,7 +105,7 @@
   briefs ask for the functions a change will need and their existing copies; the review and
   the plan carry any generalization as items whose **Files** include the shared module. The
   ownership fence stands; an implementer that still meets a duplicate outside its files
-  reports **Blocked** naming the function. (owner: "Duplicate code needs to come from the
+  reports **Blocked** naming the function. (owner: "Duplicate code detection needs to come from the
   investigation - the plan needs the direction already locked in.", decision 6)
 - 2026-08-26 — Implementer code standards are prose, threshold-free: modular and reusable, one
   concern per file, pure functions where possible, every implementation paired with tests for

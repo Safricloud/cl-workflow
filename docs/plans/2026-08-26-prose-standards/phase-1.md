@@ -123,7 +123,9 @@ and in the Status placeholder line nothing (the block shape lives in `implemente
   untouched (the block shape lives in `implementer.md`);
   `template/CLAUDE.md` — the E2E line is now W8 verbatim, naming Playwright for browser-based
   visual tests. Nothing else in the skeleton.
-- **Commits:** `014dd3d` on `worktree-agent-adad9a662e3bc94ee` (amended once to carry this sha)
+- **Commits:** `e80fc2a` on `worktree-agent-adad9a662e3bc94ee` — the whole item (three payload
+  files + this block); followed by one small commit that writes this sha into the line you are
+  reading, since a commit cannot name itself.
 - **Deviation:** two wrap deviations, both deliberate. (a) The new E2E line is 103 columns, past
   the ~95 wrap — W8 is fixed one-line wording and breaking it would split the `<cmd>` placeholder
   out of the parenthetical. (b) In `phase.md` the **Files** placeholder wraps onto a second line

@@ -63,7 +63,7 @@ Install), or install the package and use the `cl-workflow` bin.
 .claude/
   settings.json                 wires the three event hooks; sets worktree.baseRef = head
   rule-zero.conf                the ONLY file you should need to tune
-  rules/process.md              always loaded: rule zero, the two gates, the three habits, roles
+  rules/process.md              always loaded: rule zero, the two gates, the three habits, voice, code, roles
   skills/contribute/SKILL.md    /contribute — the loop as an operating checklist
   skills/contribute/templates/  review, investigation, plan, phase, blocked-issue, pr-body, issue-comment
   hooks/package.json            {"type":"module"} — keeps the hooks ESM even in a "type":"commonjs" project
@@ -141,6 +141,18 @@ One id per contribution — `<yyyy-mm-dd>-<descriptive-slug>` — names the bran
 the review directory, the plan directory (`plan.md` + one `phase-<n>.md` per phase) and the
 history directory.
 
+**How the agents speak, and what implementers are held to.** Every agent names itself at
+the start of each text block — the orchestrator writes `Orchestrator:`, an implementer
+`I-<n.m>:` (its plan item), an investigator `Investigator-<topic>:` — and writes one line
+before each tool call saying what it is about to do and why, so a transcript holding an
+orchestrator and four sub-agents can still be read. Implementers are held to modular,
+reusable code, one concern per file, no duplicate functions (the copies are found at
+investigation and the plan locks in the generalization), pure functions where the work
+allows, and tests for every piece of logic — a test that fails when the change is
+reverted. Browser-based visual tests use the suite named by the E2E line in your `CLAUDE.md`;
+the shipped skeleton names Playwright. The standard itself is in `.claude/rules/process.md`,
+which is always loaded.
+
 ## This repo
 
 ```
@@ -171,8 +183,13 @@ pnpm typecheck                   # tsc --noEmit over src/, the payload's hooks a
 pnpm build                       # tsc -p tsconfig.build.json → dist/cli.js
 git diff --exit-code dist/       # the drift gate CI enforces
 pnpm selftest                    # must print 62/62 and exit 0
-node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/   # prints nothing
+node dist/cli.js update . && git status --porcelain --untracked-files=all -- .claude/ docs/guides/
 ```
+
+That last line is the generated-copy gate, and it prints nothing when the root copy is in
+step with `template/`. `docs/guides/` is in the pathspec because `docs/guides/agent-workflow.md`
+is a managed payload file that `update` rewrites at the root too; the rest of `docs/` is not,
+because `docs/history/` and `docs/plans/` are this repo's own records.
 
 Line endings are LF everywhere, enforced by the root `.gitattributes` (`* text=auto eol=lf`).
 Without it a fresh clone on Windows rewrites every file to CRLF and changes every hash, which
@@ -184,9 +201,10 @@ hashes LF-normalised content so `update` is correct either way.
 
 `.github/workflows/ci.yml` runs on `pull_request` into `main` and on nothing else — there is no
 post-merge run. The `test` job is a matrix of `ubuntu-latest` and `windows-latest` on Node 24:
-install, lint, typecheck, build, `dist/` drift check, generated-`.claude/` drift check,
-self-test, and a CLI smoke test that inits into a temp directory and runs `doctor`. An
-aggregate job **`ci-ok`** (`needs: test`) is the single required check.
+install, lint, typecheck, build, the **dist/ drift gate**, the **generated copy drift gate**
+(`-- .claude/ docs/guides/`), the self-test, and a CLI smoke test that inits into a temp
+directory and runs `doctor`. An aggregate job **`ci-ok`** (`needs: test`) is the single
+required check.
 
 The `main` ruleset requires exactly that check name and grants **repository admins bypass**, so
 a merge is never hard-blocked — but an unbypassed PR does not merge until `ci-ok` is green.

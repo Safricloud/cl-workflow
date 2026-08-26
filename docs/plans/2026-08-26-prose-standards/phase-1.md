@@ -397,7 +397,68 @@ then the gate itself: `node dist/cli.js update . && git status --porcelain --unt
   matched trivially.
 
 ## Merge-back record (orchestrator)
-<Per item: worktree branch, commits merged, conflicts and how resolved, worktree removed.>
+All six worktrees branched from `05c8ae7` (measured: `git merge-base` of each `worktree-*`
+branch with HEAD = `05c8ae7` — `worktree.baseRef: head` is honoured; closes item (b) of the
+ledger's 2026-08-25 "measure on this install" entry). Merged in completion order, each after
+`git -C <wt> status --short` and `git -C <wt> log --oneline <branch>..HEAD`; no merge conflicts.
+
+| Item | Worktree branch | Commits merged | Merge | Removed |
+| --- | --- | --- | --- | --- |
+| 1.5 | `worktree-agent-adad9a662e3bc94ee` | `e80fc2a`, `56c3c94` | `c743f6d` | worktree + `-d` |
+| 1.2 | `worktree-agent-ab0825153965e6556` | `632420f`, `05f349e` | `9e33f3c` | worktree + `-d` (first attempt denied: `git branch -d "$B"` — the allow line needs the literal name, ledger ergonomics (c); redone literal) |
+| 1.6 | `worktree-agent-a777a40ce3eec879c` | `944bcdf` | `1f57d94` | worktree + `-d` |
+| 1.1 | `worktree-agent-ade9f5e0e4ce4cce7` | `88504a2`, `47d97ff`, then `87c903b` (see correction) | `c438b00`, then a no-op merge | worktree + `-d` |
+| 1.4 | `worktree-agent-ad3daf37e9486284b` | `7942ee5`, then `90d792a` (see correction) | `1835ba8`, then `483b53d` (no-op) | worktree + `-d` |
+| 1.3 | `worktree-agent-a95b8ae8581dacb99` | `37bdf2c`, `97d2271`, `7d24f4b` | `1d5b562` | worktree + `-d` |
+
+Every worktree had run `pnpm install --frozen-lockfile` (no `node_modules` is inherited); its
+`node_modules` was deleted before `git worktree remove`, per ledger ergonomics (a).
+
+### Correction (2026-08-26) — `git stash` is shared across worktrees
+The common text of this phase told every item to verify its acceptance grep "with and without
+your change (git stash / stash pop)". `refs/stash` lives in the common git dir, so two
+implementers running that recipe at the same moment swapped entries: item 1.1's `pop` took
+item 1.4's `SKILL.md` WIP (`14cbd83`) into 1.1's worktree, and 1.4's `pop` took 1.1's
+`process.md` WIP (`45d1c15`) into 1.4's. Both implementers noticed, rebuilt their own change
+deterministically, committed by path, saved the foreign hunks (scratchpad patches; the dropped
+stash commits stayed reachable) and reported it. Item 1.3 ran the recipe once before my
+correction reached it and popped its own entry. Resolution by the orchestrator: after both
+branches were merged, each foreign copy was `diff -q` **byte-identical** to the merged file, so
+it was committed on its own worktree branch (`87c903b`, `90d792a`) and merged as a no-op to
+leave the worktree clean — nothing discarded, nothing duplicated. The recipe is wrong and is
+not to be reused: the safe form is `git show HEAD:<path> > <scratchpad>/base` and grep both
+copies. Phase 3's acceptance already says so; the phase-1 item texts above are left as written,
+as the record of what was dispatched.
 
 ## Verification (orchestrator, after this phase merged)
-<What was run, counts, checkers verified, findings → phase 1.5 items.>
+On `1d5b562`, 2026-08-26:
+- **Full check:** `pnpm lint` clean, `pnpm typecheck` clean, `pnpm build` reproduced `dist/cli.js`
+  byte for byte (`git diff --exit-code dist/`), `pnpm selftest` 62/62. The generated-copy gate
+  was **not** run here on purpose — `update` would regenerate the root copy, which is item 2.1;
+  the expected drift was measured instead: `diff -q` template vs root differs for exactly the
+  seven managed files phase 1 changed (`process.md`, both agent definitions, `SKILL.md`,
+  `templates/investigation.md`, `templates/phase.md`, the guide) and for nothing else.
+- **Diffs read in full** by the orchestrator: all ten changed files against `05c8ae7`. The
+  canonical terms appear where the plan put them and nowhere misspelt (`Orchestrator:` 2/2/3 in
+  `process.md`/`SKILL.md`/guide; `I-<n.m>:` 1/1/2 in `process.md`/`implementer.md`/guide;
+  `I-r<cycle>.<k>` in all four of those; `Investigator-<topic>:` in `process.md`,
+  `investigator.md`, the guide; `--no-track` in `SKILL.md` and the guide). PR #4's §11 present
+  in `SKILL.md` and the guide. LF only.
+- **Checkers verified by implementers** and re-read by me in the status blocks: each acceptance
+  grep exits 1 on the base file and 0 on the changed one; item 1.6 additionally showed the old
+  pathspec blind to guide drift and the new one catching ` M docs/guides/agent-workflow.md` and
+  `?? …agent-workflow.md.new`.
+- **`.claude/rule-zero.log` since dispatch:** seven denials, none costly — three `git checkout --
+  <path>` (my restore recipe in items 1.6 and the acceptance text is a guarded shape; the
+  implementers restored by other means), two `path:outside-repo` (implementers writing to the
+  session scratchpad — correctly denied for sub-agents), one `git branch -d "$B"` (mine,
+  variable name), one status-block line that quoted a guarded command (ledger ergonomics (b)).
+- **Live prefix observation, old definition:** three of six final messages began with the
+  agent's name (1.3, 1.5, 1.6 — picked up from the plan's canonical wording), three did not
+  (1.1, 1.2, 1.4). Baseline for phase 3, which runs under the regenerated definition.
+- **Findings → phase 2:** one, cosmetic — SKILL §8's closing paragraph lost its wrap in item 1.4
+  (one 124-column line). Folded into item 2.1 (same file family, same implementer) rather than a
+  phase 1.5. Wider-than-95 hits elsewhere are byte counts on em-dashes, table rows (exempt by
+  the file's own style), and the deliberate 103-column E2E line in the skeleton (W8 fixed).
+- **Not done here:** no `git grep` for second function definitions — no function was added
+  (prose only); no UI, no container.

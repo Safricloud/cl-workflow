@@ -5,10 +5,14 @@
 `.claude/cl-workflow.lock` — nobody else runs in this phase.
 
 ### Item 2.1 — regenerate the root copy and the lock
-**Files:** `.claude/**` (generated), `docs/guides/agent-workflow.md` (generated),
-`.claude/cl-workflow.lock`
-**Approach:** `pnpm build` (must reproduce `dist/cli.js` byte for byte — no `src/` change in
-this contribution), then `node dist/cli.js update .`. Read its summary: the managed `.md` files
+**Files:** `template/.claude/skills/contribute/SKILL.md` (one rewrap, see below), `.claude/**`
+(generated), `docs/guides/agent-workflow.md` (generated), `.claude/cl-workflow.lock`
+**Approach:** First, the one finding from phase-1 verification: in
+`template/.claude/skills/contribute/SKILL.md` §8, the paragraph ending "Run `pr-watch.ts --pr
+<n>` again (no `--reset`)." lost its wrap during item 1.4 — one line is 124 columns. Rewrap that
+paragraph at ~95 columns, words unchanged; commit it on its own. Then `pnpm build` (must
+reproduce `dist/cli.js` byte for byte — no `src/` change in this contribution), then
+`node dist/cli.js update .`. Read its summary: the managed `.md` files
 phase 1 touched are rewritten, the lock changes for exactly those, nothing lands as `.new`. If a
 `.new` appears, the root copy had a hand edit — stop, report it under **Blocked**, do not
 resolve it. Confirm with `diff -q` over every template/root pair (the mapping: `template/X` ↔

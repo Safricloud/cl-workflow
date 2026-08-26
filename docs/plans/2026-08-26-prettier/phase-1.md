@@ -236,7 +236,7 @@ comments; say so.
   `// prettier-ignore` directly above `const CASES` (was `:50`, now `:53`);
   `template/.claude/hooks/docs-only.ts` — the same directly above `const COMMENT` (was `:52`,
   now `:55`), under the existing JSDoc so the ignore stays the last leading comment.
-- **Commits:** `8ba0e34`
+- **Commits:** `12a2d00` (this status line amended in a follow-up commit)
 - **Deviation:** the item reads "a `// prettier-ignore` line directly above `const CASES` …
   followed by a short comment saying why". Both halves cannot hold at once, so the reason lines
   are written *above* the directive and the directive sits directly above the `const`. Measured

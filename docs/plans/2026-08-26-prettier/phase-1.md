@@ -216,7 +216,8 @@ none — prose.
   own `*Blocked on the owner*` → `_…_` at `:22`; `template/mem/outstanding.md` — W3 on the settled
   line (`:32-35`) with the attribution, one reflow (see Deviation), plus the formatter's blank lines
   after four headings.
-- **Commits:** see the worktree branch `worktree-agent-a6677e42912c115ce` (this commit).
+- **Commits:** `b4b4537` (the three files) on `worktree-agent-a6677e42912c115ce`, plus the
+  follow-up commit that records this sha.
 - **Deviation:** two, both measured, neither changes a word.
   (a) **Prettier rewrites a settled ledger line.** `template/mem/outstanding.md` carried
   `` labelled `blocked-on-owner` `` / `  + kind + area, created before the archive. (owner)` — a

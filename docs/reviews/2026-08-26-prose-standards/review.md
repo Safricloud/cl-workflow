@@ -234,3 +234,48 @@ concern). Did not touch GitHub beyond reads.
 
 ---
 <!-- Appended at the Questions phase; the review is not rewritten above this line. -->
+## Decisions (recorded 2026-08-26)
+
+Three rounds with the question tool; each answer is the option label the owner selected, or the
+owner's own words where they typed them.
+
+1. Direction → **A — prose only** — "A — prose only" (the owner chose A over the recommended B;
+   no hook change; decisions 5 and 11 below are re-read in that light)
+2. Implementer identity → **`I-<n.m>:`** — "I-<n.m>:"
+3. Identity in the PR-review loop → **`I-r<cycle>.<k>:`**, minted by the orchestrator in each
+   inline brief — "Yes, I-r<cycle>.<k>:"
+4. Investigators → **`Investigator-<topic>:`** and one-liners before tool calls — "Yes,
+   Investigator-<topic>:"
+5. Prefix mechanism in `status-block.ts` → **not in this PR** (follows from A; not asked
+   separately)
+6. Who generalizes a duplicate → **the investigation finds it, the plan locks it in** — owner's
+   words: "Duplicate code needs to come from the investigation - the plan needs the direction
+   already locked in." Read as: investigator briefs ask for the functions the change will need
+   and any existing copies; the review and plan carry the generalization as items with the
+   shared module in **Files**; the ownership fence is unchanged; an implementer that still
+   meets a duplicate outside its files reports **Blocked** naming the function, and the
+   orchestrator writes a phase-n.5 item.
+7. Short files → **words now, numbers with the refactor** (follow-up, decision 8)
+8. Follow-ups recorded in `mem/outstanding.md` as one future "kit conformance" contribution →
+   **split `src/cli.ts` + ESLint size rules; `node:test` suite + import guards on the hooks;
+   generalize `parseOptions` into `lib.ts`**. The fourth option — `docs-only.ts` treating the
+   lock as a record — was **not** selected and is not recorded.
+9. Where Playwright is named → **`template/CLAUDE.md` only** — "template/CLAUDE.md only". The
+   managed prose stays tool-agnostic: browser-based visual tests are "the suite named by the
+   E2E line in `CLAUDE.md`"; the owned skeleton names Playwright as the default.
+10. Tools that write outside the repo (browser download, `--with-deps`, global installs) →
+    **rule-zero prose left as is** — "No — leave rule zero prose as is"
+11. CI drift-gate pathspec → first answer "N/A"; on clarification **"Include the one-line fix
+    after all"** — `ci.yml`'s `git status` pathspec gains `docs/guides/`. This is the one code
+    file in the PR; it goes through an implementer.
+12. `docs-only.ts` and the lock → **not recorded** (see 8)
+13. Merge order with PR #4 → **#4 merges first; this loop pauses at the plan until
+    `origin/main` carries it, then rebases and dispatches** — "Merge #4 first; I rebase before
+    dispatch"
+14. `parseOptions` → **follow-up** (with 8)
+15. Merge → **"Merge when silent — squash, --admin"**
+
+**Rule-zero grants written:** none now. The merge bundle (`--bundle merge-cleanup <pr>
+<branch>`) is written at §9 on the strength of decision 15, once the review loop is silent and
+CI is green. The rebase onto `origin/main` after #4 merges is a plain rebase of an unpushed
+branch — no work discarded, no grant needed.

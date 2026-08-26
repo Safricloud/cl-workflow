@@ -2,12 +2,29 @@
 
 ## Open — owner follow-ups
 <!-- dated; content/product decisions, not engineering; nothing in code blocked on these -->
+- 2026-08-26 — Merge PR #4 (the small path). `2026-08-26-prose-standards` waits at its plan
+  until `origin/main` carries it, then rebases and dispatches (owner: "Merge #4 first; I rebase
+  before dispatch"). Remove this line when #4 is on `main`.
 
 ## Blocked on the owner
 <!-- one line per GitHub issue: #n — what the owner has to do — which contribution waits -->
 <!-- #1 resolved 2026-08-25: owner delegated, MIT chosen; lands with 2026-08-25-npx-ts-kit -->
 
 ## Open — engineering follow-ups
+- 2026-08-26 — **Kit conformance** (one future contribution; owner chose these three at the
+  `2026-08-26-prose-standards` Questions phase, decision 8): (a) split `src/cli.ts` by concern
+  (579 effective lines, `cmdDoctor` at complexity 41, nesting depth 8) and add ESLint
+  `max-lines` 300 / `max-lines-per-function` 80 / `complexity` 20 at error — measured to fail
+  today on `cli.ts` alone; the root `.claude/hooks/` copy doubles every hook finding under
+  `eslint .`, decide the ignore then; (b) a `node:test` suite (`*.test.ts`, discovered by
+  `node --test` on Node 24 with no package; assert a minimum count — `node --test` exits 0 on
+  zero tests) with an `import.meta.main` guard in every hook so its functions can be imported —
+  85 of 86 top-level functions have no direct test; `docs-only.ts` (`commentOnly`, `isDocPath`)
+  first; a test under `src/` lands in `dist/` unless `tsconfig.build.json` excludes it;
+  (c) generalize `parseOptions` (`docs-only.ts` / `pr-watch.ts`, same `parseArgs` skeleton) into
+  `lib.ts`. Not in scope: `isRecord` (deliberate build boundary between `dist/` and the payload)
+  and the two `git` helpers (different contracts). Measurements in
+  `docs/history/2026-08-26-prose-standards/investigation-{mechanisms,tests}.md`.
 - 2026-08-25 — Measure on this install: (a) a hook `deny` holds under `bypassPermissions`;
   (b) `worktree.baseRef: "head"` is honoured by subagent worktrees (spawn one implementer from
   a feature branch and check `git -C .claude/worktrees/<slug> merge-base HEAD <branch>`);
@@ -42,6 +59,33 @@
   clone make it inside their worktree and delete it; the kit cannot change this.
 
 ## Settled — do not re-open, do not "fix"
+- 2026-08-26 — Every agent names itself at the start of each text block and says in one line
+  what it is about to do before a tool call: the orchestrator as `Orchestrator:`, an
+  implementer as `I-<n.m>:` (its plan item — the kit's noun is "item", never "task"), an
+  implementer on an inline brief in the PR-review loop as `I-r<cycle>.<k>:` minted by the
+  orchestrator in the brief, an investigator as `Investigator-<topic>:`. Prose only — no hook
+  checks the prefix (owner chose direction A over B). (owner, 2026-08-26-prose-standards,
+  decisions 1–5)
+- 2026-08-26 — Duplicate code is found at investigation and locked into the plan: investigator
+  briefs ask for the functions a change will need and their existing copies; the review and
+  the plan carry any generalization as items whose **Files** include the shared module. The
+  ownership fence stands; an implementer that still meets a duplicate outside its files
+  reports **Blocked** naming the function. (owner: "Duplicate code needs to come from the
+  investigation - the plan needs the direction already locked in.", decision 6)
+- 2026-08-26 — Implementer code standards are prose, threshold-free: modular and reusable, one
+  concern per file, pure functions where possible, every implementation paired with tests for
+  its logic. Numbers (ESLint size rules) arrive with the kit-conformance refactor, not before.
+  (owner, decisions 7–8)
+- 2026-08-26 — Playwright is named only in the owned `template/CLAUDE.md` skeleton (E2E line,
+  default for browser-based visual tests). The managed prose stays tool-agnostic: "the suite
+  named by the E2E line in `CLAUDE.md`". The kit repo itself never depends on Playwright — its
+  import fails the `node:`-only rule. (owner, decision 9)
+- 2026-08-26 — Rule-zero prose is not extended to outside-the-repo tool writes (browser
+  downloads, `--with-deps`, global installs); the shipped conf stays silent on them and a
+  project tunes its own conf. (owner, decision 10)
+- 2026-08-26 — `docs-only.ts` keeps classifying `.claude/cl-workflow.lock` as code, so every
+  prose change to the payload is a code PR needing the owner's merge word. Owner declined to
+  record a follow-up. (owner, decision 12)
 - 2026-08-25 — ESLint sits beside `tsc`, it does not replace it: ESLint 10 + typescript-eslint 8
   on `recommendedTypeChecked`, config in `eslint.config.mjs` (flag-free; the owner chose it over
   `eslint.config.ts`), `pnpm lint` = `eslint --max-warnings 0 .` and a CI step. The `node:`-only

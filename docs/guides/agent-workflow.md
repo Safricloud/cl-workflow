@@ -1,8 +1,10 @@
 # The contribution pattern — Claude Code edition
 
 Every contribution — a feature request, a bug report, one or more GitHub issues, owner feedback
-in conversation, a post-merge reviewer comment — goes through the same loop. There is no "small change" path; small
-changes just produce short documents. Project-specific values are `<placeholders>`;
+in conversation, a post-merge reviewer comment — goes through the same loop, with one deliberate
+exception: a change of a few lines that the owner declares small — or that the orchestrator
+proposes as small and the owner accepts — takes the **small path** (§11), which keeps the rules
+and the verification and drops the ceremony. Project-specific values are `<placeholders>`;
 `.claude/rule-zero.conf` and the *Deploy* section of `CLAUDE.md` are the dials each project turns.
 
 The pattern, in one line:
@@ -48,14 +50,15 @@ in git, and on GitHub.
 ### 0.2 Three roles, and no step vouches for itself
 
 - **Owner** — answers the questions (one phase, as many as needed), reserves the merge, may
-  delegate it with a word. Never an agent. Has given one standing merge approval: docs-only
-  PRs (§9).
+  delegate it with a word. Never an agent. Has given two standing merge approvals: docs-only
+  PRs (§9) and small-path PRs (§11).
 - **Orchestrator** — the agent in the conversation. Orients, briefs investigators, writes the
   review and the plan, asks the questions, dispatches implementers, merges their worktree
   branches, verifies everything itself, decides mid-loop and records it, opens a GitHub issue for
   anything blocked on the owner, archives, opens the PR, runs the review loop, merges on the
   owner's word, deploys per `CLAUDE.md`. **Edits documents only — never code.** Every code
-  change, including a one-line fix, goes through an implementer.
+  change goes through an implementer — except on the small path (§11), where the orchestrator
+  makes the few-line change itself and the full check is the gate.
 - **Sub-agents** — **Opus**, whatever the orchestrator runs on. `investigator`: one brief, one
   report under `docs/reviews/<id>/`, nothing else writable. `implementer`: one plan item, its own
   worktree, commits to its own branch, never pushes, never takes a rule-zero action, keeps its
@@ -424,6 +427,48 @@ result, open blocked-on-owner issues. No commit. The loop is over.
 
 ---
 
+## 11. The small path
+
+**Purpose:** scale the ceremony to the risk without scaling down the rules. A conf line, a doc
+fix, a version pin or a one-line bug does not need three investigators, a review document, a
+plan directory, a worktree and an archive to be done well — it needs the change, the full
+check, a record, a reviewer and a merge. The full loop applied to a one-liner was measured as
+the thing that made the loop feel heavier than the change (owner, 2026-08-26).
+
+**What qualifies.** A few lines in a few files, no new dependency, no gate or hook logic. The
+owner declares it (`/contribute --small <ask>`, or "small" in the ask), or the orchestrator
+proposes it when restating the ask and the owner accepts. Nobody else decides.
+
+**What stays.** Rule zero and its hook; the three habits; the full check from `CLAUDE.md` as
+the gate, with the checker verified where a test exists; the review loop (`pr-watch.ts` to
+silence, every item verified before it is acted on, a cycle comment per cycle); the record —
+one entry in `docs/history/index.md`, committed with the change; `mem/` if a decision was
+settled; the deploy step.
+
+**What goes.** The review document, the Questions phase, the plan directory, implementers and
+worktrees, the archive directory — and, usually, investigators. If the one measurement that
+decides whether the change is small needs an investigator, run one; its report is then part of
+the record and is archived under `docs/history/<id>/` with the change, exactly as in the full
+loop. Investigation reports are never deleted (owner, 2026-08-26).
+
+The orchestrator makes the change itself — the one place the "documents only" rule is lifted —
+and in a kit repo edits `template/` and regenerates the root copy with the CLI. The PR body is
+short: ask and source, why small and who declared it, what changed, validation with counts and
+what was seen to fail.
+
+**How it merges.** Under a standing approval, the second after docs-only: once the review loop
+is silent and `ci-ok` is green on the head, the orchestrator writes the bundle grant and
+merges (squash, `--admin`) without a word. The report names the way in — "small path,
+declared by the owner" or "small path, proposed and accepted".
+
+**Escalation is the safety.** The moment orientation or verification shows more than the
+change — a test that pins the old behaviour, a second file family, a hook or gate touched, a
+decision the owner would want to make — the orchestrator stops, says so, and runs the full
+loop from §1. The small path never widens silently; a small change that turns out not to be
+small is exactly what the full loop is for.
+
+---
+
 ## Appendix A — the ledger (`mem/outstanding.md`)
 
 Three sections, each entry dated:
@@ -472,6 +517,11 @@ An entry moves between sections; it is deleted only when it is no longer true.
       cancelled): `--admin --delete-branch` → local `-D` → grants cleared; no commit
 - [ ] **Deploy** per `CLAUDE.md`: run watched to completion, or containers rebuilt and checked;
       one-paragraph report; no commit
+- [ ] **Small path** (§11), when declared or accepted: ask restated with why it is small; area
+      read, the one thing that could make it not small measured; change made by the
+      orchestrator; full check + checker verified; one `docs/history/index.md` line committed
+      with the change; short PR; pr-watch to silence; merged when silent and `ci-ok` green;
+      escalated to the full loop the moment it is more than the change
 
 ## Appendix D — what changed from the portable baseline, and why
 
@@ -495,3 +545,4 @@ An entry moves between sections; it is deleted only when it is no longer true.
 | Merge only on the owner's explicit ask | + the **docs-only standing rule**: `docs-only.ts` measures the diff and writes the grant itself; CI cancelled; `--admin` always | One standing approval, made mechanical and conservative |
 | One issue per branch | An ask may name several issues; one PR or split is a Questions-phase decision | The owner's asks come in batches |
 | Loop ends at "report and stop" | + **Merge** on the owner's word (bundle grant) + **Deploy** per `CLAUDE.md` | The loop closes on the running system |
+| No small-change path; small changes produce short documents | The **small path** (§11): declared or accepted, orchestrator edits directly, full check, PR + one index entry, merged when silent and `ci-ok` green, escalates when it is more than the change | Owner, 2026-08-26: one-liners should not need the full loop |

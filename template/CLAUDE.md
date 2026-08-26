@@ -18,8 +18,9 @@ Mode: `production-ci` | `local-containers` | `none yet`
 - local-containers: rebuild `<cmd>`; checks: `<how to see user id, migrations, bound port, stderr>`
 
 ## Process
-Every contribution runs `/contribute` (`.claude/skills/contribute/SKILL.md`). Rule zero, the
-two owner gates and the three habits are in `.claude/rules/process.md`; the reasoning is in
+Every contribution runs `/contribute` (`.claude/skills/contribute/SKILL.md`); a change of a
+few lines the owner declares small runs its small path (`/contribute --small`, SKILL §11).
+Rule zero, the two owner gates and the three habits are in `.claude/rules/process.md`; the reasoning is in
 `docs/guides/agent-workflow.md`, which wins over this file on conflict. Durable facts live in
 `mem/` (start at `mem/index.md`); open work and settled decisions in `mem/outstanding.md`.
 This file is repo facts and conventions only — not a ledger.

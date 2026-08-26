@@ -2,8 +2,9 @@
 
 Every contribution — a feature request, a bug report, one or more GitHub issues, owner feedback
 in conversation, a post-merge reviewer comment — goes through the same loop, with one deliberate
-exception: a change of a few lines that the owner declares small takes the **small path** (§11),
-which keeps the rules and the verification and drops the ceremony. Project-specific values are `<placeholders>`;
+exception: a change of a few lines that the owner declares small — or that the orchestrator
+proposes as small and the owner accepts — takes the **small path** (§11), which keeps the rules
+and the verification and drops the ceremony. Project-specific values are `<placeholders>`;
 `.claude/rule-zero.conf` and the *Deploy* section of `CLAUDE.md` are the dials each project turns.
 
 The pattern, in one line:

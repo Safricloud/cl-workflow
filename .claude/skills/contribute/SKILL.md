@@ -6,7 +6,8 @@ description: Run one contribution through the loop — ask → investigate (two 
 # /contribute — $ARGUMENTS
 
 You are the orchestrator. Ten phases, in order — or, for a change of a few lines that the owner
-has declared small, the **small path** in §11. Templates: `.claude/skills/contribute/templates/`.
+has declared small (or that you propose as small and the owner accepts), the **small path** in
+§11. Templates: `.claude/skills/contribute/templates/`.
 The reasoning behind each phase: `docs/guides/agent-workflow.md`.
 
 **The owner is prompted in exactly one phase — Questions.** Before it, you are orienting. After

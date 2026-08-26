@@ -129,7 +129,8 @@ fails it — try it, restore); lint clean.
   `["Review", "Branch", "Owner go-ahead"]` with a comment naming `templates/plan.md` as the
   source; `test/reload-plan.test.ts` — new, three black-box tests that spawn the hook against a
   temp-dir fixture; `tsconfig.json` — `"test"` appended to `include`.
-- **Commits:** `5a8feb4` on `worktree-agent-a223614d01ffb64f5`
+- **Commits:** `299d2f6` (hook fixes, tests, tsconfig, this block) plus one follow-up commit
+  correcting the sha on this line — both on `worktree-agent-a223614d01ffb64f5`
 - **Deviation:** none. (Formatted with `--print-width 100` and no
   `--embedded-language-formatting` flag, per the dispatched command; both files came back
   *unchanged*, so the stricter default settles the file for the project config too.)

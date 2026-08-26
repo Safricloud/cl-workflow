@@ -6,7 +6,7 @@
   "hashAlgo": "sha256-lf",
   "files": {
     ".claude/.gitattributes": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c",
-    ".claude/.gitignore": "dda7eeeb0fdfbcc920f870f2bfd7238b32ebe2d7fe721b25c711368c3d968a43",
+    ".claude/.gitignore": "f1d2debce7a014aaad7631277715b813954788cbb771e2c22a622aa35eec25c5",
     ".claude/agents/implementer.md": "0e0a80e23bc3c243b935c199694ed758222d12e98cc1e570ade1c67a57b8224f",
     ".claude/agents/investigator.md": "bf7e0a3f606952653a4c1726b8a48cd09bffa7e64fbd9aa83f9ad8bbde5a0753",
     ".claude/hooks/docs-only.ts": "bcabc56f9bab19130cc8967ae0d51826576121d36c6b72b3a0c1a24bac4381cd",

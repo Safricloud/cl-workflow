@@ -78,7 +78,7 @@ Install), or install the package and use the `cl-workflow` bin.
   agents/implementer.md         Opus, worktree-isolated, commits to its branch, never pushes, status block kept current
   agents/investigator.md        Opus, read-only on the code, writes one report under docs/reviews/<id>/
   .gitattributes                keeps the kit's own files LF inside your project
-  .gitignore                    grants, log, worktrees, pr-watch state, __pycache__
+  .gitignore                    grants, log, worktrees, pr-watch state
 docs/guides/agent-workflow.md   the process guide (baseline revised; Appendix D = what changed)
 docs/{plans,reviews,history,reports}/ + docs/history/index.md (the changelog)
 mem/index.md, mem/outstanding.md  the ledger, seeded with what this build settled and what you still need to measure

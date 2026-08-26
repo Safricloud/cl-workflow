@@ -8,8 +8,16 @@ of the standard (baseline this morning: sub-agents 0% prefixed, 16–78% narrate
 **Magnet files this phase touches:** none — README is not in the payload.
 
 ### Item 3.1 — README: the gate line and how the agents speak
-**Files:** `README.md`
-**Approach:** (a) The "Full check" / CI description that quotes the drift-gate command gains
+**Files:** `README.md`; plus, for the rewrap only, `template/.claude/skills/contribute/SKILL.md`
+and its generated copy `.claude/skills/contribute/SKILL.md` with `.claude/cl-workflow.lock`
+**Approach:** (0) Phase-2 verification found a second unwrapped line in
+`template/.claude/skills/contribute/SKILL.md`, §11 step 5 — 122 columns, "…`none`, wrapped
+like its neighbours — committed with the change. No review document and no plan directory;
+`mem/` only…" — from PR #4's text. Same pattern as the §8 line phase 2 fixed, so fix it too:
+rewrap at ~95 columns, words unchanged, then regenerate the root copy and the lock with
+`pnpm build && node dist/cli.js update .` (expect *1 refreshed*; the lock moves for that one
+file; zero `.new`), and commit the three files together. Then README:
+(a) The "Full check" / CI description that quotes the drift-gate command gains
 the widened pathspec (`-- .claude/ docs/guides/`) and its CI enumeration names the step as
 `ci.yml` now names it. (b) Under the process description (where the README explains the loop
 and the roles), one short paragraph — three or four sentences — saying that every agent names

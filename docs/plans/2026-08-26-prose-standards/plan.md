@@ -142,6 +142,17 @@ gives, but the terms (`Orchestrator:`, `I-<n.m>:`, `I-r<cycle>.<k>:`, `Investiga
   and the merge succeeded at `8e29e80`. A local branch `small-path-rebased-unused` (the
   discarded rebase attempt, content-equivalent to what merged) is left for the owner to
   delete: `-d` refuses it and `-D` is rule zero.
+- **2026-08-26 — Both unwrapped lines in `SKILL.md` are rewrapped, PR #4's included.** Phase 1
+  left one line at 124 columns (§8; fixed in item 2.1); phase-2 verification found a second at
+  122 columns in §11, blamed to `8e29e80` (PR #4). The plan said items touching `SKILL.md` add
+  nothing to §11; a rewrap changes no words, and the guide's rule is to fix the pattern
+  everywhere, not the flagged line — so item 3.1 rewraps it and regenerates the root copy and
+  the lock. Grounds: two fixes of one pattern in one PR read as one thing.
+- **2026-08-26 — The lock's missing owned entry is a ledger follow-up, not this PR.** Item 2.1
+  found `.claude/cl-workflow.lock` holds 32 entries and omits `mem/outstanding.md` although
+  `OWNED` lists it: `cmdUpdate` skips owned files before recording them and seeds the record
+  from the previous lock, so an owned path absent at `init` never reappears. Pre-existing, CLI
+  code, outside a prose contribution; recorded under *Open — engineering follow-ups*.
 
 ## Phasing
 Phase 1 — six items in parallel, one file family each, no magnet file shared: `process.md` /

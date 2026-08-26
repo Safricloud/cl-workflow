@@ -65,6 +65,13 @@
   outside the worktree>`, `cd <absolute path>` before `git`, and any Bash text containing a
   bare `<` (a heredoc with `i < n` is read as a redirect) — implementers needing a scratch
   clone make it inside their worktree and delete it; the kit cannot change this.
+- 2026-08-26 — `.claude/cl-workflow.lock` in this repo has 32 entries and omits
+  `mem/outstanding.md` although `OWNED` lists it (`src/cli.ts:31-41`): `cmdUpdate` skips owned
+  files with `continue` before `recorded[file.rel]` is set (`src/cli.ts:483-485`) and seeds
+  `recorded` from the previous lock (`:466`), so an owned path absent at `init` can never
+  reappear on `update`. Harmless today (`update` never touches owned files); `doctor`'s
+  disk-vs-lock check simply does not see that file. Fix with the kit-conformance work or on
+  its own; measured by item 2.1 of `2026-08-26-prose-standards`.
 - 2026-08-26 — Kit ergonomics seen in `2026-08-26-prose-standards`, not fixed: (e) **`git stash`
   is shared across worktrees** — `refs/stash` lives in the common git dir, so two implementers
   stashing at the same moment swap entries (measured: items 1.1 and 1.4 popped each other's

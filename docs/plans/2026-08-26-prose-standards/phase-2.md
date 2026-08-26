@@ -111,8 +111,33 @@ identical to the template copies — `pnpm lint` and `pnpm typecheck` still cove
   #4 wrote it. Both halves of the widened pathspec are measured above, so that one is closed.
 
 ## Merge-back record (orchestrator)
-<worktree branch, commits merged, conflicts, worktree removed.>
+`worktree-agent-a132217ad314b5111`, branched from `97f98f4`; status clean (the implementer had
+deleted its `node_modules`); commits `cea9790`, `e170ab8`, `3968b19`, `64b2935` read; merged
+`eb09764` with no conflict; worktree removed, branch deleted with `-d`.
 
 ## Verification (orchestrator, after this phase merged)
-<Full check; gate with the new pathspec; checker verified by hand-editing the root guide;
-parity; the lock diff read.>
+On `eb09764`, 2026-08-26, by the orchestrator:
+- **Full check:** `pnpm lint` clean, `pnpm typecheck` clean, `pnpm build` reproduces `dist/cli.js`
+  (`git diff --exit-code dist/`), `pnpm selftest` 62/62.
+- **The gate, widened:** `node dist/cli.js update .` → *0 refreshed, 24 already current, 0
+  `.new`, 9 owned untouched*; `git status --porcelain --untracked-files=all -- .claude/
+  docs/guides/` printed nothing.
+- **Parity:** 26 template/root pairs byte-identical — the investigation's 25 plus
+  `mem/index.md` (owned, unchanged here); the only differing payload files are the owned root
+  `CLAUDE.md`, `docs/history/index.md`, `mem/outstanding.md`, as expected.
+- **Lock:** `git diff 97f98f4 -- .claude/cl-workflow.lock | grep -c '^[-+]    "'` = 14 — the
+  seven regenerated managed `.md` files, twice; no other key moved.
+- **Checker verified by me, not on 2.1's word:** appended a probe line to the generated root
+  `docs/guides/agent-workflow.md`, ran `update` (it wrote the `.new` beside it); the **old**
+  pathspec `-- .claude/` printed **nothing**, the **new** `-- .claude/ docs/guides/` printed
+  ` M docs/guides/agent-workflow.md` and `?? docs/guides/agent-workflow.md.new`; restored with
+  `mv -f` of the `.new` (template bytes), `update` again → 24 current, tree clean, `diff -q`
+  guide parity restored. Old gate blind, new gate red then green — both seen.
+- **Findings:** (1) a second unwrapped line in `SKILL.md` §11 (122 columns, PR #4's text) —
+  same pattern as the §8 line; rewrapped in item 3.1 with a regeneration (mid-loop decision in
+  `plan.md`). (2) the lock omits `mem/outstanding.md` — pre-existing CLI behaviour, ledger
+  follow-up (mid-loop decision in `plan.md`). No phase 2.5.
+- **Live prefix observation:** 2.1's final message began `I-2.1:` — still under the old root
+  definition (its worktree branched before it regenerated the copy). Phase 3 is the first
+  implementer to run under the regenerated `implementer.md`.
+- **Not done:** no UI, no container; `.claude/rule-zero.log` shows no denial for this item.

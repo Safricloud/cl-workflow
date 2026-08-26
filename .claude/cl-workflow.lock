@@ -21,7 +21,7 @@
     ".claude/rule-zero.conf": "63402b3d6582dfd6445bec88fe85660625ba0a9520e3a86cbd8ad7404f90b26a",
     ".claude/rules/process.md": "57b3e3aef2cc107e9e677c8c47d9b6b4b7c9355274a1563e8f0c525590ba3b8f",
     ".claude/settings.json": "0e52d4c865808bc6f2c4cde7d62e85638c1876091e530fa7666029068394bcb8",
-    ".claude/skills/contribute/SKILL.md": "6312d0039a8d03bb64dde2fe8775ee50f7bb74b01c40ad0d572eab628423ea0a",
+    ".claude/skills/contribute/SKILL.md": "5b2b0c2027a47129b3d670640b756deaf733ab0894413bbdeb24ca47a0e38d26",
     ".claude/skills/contribute/templates/blocked-issue.md": "2603ac2946c04c4464d7e709f26f4c93af6d82145d70439cb2c7b949cedf213c",
     ".claude/skills/contribute/templates/investigation.md": "6caf1a27dc0ce63150970c9cc98dc790fdcd4a309c1ed109008598e4502c1349",
     ".claude/skills/contribute/templates/issue-comment.md": "7338fac3d2e364e12bbaba6000c4108e359912925ff39ca03f11bb831569ba30",

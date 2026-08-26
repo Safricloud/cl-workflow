@@ -34,7 +34,10 @@ them.
 **Scoped validation:** `pnpm lint && pnpm typecheck`; `grep -n 'docs/guides/' README.md`; `grep -c 'Orchestrator:' README.md`
 **Acceptance:** `grep -q -- '-- .claude/ docs/guides/' README.md && grep -q 'I-<n.m>:' README.md && grep -q 'Playwright' README.md` exits 0 on your file and exits 1 on the base copy taken with `git show HEAD:README.md > <scratchpad>/README.base.md` — **never `git stash`**: `refs/stash` is shared across worktrees (phase 1 measured the collision). `grep -c 'Managed (23 files)' README.md` prints 1 (unchanged).
 #### Status — item 3.1
-*(implementer keeps this current as it works: In progress → Done | Blocked)*
+**In progress** (implementer, 2026-08-26).
+- Step (0) done in `template/`: `SKILL.md` §11 step 5 rewrapped, 122 → max 99 columns in the
+  section; word stream verified identical (`tr -s '[:space:]' '\n' | diff` — 2887 tokens both
+  sides, no difference). Root copy + lock regeneration next, then the README.
 
 ## Merge-back record (orchestrator)
 <worktree branch, commits merged, conflicts, worktree removed.>

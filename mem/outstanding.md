@@ -23,7 +23,8 @@
   `node --test` on Node 24 with no package; assert a minimum count — `node --test` exits 0 on
   zero tests) with an `import.meta.main` guard in every hook so its functions can be imported —
   85 of 86 top-level functions have no direct test; `docs-only.ts` (`commentOnly`, `isDocPath`)
-  first; a test under `src/` lands in `dist/` unless `tsconfig.build.json` excludes it;
+  first; a test under `src/` lands in `dist/` unless `tsconfig.build.json` excludes it —
+  location settled 2026-08-26: `test/`, run by `pnpm test` (2026-08-26-prettier, decision 10);
   (c) generalize `parseOptions` (`docs-only.ts` / `pr-watch.ts`, same `parseArgs` skeleton) into
   `lib.ts`. Not in scope: `isRecord` (deliberate build boundary between `dist/` and the payload)
   and the two `git` helpers (different contracts). Measurements in

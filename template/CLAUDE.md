@@ -3,6 +3,7 @@
 <One paragraph: what this repo is, the stack, the default branch.>
 
 ## Commands
+
 - Install: `<cmd>`
 - Full check (format check + lint + typecheck + unit): `<cmd>`
 - Format: `<write cmd>` / `<check cmd>` (the check is the first step of the full check; default
@@ -12,14 +13,18 @@
 - Container: `<cmd>`
 
 ## Conventions that will fail your lint
+
 - <the two or three that bite most>
 
 ## Deploy
+
 Mode: `production-ci` | `local-containers` | `none yet`
+
 - production-ci: workflow `<name>`; `gh run list --workflow <name> --branch <default> -L1` then `gh run watch <id>`
 - local-containers: rebuild `<cmd>`; checks: `<how to see user id, migrations, bound port, stderr>`
 
 ## Process
+
 Every contribution runs `/contribute` (`.claude/skills/contribute/SKILL.md`); a change of a
 few lines the owner declares small runs its small path (`/contribute --small`, SKILL §11).
 Rule zero, the two owner gates and the three habits are in `.claude/rules/process.md`; the reasoning is in

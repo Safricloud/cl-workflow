@@ -22,3 +22,10 @@ One entry per contribution (one logical line, wrapped like the rest), newest las
   with the logic) in `process.md`, both agent definitions, SKILL and the guide §0.5; Playwright
   named in the owned CLAUDE.md skeleton; branches created `--no-track`; CI drift gate widened
   to `docs/guides/`; live measurement 96% prefixed / 49% narrated · blocked: none
+
+- 2026-08-26 · 2026-08-26-remove-python-remnants · small: the last Python remnants gone — the stray
+  `.claude/hooks/__pycache__/*.pyc` deleted from disk, the `__pycache__/` ignore line dropped from
+  the root `.gitignore`, `template/.claude/gitignore` and its generated root copy, and the README
+  tree line that listed it; the CLI's retirement of a legacy `python3 …/rule-zero.py` settings
+  entry and the hooks' "Python original" comments stay, being migration and documentation, not
+  tooling · blocked: none

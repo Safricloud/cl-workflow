@@ -16,6 +16,16 @@ You are implementing **one item**. The orchestrator's message gives you either
 
 If it gives you neither, stop and say so.
 
+## Voice
+
+- **Your name is `I-<n.m>:`** — your plan item, so item 2.3 writes `I-2.3:`. Every text block you
+  write begins with it, your final message to the orchestrator included. On an inline brief there
+  is no item number: the brief names you `I-r<cycle>.<k>:` (review cycle, brief number —
+  `I-r2.1:`), and you sign with that.
+- **One line before each tool call**, prefixed like every other, saying what you are about to do
+  and why: "I-2.3: reading `src/cli.ts` to see how `update` resolves the payload." Not what you
+  did; the result says that.
+
 ## Before editing
 
 1. Read `docs/guides/agent-workflow.md`, `CLAUDE.md`, and the `mem/<area>.md` file for the area
@@ -38,6 +48,23 @@ If it gives you neither, stop and say so.
   database, edits outside the repo. A hook enforces this and will deny the call; when it does,
   record the exact command under **Blocked** and move on. Delegation is not approval.
 
+## Code
+
+- **Modular and reusable.** Small functions with one job each, composed; the piece you need next
+  week should be liftable without the piece beside it.
+- **No duplicate functions.** Never implement a function that already exists. Finding the copies
+  is investigation work, and the plan locks in the generalization: the shared module is in the
+  **Files** of the item that generalizes it. If you meet a duplicate the plan did not foresee and
+  its file is not yours, report **Blocked** naming the function; do not copy it and do not edit
+  outside your files.
+- **One concern per file.** A file you cannot summarize in one sentence is two files. Keep files
+  short; no number is given — the project's lint carries one if it wants one.
+- **Pure functions.** Prefer inputs to outputs, no hidden state, no I/O inside — and keep I/O at
+  the edges, so the logic can be tested by calling it.
+- **Tests with the logic.** Every implementation pairs with tests for its logic. Browser-based
+  visual tests use the suite named by the E2E line in `CLAUDE.md`; the orchestrator still
+  appraises the screenshots that suite produces.
+
 ## Commits
 
 - Commit to your worktree branch as you go — small commits, message says what and why. Commits
@@ -47,10 +74,13 @@ If it gives you neither, stop and say so.
 
 ## Validation
 
-- Run the **scoped** commands named in your item (siblings share the phase; the orchestrator runs
-  the full check after merging).
+- **Write the tests** for the logic you added — a test that fails when the change is reverted.
+  An item with no logic in it (prose, configuration) has none: say so on the **Tests** line, with
+  the reason.
 - **Verify the checker**: make your new test fail on purpose (revert the change or break the
   assertion), see it fail, restore it, see it pass. Record both results.
+- Run the **scoped** commands named in your item (siblings share the phase; the orchestrator runs
+  the full check after merging).
 - A convenient result — zero tests collected, an empty grep, an unchanged lockfile — is a claim.
   Confirm the command did what you think before you believe it.
 
@@ -79,6 +109,7 @@ to the PR.
 - **Validation (scoped; full check left to the orchestrator):**
   - `<command>` — <n> pass, 0 fail
   - **Checker verified:** reverted <X>, tests failed (`<actual vs expected>`); restored, green
+- **Tests:** <files added or changed — or "none: no logic", with the reason>
 - **Blocked on:** <exact command the hook denied, or the file outside your scope — or "nothing">
 - **Orchestrator should verify:** <anything you could not, e.g. the full check, a new suppression>
 ```

@@ -58,11 +58,13 @@ in git, and on GitHub.
   anything blocked on the owner, archives, opens the PR, runs the review loop, merges on the
   owner's word, deploys per `CLAUDE.md`. **Edits documents only — never code.** Every code
   change goes through an implementer — except on the small path (§11), where the orchestrator
-  makes the few-line change itself and the full check is the gate.
+  makes the few-line change itself and the full check is the gate. Every text block it writes
+  begins `Orchestrator:` (§0.5).
 - **Sub-agents** — **Opus**, whatever the orchestrator runs on. `investigator`: one brief, one
   report under `docs/reviews/<id>/`, nothing else writable. `implementer`: one plan item, its own
   worktree, commits to its own branch, never pushes, never takes a rule-zero action, keeps its
-  status block in the plan current from *In progress* to *Done* or *Blocked*.
+  status block in the plan current from *In progress* to *Done* or *Blocked*. Each names itself
+  in every text block it writes (`I-<n.m>:`, `Investigator-<topic>:` — §0.5).
 
 ### 0.3 Rule zero (overrides everything below)
 
@@ -106,6 +108,58 @@ after every conf edit and in CI.
 3. **Say what you did not do.** Scope left out, gates not run, claims adopted on argument rather
    than reproduction — all written down, flagged.
 
+### 0.5 How agents write, and what implementers are held to
+
+**Every text block begins with the writer's name.** The orchestrator writes `Orchestrator:`; an
+implementer writes `I-<n.m>:` — its plan item, `I-2.3:` — and an implementer working an inline
+brief in the PR-review loop writes `I-r<cycle>.<k>:`, minted for it by the brief (`I-r2.1:`);
+an investigator writes `Investigator-<topic>:`, the stem of its report file
+(`Investigator-mechanisms:`). A transcript holding an orchestrator and four sub-agents is
+unreadable without names: scrolling back, there is no other way to tell who claimed what. A
+sub-agent's running text reaches the owner only through `/tasks` and through its final message,
+so the name matters most on that final message — the one block the owner is certain to read —
+and the narration below is for whoever opens the transcript afterwards.
+
+**One line before each tool call, prefixed like every other block**, saying what is about to
+happen and why: "Orchestrator: reading the drift gate in `ci.yml` to see which paths it
+inspects." Not what was done — the result says that. This is what makes a long transcript
+skimmable, and an agent that cannot write the line has not yet decided what it is doing.
+
+Both of these are prose, by the owner's choice. The principle at the top of this guide prefers a
+mechanism, and one exists in outline: a `SubagentStop` payload carries `last_assistant_message`
+(per the Claude Code hooks documentation), so a hook could refuse a final message that does not
+begin with the agent's name. It is not built. The standard is carried by the definitions the
+agents read, and conformance is measured by reading transcripts, not by a gate.
+
+**What implementers are held to when they write code:**
+
+- **Modular and reusable.** Small functions with one job each, composed. The piece needed next
+  week should be liftable without the piece beside it; reuse is a property of size, not of
+  intention.
+- **No duplicate functions.** Never implement a function that already exists. Finding the copies
+  is investigation work — an investigator lists the functions a change will need and every
+  existing copy of each — and the plan locks the direction in before dispatch: the shared module
+  is named under **Files** in the item that generalizes it, so the ownership fence and the
+  generalization never contradict each other. An implementer that meets a duplicate the plan did
+  not foresee, in a file that is not its own, reports **Blocked** naming the function; it does
+  not copy it and it does not edit outside its files. Three cases, and only the first is a
+  defect: a real duplicate is generalized into the shared module (this kit's `parseOptions`,
+  the same skeleton in two hooks, is one and is on the ledger); the same name with a different
+  contract stays two functions (its two `git` helpers); a copy across a build boundary stays,
+  with the boundary named in a comment (`isRecord`, once in the compiled CLI and once in the
+  payload's hooks — each side has to stand alone).
+- **One concern per file.** A file you cannot summarize in one sentence is two files. No number
+  is given here; the project's lint carries one if it wants one, and a threshold invented in
+  prose is a threshold nobody measured.
+- **Pure functions where the work allows.** Inputs to outputs, no hidden state, no I/O inside,
+  I/O kept at the edges — so the logic can be tested by calling it instead of by staging the
+  world around it.
+- **Every implementation pairs with tests for its logic** — a test that fails when the change is
+  reverted; that is the standard §6 applies to a checker. Browser-based visual tests use the
+  suite named by the E2E line in `CLAUDE.md`, and the orchestrator still appraises the
+  screenshots that suite produces: a green visual test says the pixels did not move, not that
+  they are right. An item that adds no logic says so, with the reason, in its status block.
+
 ---
 
 ## 1. The ask
@@ -120,8 +174,12 @@ whether they ship as one PR with a `Fixes` line each, or split into one contribu
 is a Questions-phase decision the review recommends on — one PR when they touch the same area,
 split when they do not. Then: confirm the checkout
 (`git fetch && git status` — default branch, remote head, clean; record the SHA), mint the id,
-create the branch, create `docs/reviews/<id>/`. From here everything is committed on the branch
-as it is written: the documents are the state of record, and compaction can happen at any time.
+create the branch with no upstream (`git switch -c <branch> --no-track origin/main`; then
+`git config --get branch.<branch>.merge` must print nothing — a branch that tracks `origin/main`
+is pushed *to* `main` by an IDE "Sync Changes", and the loop's record commits must land with the
+PR, never before it), create `docs/reviews/<id>/`. From here everything is committed on the
+branch as it is written: the documents are the state of record, and compaction can happen at any
+time.
 
 ---
 
@@ -139,7 +197,9 @@ briefs. It does not end with a view.
 
 **Tier two — investigators, thorough, parallel.** One `investigator` per brief. A brief is: the
 id, one question, the paths in scope, the facts wanted and where to measure them, and whether
-the owner has asked for live reads. Each investigator writes
+the owner has asked for live reads. When the brief concerns code that will be written, the facts
+wanted include the functions the change will need and their existing copies, with `file:line` —
+that list is what lets the plan lock the generalization in (§0.5). Each investigator writes
 `docs/reviews/<id>/investigation-<topic>.md` — a hook in its definition fences every write to
 `docs/reviews/` — and returns only its *Answer* paragraph. The orchestrator reads the files it
 needs. Investigation reports are part of the record and archive with the review.
@@ -229,7 +289,8 @@ Built from the review, the investigations and the recorded decisions (`templates
   magnet file — lockfile, root manifest, `CLAUDE.md`, a shared client, the same region of a
   module — conflict on merge: different phases, or the shared edit is committed as a seed before
   the phase. Everything else runs in parallel.
-- **Items** (in the phase files) — each with **Files** it owns, **Approach** citing the facts,
+- **Items** (in the phase files) — each with **Files** it owns — and, when the item generalizes
+  a function, the shared module it moves into — **Approach** citing the facts,
   **Conventions that will fail your lint**, **Scoped validation** commands, **Acceptance
   including tests** (what must FAIL if the change is reverted). An item without a test in its
   acceptance is not done when the agent says it is. Under each item, a **Status** heading the
@@ -274,11 +335,14 @@ as *Done* or *Blocked*; commits the phase file; returns a short summary and its 
 
 **Verify — after each phase merge and again at the end, on the merged branch, yourself.** Believe
 nothing until you have seen it. Full check and build. The diff of every load-bearing file, not
-the agent's summary of it. Grep for the conventions the area breaks. `.claude/rule-zero.log` for
-any denial an implementer hit. The gates the package check does **not** cover — root config,
-scripts, formatting, the container build — CI gates them separately, so find out here. **Verify
-the checker**: a new test is evidence only once seen to fail — revert the fix, watch it go red,
-restore. **Distrust convenient results**: zero tests run, an empty grep, an unchanged lockfile.
+the agent's summary of it. Grep for the conventions the area breaks. `git grep` the names of the
+functions the phase added, looking for a second definition — parallel implementers cannot see
+each other's worktrees, so a duplicate the plan did not foresee first exists here.
+`.claude/rule-zero.log` for any denial an implementer hit. The gates the package check does
+**not** cover — root config, scripts, formatting, the container build — CI gates them
+separately, so find out here. **Verify the checker**: a new test is evidence only once seen to
+fail — revert the fix, watch it go red, restore. **Distrust convenient results**: zero tests
+run, an empty grep, an unchanged lockfile.
 UI at each viewport, screenshots before and after, appraised by you. Containers: run it — user
 id, migrations applied, server bound, nothing in stderr; a green build is not validation. Docs:
 re-read every sentence the change made true or false; nothing mechanical checks prose, and that
@@ -359,7 +423,9 @@ posted nothing" and "Copilot never arrived" are distinguishable states, and both
    part → what was adopted and on which argument*; *not a finding → the verified reason*.
 3. Legitimate ones go to implementers as **inline briefs** — files, approach, scoped
    validation, acceptance, in the message — because the plan is archived and is not reopened.
-   Each returns its status block in its message. Verify, commit the fix, push.
+   Each brief opens with "You are `I-r<cycle>.<k>`" (the review cycle, then the brief's number
+   within it), since there is no item number to name the implementer by; it signs its text with
+   that name. Each returns its status block in its message. Verify, commit the fix, push.
 4. Reply to each comment with what was done or the verified reason.
 5. Post one **cycle comment** on the PR — head SHA, items returned, verdicts, the implementers'
    status blocks. That comment is the cycle record; nothing in the repo is updated.
@@ -495,7 +561,8 @@ An entry moves between sections; it is deleted only when it is no longer true.
 - [ ] **Ask** restated with source; checkout at remote default head, clean; id minted; branch and
       `docs/reviews/<id>/` created
 - [ ] **Investigate**: tier one brief; investigators briefed, one report each under
-      `docs/reviews/<id>/`; nothing changed
+      `docs/reviews/<id>/`; the functions any new code will need and their copies listed;
+      nothing changed
 - [ ] **Review** written for the owner: short answer, what we found, what not to change,
       directions with a recommendation, decisions we need, not done; committed
 - [ ] **Questions** asked with the question tool, all of them, each with a recommendation;
@@ -504,7 +571,8 @@ An entry moves between sections; it is deleted only when it is no longer true.
       for veto, phasing) + `phase-<n>.md` (items with files/approach/validation/acceptance+tests)
 - [ ] **Orchestrate**: implementers dispatched; phases merged back (status clean → read commits →
       merge → worktree remove → branch -d); verified by the orchestrator on the merged branch;
-      findings fixed by implementers via `phase-<n>.5.md`; mid-loop decisions recorded;
+      the phase's new function names grepped for a second definition; findings fixed by
+      implementers via `phase-<n>.5.md`; mid-loop decisions recorded;
       blocked-on-owner issues created and labelled; final commit
 - [ ] **PR**: archived into `docs/history/<id>/` with an index line; `mem/` and `CLAUDE.md`
       reflect the code; pushed — **last record commit**; `gh pr create` with decisions-to-veto,
@@ -546,3 +614,4 @@ An entry moves between sections; it is deleted only when it is no longer true.
 | One issue per branch | An ask may name several issues; one PR or split is a Questions-phase decision | The owner's asks come in batches |
 | Loop ends at "report and stop" | + **Merge** on the owner's word (bundle grant) + **Deploy** per `CLAUDE.md` | The loop closes on the running system |
 | No small-change path; small changes produce short documents | The **small path** (§11): declared or accepted, orchestrator edits directly, full check, PR + one index entry, merged when silent and `ci-ok` green, escalates when it is more than the change | Owner, 2026-08-26: one-liners should not need the full loop |
+| Agents unnamed; no code-structure rules | Every agent prefixes its text with its name and narrates before tool calls; implementer code standards and tests-with-logic in the definition; duplicates found at investigation | Owner's standard, 2026-08-26; prose by the owner's choice (direction A) |
